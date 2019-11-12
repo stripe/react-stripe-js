@@ -1,0 +1,39 @@
+---
+extends:
+  - airbnb
+  - plugin:flowtype/recommended
+  # overwrite any rules that may conflict with prettier
+  - prettier
+  - prettier/flowtype
+  - prettier/react
+  - prettier/standard
+parser: 'babel-eslint'
+plugins:
+  - flowtype
+  - jest
+env:
+  jest/globals: true
+  browser: true
+rules:
+  react/jsx-filename-extension: 0
+  react/jsx-props-no-spreading: 0
+  no-duplicate-imports: 2 # doesn't support flow imports.
+  no-console: 0
+  func-style: 2
+  consistent-return: 2
+  jsx-a11y/label-has-associated-control: 0
+  react/prop-types: 0
+  prefer-arrow-callback:
+    - 2
+    - allowNamedFunctions: false
+      allowUnboundThis: false
+  flowtype/no-primitive-constructor-types: 2
+  flowtype/require-valid-file-annotation:
+    - 2
+    - 'always'
+    - annotationStyle: 'line'
+  no-unused-vars:
+    - 2
+    - ignoreRestSiblings: true
+  jest/no-disabled-tests: 2
+  jest/no-focused-tests: 2
