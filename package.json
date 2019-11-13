@@ -2,29 +2,29 @@
   "name": "@stripe/react-stripe",
   "version": "6.0.0-alpha.0",
   "description": "React components for Stripe.js and Stripe Elements",
-  "main": "./lib/index.js",
-  "module": "es/index.js",
-  "jsnext:main": "es/index.js",
+  "main": "dist/react-stripe.js",
+  "module": "dist/react-stripe.esm.js",
+  "jsnext:main": "dist/react-stripe.esm.js",
+  "browser:min": "dist/react-stripe.umd.min.js",
+  "browser": "dist/react-stripe.umd.js",
   "scripts": {
-    "test": "node_modules/.bin/jest",
-    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "build:umd": "cross-env BABEL_ENV=commonjs webpack src/index.js -o dist/react-stripe-elements.js --config webpack.config.prod.js --env.noMinimize",
-    "build:umd:min": "cross-env BABEL_ENV=commonjs webpack src/index.js -o dist/react-stripe-elements.min.js --config webpack.config.prod.js",
-    "lint": "eslint src demo",
+    "test": "jest",
+    "rollup": "rollup -c",
+    "lint": "eslint src examples",
     "flow": "flow",
-    "build": "yarn run lint && yarn run flow && yarn run build:commonjs && yarn run build:es && yarn run build:umd && yarn run build:umd:min",
-    "clean": "rimraf lib dist es",
+    "build": "yarn run lint && yarn run flow && yarn run rollup",
+    "clean": "rimraf dist",
     "prettier": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
     "prettier-list-different": "prettier './**/*.js' './**/*.css' './**/*.md' --list-different",
     "prepublish": "yarn run clean && yarn run build",
-    "demo": "webpack-dev-server --content-base dist",
-    "doctoc": "doctoc README.md"
+    "doctoc": "doctoc README.md",
+    "storybook": "start-storybook -p 6006 -c ./examples/storybook"
   },
   "keywords": [],
   "author": "Stripe (https://www.stripe.com)",
   "license": "MIT",
   "dependencies": {
+    "babel-loader": "^8.0.6",
     "prop-types": "15.7.2"
   },
   "repository": {
@@ -33,9 +33,7 @@
   },
   "files": [
     "dist",
-    "lib",
-    "src",
-    "es"
+    "src"
   ],
   "jest": {
     "setupFilesAfterEnv": [
@@ -48,10 +46,12 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.7.0",
+    "@storybook/addon-actions": "^5.2.6",
+    "@storybook/addon-links": "^5.2.6",
+    "@storybook/addons": "^5.2.6",
+    "@storybook/react": "^5.2.6",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
-    "babel-loader": "^8.0.6",
-    "cross-env": "^5.0.5",
     "doctoc": "^1.3.0",
     "enzyme": "3.10",
     "enzyme-adapter-react-16": "^1.14.0",
@@ -67,15 +67,16 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "flow-bin": "^0.111.3",
     "jest": "^24.9.0",
-    "html-webpack-plugin": "^3.2.0",
     "prettier": "^1.19.1",
-    "react": "16.8.0",
-    "react-dom": "16.8.0",
-    "react-test-renderer": "16.8.0",
+    "react": "~16.8.0",
+    "react-dom": "~16.8.0",
+    "react-test-renderer": "~16.8.0",
     "rimraf": "^2.6.2",
-    "webpack": "^4.29.0",
-    "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "^3.1.14"
+    "rollup": "^1.27.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2"
   },
   "peerDependencies": {
     "react": "^16.8.0",
