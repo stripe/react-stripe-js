@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import isEqual from '../utils/isEqual';
 
-const {useContext, useEffect, useRef} = React;
+const {useContext, useEffect, useRef, useState} = React;
 
 type ElementContext =
   | {|
@@ -55,36 +55,42 @@ const usePrevious = (value) => {
   return ref.current;
 };
 
-export const Elements = ({stripe, options, children}: Props) => {
-  const elementsRef = useRef({tag: 'loading'});
-  const prevStripe = usePrevious(stripe);
-  const prevOptions = usePrevious(options);
-
-  // The following condition can only necessarilly be true once:
-  // either on the first render if the `stripe` prop is initially set,
-  // or in the render triggered by the user setting the `stripe` prop.
-  if (stripe != null && elementsRef.current.tag === 'loading') {
-    // We are using types to enforce the `stripe` prop in this lib,
-    // but in a real integration, `stripe` could be anything, so we need
-    // to do some sanity validation to prevent type errors.
-    validateStripe(stripe);
-
-    // Rather than in using state, we want to store elements in a
-    // ref as soon as we receive the `stripe` prop, because
-    // setting the ref does not trigger a render, while using
-    // state would trigger an unecessary secondary render.
-    elementsRef.current = {
-      tag: 'ready',
-      elements: stripe.elements(options || {}),
-    };
+const createElementsContext = (
+  stripe: ?StripeShape,
+  options: ?MixedObject
+): ElementContext => {
+  if (stripe == null) {
+    return {tag: 'loading'};
   }
 
+  // We are using types to enforce the `stripe` prop in this lib,
+  // but in a real integration, `stripe` could be anything, so we need
+  // to do some sanity validation to prevent type errors.
+  validateStripe(stripe);
+
+  return {
+    tag: 'ready',
+    elements: stripe.elements(options || {}),
+  };
+};
+
+export const Elements = ({stripe, options, children}: Props) => {
+  const [elements, setElements] = useState(() =>
+    createElementsContext(stripe, options)
+  );
+
+  if (stripe != null && elements.tag === 'loading') {
+    setElements(createElementsContext(stripe, options));
+  }
+
+  const prevStripe = usePrevious(stripe);
   if (prevStripe != null && prevStripe !== stripe) {
     console.warn(
       'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
     );
   }
 
+  const prevOptions = usePrevious(options);
   if (prevStripe != null && !isEqual(prevOptions, options)) {
     console.warn(
       'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
@@ -92,7 +98,7 @@ export const Elements = ({stripe, options, children}: Props) => {
   }
 
   return (
-    <ElementsContext.Provider value={elementsRef.current}>
+    <ElementsContext.Provider value={elements}>
       {children}
     </ElementsContext.Provider>
   );

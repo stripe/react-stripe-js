@@ -35,6 +35,16 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
+  it('only creates elements once', () => {
+    mount(
+      <Elements stripe={stripe}>
+        <InjectedTestComponent />
+      </Elements>
+    );
+
+    expect(stripe.elements.mock.calls).toHaveLength(1);
+  });
+
   it('injects elements with the injectElements HOC', () => {
     const WithAHOC = injectElements(TestComponent);
 
