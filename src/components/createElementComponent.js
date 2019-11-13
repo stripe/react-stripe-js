@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable react/forbid-prop-types */
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useElements} from './Elements';
 import isEqual from '../utils/isEqual';
@@ -65,7 +65,7 @@ const createElementComponent = (type: string) => {
     const callOnClick = callbackReference(onClick);
     const callOnChange = callbackReference(onChange);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (
         elementRef.current == null &&
         elements != null &&
