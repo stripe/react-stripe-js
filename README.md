@@ -115,9 +115,7 @@ to call `window.Stripe` with your
 ```jsx
 // src/globals.js
 
-const stripe = window.Stripe('{{PUBLISHABLE_KEY}}');
-
-export default stripe;
+export const stripe = window.Stripe('{{PUBLISHABLE_KEY}}');
 ```
 
 _Note: If you are using server side rendering (SSR), this approach needs to be
@@ -130,6 +128,7 @@ in the `<Elements>` Provider:
 
 ```jsx
 // src/App.js
+
 import React from 'react';
 import {Elements} from '@stripe/react-stripe';
 
