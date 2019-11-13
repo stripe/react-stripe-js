@@ -1,7 +1,12 @@
 // @noflow
 import React from 'react';
 import {mount} from 'enzyme';
-import {Elements, useElements, injectElements} from './Elements';
+import {
+  Elements,
+  useElements,
+  injectElements,
+  ElementsConsumer,
+} from './Elements';
 import {mockStripe} from '../../test/mocks';
 
 const TestComponent = () => <div>test</div>;
@@ -20,7 +25,7 @@ describe('Elements', () => {
     stripe.elements.mockReturnValue(mockElements);
   });
 
-  it('injects elements context with the useElements hook', () => {
+  it('injects elements with the useElements hook', () => {
     const wrapper = mount(
       <Elements stripe={stripe}>
         <InjectedTestComponent />
@@ -30,12 +35,24 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
-  it('injects stripe with the injectElements HOC', () => {
+  it('injects elements with the injectElements HOC', () => {
     const WithAHOC = injectElements(TestComponent);
 
     const wrapper = mount(
       <Elements stripe={stripe}>
         <WithAHOC />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+  });
+
+  it('provides elements with the ElementsConsumer component', () => {
+    const wrapper = mount(
+      <Elements stripe={stripe}>
+        <ElementsConsumer>
+          {(elements) => <TestComponent elements={elements} />}
+        </ElementsConsumer>
       </Elements>
     );
 

@@ -124,6 +124,19 @@ export const useElements = () => {
   return parseElementsContext(ctx);
 };
 
+export const ElementsConsumer = ({
+  children,
+}: {|
+  children: (elements: ElementsShape | null) => React$Node,
+|}) => {
+  const elements = useElements();
+  return children(elements);
+};
+
+ElementsConsumer.propTypes = {
+  children: PropTypes.func,
+};
+
 export const injectElements = <Config: {}>(
   WrappedComponent: React.AbstractComponent<Config>
 ) => {
