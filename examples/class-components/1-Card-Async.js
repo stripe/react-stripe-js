@@ -88,8 +88,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // Component did mount is only called in browser environments
-    // So this will also work with server side rendering.
     waitForStripe.then((stripe) => {
       this.setState({stripe});
     });
