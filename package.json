@@ -17,6 +17,7 @@
     "prettier": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
     "prettier-list-different": "prettier './**/*.js' './**/*.css' './**/*.md' --list-different",
     "prepublish": "yarn run clean && yarn run build",
+    "publish": "npm publish --access public",
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 -c ./examples/storybook"
   },
