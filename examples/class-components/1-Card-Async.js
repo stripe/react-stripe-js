@@ -2,9 +2,9 @@
 /* eslint-disable max-classes-per-file, react/destructuring-assignment */
 
 import React from 'react';
-import {CardElement, Elements, ElementsConsumer} from '../src';
+import {CardElement, Elements, ElementsConsumer} from '../../src';
 
-import './common/styles.css';
+import '../styles.css';
 
 const waitForStripe = new Promise((resolve) => {
   // You can inject a script tag manually like this, or you can just

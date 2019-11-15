@@ -4,8 +4,6 @@ import './story.css';
 import {storiesOf, module} from '@storybook/react';
 import React, {useEffect, useState} from 'react';
 
-const stories = storiesOf('react-stripe', module);
-
 const SyncExample = ({file}) => {
   const [example, setExample] = useState(null);
 
@@ -21,7 +19,7 @@ const SyncExample = ({file}) => {
     stripeJs.src = 'https://js.stripe.com/v3/';
     stripeJs.async = true;
     stripeJs.onload = () => {
-      import(`../${file}`).then(({default: Example}) => {
+      import(`../examples/${file}`).then(({default: Example}) => {
         setExample(<Example />);
       });
     };
@@ -37,7 +35,7 @@ const AsyncExample = ({file}) => {
   // For async demos, we don't need to preload Stripe before
   // loading the module, since this is done inside the demo.
   useEffect(() => {
-    import(`../${file}`).then(({default: Example}) => {
+    import(`../examples/${file}`).then(({default: Example}) => {
       setExample(<Example />);
     });
   }, []);
@@ -45,19 +43,31 @@ const AsyncExample = ({file}) => {
   return example;
 };
 
-const ASYNC_EXAMPLES = ['Async Loading'];
+const ASYNC_EXAMPLES = ['Card Async'];
 
+const addDemo = (directory, file, stories) => {
+  const name = file
+    .replace('.js', '')
+    .split('-')
+    .slice(1)
+    .join(' ');
+  const async = ASYNC_EXAMPLES.indexOf(name) !== -1;
+  const ExampleComponent = async ? AsyncExample : SyncExample;
+  stories.add(name, () => <ExampleComponent file={`${directory}/${file}`} />);
+};
+
+const hooksStories = storiesOf('react-stripe/Hooks', module);
 require
-  .context('../', false, /\/\d-(.*).js$/)
+  .context('../examples/hooks/', false, /\/\d-(.*).js$/)
   .keys()
   .forEach((key) => {
-    const file = key.slice(2);
-    const name = file
-      .replace('.js', '')
-      .split('-')
-      .slice(1)
-      .join(' ');
-    const async = ASYNC_EXAMPLES.indexOf(name) !== -1;
-    const ExampleComponent = async ? AsyncExample : SyncExample;
-    stories.add(name, () => <ExampleComponent file={file} />);
+    addDemo('hooks', key.slice(2), hooksStories);
+  });
+
+const classStories = storiesOf('react-stripe/Class Components', module);
+require
+  .context('../examples/class-components/', false, /\/\d-(.*).js$/)
+  .keys()
+  .forEach((key) => {
+    addDemo('class-components', key.slice(2), classStories);
   });

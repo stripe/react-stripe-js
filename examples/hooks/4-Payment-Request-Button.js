@@ -1,10 +1,10 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
-import {PaymentRequestButtonElement, Elements} from '../src';
+import {PaymentRequestButtonElement, Elements} from '../../src';
 
-import {logEvent, Result, ErrorResult} from './common/util';
-import './common/styles.css';
+import {logEvent, Result, ErrorResult} from '../util';
+import '../styles.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 

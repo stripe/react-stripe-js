@@ -1,9 +1,9 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
-import {CardElement, Elements, useElements} from '../src';
+import {CardElement, Elements, useElements} from '../../src';
 
-import './common/styles.css';
+import '../styles.css';
 
 const waitForStripe = new Promise((resolve) => {
   if (typeof window === 'undefined') {

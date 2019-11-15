@@ -7,10 +7,10 @@ import {
   CardExpiryElement,
   Elements,
   useElements,
-} from '../src';
+} from '../../src';
 
-import {logEvent, Result, ErrorResult} from './common/util';
-import './common/styles.css';
+import {logEvent, Result, ErrorResult} from "../util";
+import "../styles.css";
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 

@@ -1,17 +1,18 @@
 // @noflow
 
 import React, {useState} from 'react';
-import {CardElement, Elements, useElements} from '../src';
+import {IbanElement, Elements, useElements} from '../../src';
 
-import {logEvent, Result, ErrorResult, useDynamicFontSize} from './common/util';
-import './common/styles.css';
+import {logEvent, Result, ErrorResult} from '../util';
+import '../styles.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
-const getOptions = (fontSize) => ({
+const ELEMENT_OPTIONS = {
+  supportedCountries: ['SEPA'],
   style: {
     base: {
-      fontSize,
+      fontSize: '18px',
       color: '#424770',
       letterSpacing: '0.025em',
       '::placeholder': {
@@ -22,30 +23,31 @@ const getOptions = (fontSize) => ({
       color: '#9e2146',
     },
   },
-});
+};
 
 const Checkout = () => {
   const elements = useElements();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [result, setResult] = useState(null);
-  const fontSize = useDynamicFontSize();
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
 
-    const cardElement = elements.getElement('card');
+    const ibanElement = elements.getElement('iban');
 
     const payload = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
+      type: 'sepa_debit',
+      sepa_debit: ibanElement,
       billing_details: {
         name,
+        email,
       },
     });
 
     if (payload.error) {
       console.log('[error]', payload.error);
-      setResult(<ErrorResult>{payload.error.message}</ErrorResult>);
+      setResult(<ErrorResult>payload.error.message</ErrorResult>);
     } else {
       console.log('[PaymentMethod]', payload.paymentMethod);
       setResult(<Result>Got PaymentMethod: {payload.paymentMethod.id}</Result>);
@@ -63,14 +65,24 @@ const Checkout = () => {
           setName(e.target.value);
         }}
       />
-      <label htmlFor="card">Card details</label>
-      <CardElement
-        id="card"
+      <label htmlFor="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        required
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+        }}
+      />
+      <label htmlFor="iban">Bank Account</label>
+      <IbanElement
+        id="iban"
         onBlur={logEvent('blur')}
         onChange={logEvent('change')}
         onFocus={logEvent('focus')}
         onReady={logEvent('ready')}
-        options={getOptions(fontSize)}
+        options={ELEMENT_OPTIONS}
       />
       {result}
       <button type="submit">Pay</button>

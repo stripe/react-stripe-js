@@ -1,9 +1,9 @@
 // @noflow
 
 import React from 'react';
-import {CardElement, Elements, ElementsConsumer} from '../src';
+import {CardElement, Elements, ElementsConsumer} from '../../src';
 
-import './common/styles.css';
+import '../styles.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 

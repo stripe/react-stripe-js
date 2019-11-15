@@ -19,7 +19,7 @@
     "prepublish": "yarn run clean && yarn run build",
     "publish": "npm publish --access public",
     "doctoc": "doctoc README.md",
-    "storybook": "start-storybook -p 6006 -c ./examples/storybook"
+    "storybook": "start-storybook -p 6006 "
   },
   "keywords": [],
   "author": "Stripe (https://www.stripe.com)",
