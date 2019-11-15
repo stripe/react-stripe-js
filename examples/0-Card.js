@@ -6,7 +6,6 @@ import {CardElement, Elements, useElements} from '../src';
 import {logEvent, Result, ErrorResult, useDynamicFontSize} from './common/util';
 import './common/styles.css';
 
-console.log(window.Stripe);
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const getOptions = (fontSize) => ({
