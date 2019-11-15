@@ -1,7 +1,7 @@
 # @stripe/react-stripe
 
-[![build status](https://img.shields.io/travis/stripe/react-stripe-elements/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe)
-[![npm version](https://img.shields.io/npm/v/react-stripe-elements.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe)
+[![build status](https://img.shields.io/travis/stripe/react-stripe/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe)
+[![npm version](https://img.shields.io/npm/v/@stripe/react-stripe.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe)
 
 > React components for Stripe.js and Stripe Elements
 
@@ -86,7 +86,7 @@ npm install --save react-stripe-elements
 OR use the UMD build (exports a global `ReactStripeElements` object);
 
 ```html
-<script src="https://unpkg.com/react-stripe-elements@latest/dist/@stripe-react-stripe.min.js"></script>
+<script src="https://unpkg.com/@stripe/react-stripe@latest/dist/react-stripe.umd.min.js"></script>
 ```
 
 ### Include Stripe.js in your application
