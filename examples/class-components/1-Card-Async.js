@@ -7,6 +7,12 @@ import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles.css';
 
 const waitForStripe = new Promise((resolve) => {
+  if (typeof window === 'undefined') {
+    // We can also make this work with server side rendering (SSR) by
+    // resolving to null when not in a browser environment.
+    resolve(null);
+  }
+ 
   // You can inject a script tag manually like this, or you can just
   // use the 'async' attribute on the Stripe.js v3 <script> tag.
   const stripeJs = document.createElement('script');
