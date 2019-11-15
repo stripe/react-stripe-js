@@ -22,7 +22,7 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-const CardField = () => (
+const MyCardField = () => (
   <div>
     <label htmlFor="card">Card details</label>
     <CardElement id="card" options={ELEMENT_OPTIONS} />
@@ -56,7 +56,7 @@ const Checkout = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <CardField />
+      <MyCardField />
       <button type="submit">Pay</button>
     </form>
   );
