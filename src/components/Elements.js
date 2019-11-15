@@ -110,11 +110,13 @@ Elements.propTypes = {
   options: PropTypes.object,
 };
 
-const parseElementsContext = (ctx: ?ElementContext): null | ElementsShape => {
+const parseElementsContext = (
+  ctx: ?ElementContext,
+  useCase: string
+): null | ElementsShape => {
   if (!ctx) {
     throw new Error(
-      `It looks like you are trying to inject Stripe context outside of an Elements context.
-Please be sure the component that calls createSource or createToken is within an <Elements> component.`
+      `Could not find elements context; You need to wrap the part of your app that is ${useCase} in an <Elements> provider.`
     );
   }
 
@@ -125,36 +127,23 @@ Please be sure the component that calls createSource or createToken is within an
   return ctx.elements;
 };
 
-export const useElements = () => {
+export const useElementsWithUseCase = (useCaseMessage: string) => {
   const ctx = useContext(ElementsContext);
-  return parseElementsContext(ctx);
+  return parseElementsContext(ctx, useCaseMessage);
 };
+
+export const useElements = () =>
+  useElementsWithUseCase('calling useElements()');
 
 export const ElementsConsumer = ({
   children,
 }: {|
   children: (elements: ElementsShape | null) => React$Node,
 |}) => {
-  const elements = useElements();
+  const elements = useElementsWithUseCase('mounting <ElementsConsumer>');
   return children(elements);
 };
 
 ElementsConsumer.propTypes = {
   children: PropTypes.func,
-};
-
-export const injectElements = <Config: {}>(
-  WrappedComponent: React.AbstractComponent<Config>
-) => {
-  const Injected = (props: MixedObject) => (
-    <ElementsContext.Consumer>
-      {(ctx) => (
-        <WrappedComponent elements={parseElementsContext(ctx)} {...props} />
-      )}
-    </ElementsContext.Consumer>
-  );
-  Injected.displayName = `InjectElements(${WrappedComponent.displayName ||
-    WrappedComponent.name ||
-    'Component'})`;
-  return Injected;
 };

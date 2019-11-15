@@ -108,12 +108,13 @@ describe('createElementComponent', () => {
   });
 
   it('throws when the Element is mounted outside of Elements context', () => {
-    const consoleError = console.error;
-    console.error = () => {};
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
     expect(() => mount(<CardElement />)).toThrow(
-      'It looks like you are trying to inject Stripe context outside of an Elements context.'
+      'Could not find elements context; You need to wrap the part of your app that is mounting <CardElement> in an <Elements> provider.'
     );
-    console.error = consoleError;
+    console.error.mockRestore();
   });
 
   it('propagates the Element`s ready event to the current onReady prop', () => {
@@ -302,8 +303,8 @@ describe('createElementComponent', () => {
       />
     );
 
-    const consoleWarn = console.warn;
-    console.warn = jest.fn();
+    jest.spyOn(console, 'warn');
+    console.warn.mockImplementation(() => {});
     wrapper.setProps({
       options: {
         paymentRequest: Symbol('PaymentRequest'),
@@ -315,7 +316,7 @@ describe('createElementComponent', () => {
       'Unsupported prop change: options.paymentRequest is not a customizable property.'
     );
 
-    console.warn = consoleWarn;
+    console.warn.mockRestore();
   });
 
   it('destroys an existing Element when the component unmounts', () => {

@@ -1,12 +1,7 @@
 // @noflow
 import React from 'react';
 import {mount} from 'enzyme';
-import {
-  Elements,
-  useElements,
-  injectElements,
-  ElementsConsumer,
-} from './Elements';
+import {Elements, useElements, ElementsConsumer} from './Elements';
 import {mockStripe} from '../../test/mocks';
 
 const TestComponent = () => <div>test</div>;
@@ -43,18 +38,6 @@ describe('Elements', () => {
     );
 
     expect(stripe.elements.mock.calls).toHaveLength(1);
-  });
-
-  it('injects elements with the injectElements HOC', () => {
-    const WithAHOC = injectElements(TestComponent);
-
-    const wrapper = mount(
-      <Elements stripe={stripe}>
-        <WithAHOC />
-      </Elements>
-    );
-
-    expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
   it('provides elements with the ElementsConsumer component', () => {
@@ -98,8 +81,9 @@ describe('Elements', () => {
   });
 
   it('errors when props.stripe is `false`', () => {
-    const consoleError = console.error;
-    console.error = () => {};
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
 
     expect(() =>
       mount(
@@ -109,12 +93,13 @@ describe('Elements', () => {
       )
     ).toThrow('Invalid prop `stripe` supplied to `Elements`.');
 
-    console.error = consoleError;
+    console.error.mockRestore();
   });
 
   it('errors when props.stripe is a string', () => {
-    const consoleError = console.error;
-    console.error = () => {};
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
 
     expect(() =>
       mount(
@@ -123,14 +108,14 @@ describe('Elements', () => {
         </Elements>
       )
     ).toThrow('Invalid prop `stripe` supplied to `Elements`.');
-    console.error = consoleError;
+    console.error.mockRestore();
   });
 
   it('does not allow changes to a set Stripe object', () => {
     const wrapper = mount(<Elements stripe={stripe} />);
 
-    const consoleWarn = console.warn;
-    console.warn = jest.fn();
+    jest.spyOn(console, 'warn');
+    console.warn.mockImplementation(() => {});
 
     const stripe2 = mockStripe();
     wrapper.setProps({stripe: stripe2});
@@ -141,14 +126,14 @@ describe('Elements', () => {
       'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
     );
 
-    console.warn = consoleWarn;
+    console.warn.mockRestore();
   });
 
   it('does not allow changes to options after setting the Stripe object', () => {
     const wrapper = mount(<Elements stripe={stripe} options={{foo: 'foo'}} />);
 
-    const consoleWarn = console.warn;
-    console.warn = jest.fn();
+    jest.spyOn(console, 'warn');
+    console.warn.mockImplementation(() => {});
 
     wrapper.setProps({options: {bar: 'bar'}});
 
@@ -159,14 +144,14 @@ describe('Elements', () => {
       'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
     );
 
-    console.warn = consoleWarn;
+    console.warn.mockRestore();
   });
 
   it('allows options changes before setting the Stripe object', () => {
     const wrapper = mount(<Elements stripe={null} options={{foo: 'foo'}} />);
 
-    const consoleWarn = console.warn;
-    console.warn = jest.fn();
+    jest.spyOn(console, 'warn');
+    console.warn.mockImplementation(() => {});
 
     wrapper.setProps({options: {bar: 'bar'}});
 
@@ -176,25 +161,32 @@ describe('Elements', () => {
 
     expect(stripe.elements).toHaveBeenCalledWith({bar: 'bar'});
 
-    console.warn = consoleWarn;
+    console.warn.mockRestore();
   });
 
   it('throws when trying to call useElements outside of Elements context', () => {
-    const consoleError = console.error;
-    console.error = () => {};
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
     expect(() => mount(<InjectedTestComponent />)).toThrow(
-      'It looks like you are trying to inject Stripe context outside of an Elements context.'
+      'Could not find elements context; You need to wrap the part of your app that is calling useElements() in an <Elements> provider.'
     );
-    console.error = consoleError;
+    console.error.mockRestore();
   });
 
-  it('throws when trying to mount an injected component outside of Elements context', () => {
-    const consoleError = console.error;
-    console.error = () => {};
-    const WithAHOC = injectElements(TestComponent);
-    expect(() => mount(<WithAHOC />)).toThrow(
-      'It looks like you are trying to inject Stripe context outside of an Elements context.'
+  it('throws when trying to mount an <ElementsConsumer> outside of Elements context', () => {
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
+    const WithAConsumer = () => (
+      <ElementsConsumer>
+        {(elements) => <TestComponent elements={elements} />}
+      </ElementsConsumer>
     );
-    console.error = consoleError;
+
+    expect(() => mount(<WithAConsumer />)).toThrow(
+      'Could not find elements context; You need to wrap the part of your app that is mounting <ElementsConsumer> in an <Elements> provider.'
+    );
+    console.error.mockRestore();
   });
 });

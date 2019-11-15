@@ -2,7 +2,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
-import {useElements} from './Elements';
+import {useElementsWithUseCase} from './Elements';
 import isEqual from '../utils/isEqual';
 
 type Props = {
@@ -43,6 +43,8 @@ const callbackReference = (cb: MixedFunction) => {
 };
 
 const createElementComponent = (type: string) => {
+  const displayName = `${capitalized(type)}Element`;
+
   const Element = (props: Props) => {
     const {
       id,
@@ -55,7 +57,7 @@ const createElementComponent = (type: string) => {
       onClick,
     } = props;
 
-    const elements = useElements();
+    const elements = useElementsWithUseCase(`mounting <${displayName}>`);
     const elementRef = useRef();
     const domNode = useRef();
 
@@ -146,7 +148,7 @@ const createElementComponent = (type: string) => {
     options: {},
   };
 
-  Element.displayName = `${capitalized(type)}Element`;
+  Element.displayName = displayName;
 
   return Element;
 };
