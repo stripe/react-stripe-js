@@ -1,10 +1,14 @@
 // @noflow
 /* eslint-disable import/no-extraneous-dependencies */
-import './story.css';
 import {storiesOf, module} from '@storybook/react';
 import React, {useEffect, useState} from 'react';
 
 const SyncExample = ({file}) => {
+  // force iframe to reload on each example
+  if (window.reload) {
+    window.location.href = window.location.href;
+  }
+
   const [example, setExample] = useState(null);
 
   // We need to dynamically load Stripe.js, since
@@ -21,6 +25,7 @@ const SyncExample = ({file}) => {
     stripeJs.onload = () => {
       import(`../examples/${file}`).then(({default: Example}) => {
         setExample(<Example />);
+        window.reload = true;
       });
     };
     document.body.appendChild(stripeJs);
@@ -30,6 +35,11 @@ const SyncExample = ({file}) => {
 };
 
 const AsyncExample = ({file}) => {
+  // force iframe to reload on each example
+  if (window.reload) {
+    window.location.href = window.location.href;
+  }
+
   const [example, setExample] = useState(null);
 
   // For async demos, we don't need to preload Stripe before
@@ -37,6 +47,7 @@ const AsyncExample = ({file}) => {
   useEffect(() => {
     import(`../examples/${file}`).then(({default: Example}) => {
       setExample(<Example />);
+      window.reload = true;
     });
   }, []);
 
@@ -51,6 +62,7 @@ const addDemo = (directory, file, stories) => {
     .split('-')
     .slice(1)
     .join(' ');
+
   const async = ASYNC_EXAMPLES.indexOf(name) !== -1;
   const ExampleComponent = async ? AsyncExample : SyncExample;
   stories.add(name, () => <ExampleComponent file={`${directory}/${file}`} />);
