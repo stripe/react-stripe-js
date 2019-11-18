@@ -3,7 +3,7 @@
 import React from 'react';
 import {CardElement, Elements, useElements} from '../../src';
 
-import '../styles.css';
+import '../styles/common.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 

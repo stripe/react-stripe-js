@@ -3,8 +3,7 @@
 
 import React from 'react';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
-
-import '../styles.css';
+import '../styles/common.css';
 
 const waitForStripe = new Promise((resolve) => {
   if (typeof window === 'undefined') {

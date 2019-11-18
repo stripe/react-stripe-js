@@ -9,8 +9,8 @@ import {
   useElements,
 } from '../../src';
 
-import {logEvent, Result, ErrorResult} from "../util";
-import "../styles.css";
+import {logEvent, Result, ErrorResult} from '../util';
+import '../styles/common.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
