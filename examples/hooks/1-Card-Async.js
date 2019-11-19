@@ -4,24 +4,6 @@ import React, {useState, useEffect} from 'react';
 import {CardElement, Elements, useElements} from '../../src';
 import '../styles/common.css';
 
-const waitForStripe = new Promise((resolve) => {
-  if (typeof window === 'undefined') {
-    // We can also make this work with server side rendering (SSR) by
-    // resolving to null when not in a browser environment.
-    resolve(null);
-  }
-
-  // You can inject a script tag manually like this, or you can just
-  // use the 'async' attribute on the Stripe.js v3 <script> tag.
-  const stripeJs = document.createElement('script');
-  stripeJs.src = 'https://js.stripe.com/v3/';
-  stripeJs.async = true;
-  stripeJs.onload = () => {
-    resolve(window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'));
-  };
-  document.body.appendChild(stripeJs);
-});
-
 const ELEMENT_OPTIONS = {
   style: {
     base: {
@@ -81,7 +63,21 @@ const App = () => {
   const [stripe, setStripe] = useState(null);
 
   useEffect(() => {
-    waitForStripe.then(setStripe);
+    if (typeof window === 'undefined') {
+      // We can also make this work with server side rendering (SSR) by
+      // returning early when not in a browser environment.
+      return;
+    }
+
+    // You can inject a script tag manually like this, or you can just
+    // use the 'async' attribute on the Stripe.js v3 script tag.
+    const stripeJs = document.createElement('script');
+    stripeJs.src = 'https://js.stripe.com/v3/';
+    stripeJs.async = true;
+    stripeJs.onload = () => {
+      setStripe(window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'));
+    };
+    document.body.appendChild(stripeJs);
   }, []);
 
   return (

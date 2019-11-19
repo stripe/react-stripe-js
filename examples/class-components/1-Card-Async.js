@@ -5,25 +5,6 @@ import React from 'react';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/common.css';
 
-const waitForStripe = new Promise((resolve) => {
-  if (typeof window === 'undefined') {
-    // We can also make this work with server side rendering (SSR) by
-    // resolving to null when not in a browser environment.
-    resolve(null);
-  }
- 
-  // You can inject a script tag manually like this, or you can just
-  // use the 'async' attribute on the Stripe.js v3 <script> tag.
-  const stripeJs = document.createElement('script');
-  stripeJs.src = 'https://js.stripe.com/v3/';
-  stripeJs.async = true;
-  stripeJs.onload = () => {
-    resolve(window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'));
-  };
-
-  document.body.appendChild(stripeJs);
-});
-
 const ELEMENT_OPTIONS = {
   style: {
     base: {
@@ -89,21 +70,33 @@ class MyCheckoutForm extends React.Component {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {stripe: null};
+    this.state = {
+      stripe: null,
+    };
   }
 
   componentDidMount() {
-    waitForStripe.then((stripe) => {
-      this.setState({stripe});
-    });
+    // componentDidMount is only called in browser environments,
+    // so this will also work with server side rendering (SSR).
+
+    // You can inject a script tag manually like this, or you can just
+    // use the 'async' attribute on the Stripe.js v3 script tag.
+    const stripeJs = document.createElement('script');
+    stripeJs.src = 'https://js.stripe.com/v3/';
+    stripeJs.async = true;
+    stripeJs.onload = () => {
+      this.setState({
+        stripe: window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'),
+      });
+    };
+    document.body.appendChild(stripeJs);
   }
 
   render() {
+    const {stripe} = this.state;
     return (
-      <Elements stripe={this.state.stripe}>
-        {this.state.stripe ? (
-          <MyCheckoutForm stripe={this.state.stripe} />
-        ) : null}
+      <Elements stripe={stripe}>
+        {stripe ? <MyCheckoutForm stripe={stripe} /> : null}
       </Elements>
     );
   }
