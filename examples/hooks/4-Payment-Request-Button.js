@@ -3,10 +3,31 @@
 import React, {useState, useEffect} from 'react';
 import {PaymentRequestButtonElement, Elements} from '../../src';
 
-import {logEvent, Result, ErrorResult} from '../util';
+import {Result, ErrorResult} from '../util';
 import '../styles/common.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
+const NotAvailableResult = () => (
+  <Result>
+    <p style={{textAlign: 'center'}}>
+      PaymentRequest is not available in your browser.
+    </p>
+    {window.location.protocol !== 'https:' && (
+      <p style={{textAlign: 'center'}}>
+        Try using{' '}
+        <a
+          href="https://ngrok.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ngrok
+        </a>{' '}
+        to view this demo over https.
+      </p>
+    )}
+  </Result>
+);
 
 const ELEMENT_OPTIONS = {
   style: {
@@ -32,7 +53,6 @@ const Checkout = () => {
     });
 
     pr.on('paymentmethod', async (e) => {
-      logEvent('[PaymentMethod]', e.paymentMethod);
       setResult(<Result>Got PaymentMethod: {e.paymentMethod.id}</Result>);
       e.complete('success');
     });
@@ -41,26 +61,7 @@ const Checkout = () => {
       if (canMakePaymentRes) {
         setPaymentRequest(pr);
       } else {
-        setResult(
-          <Result>
-            <p style={{textAlign: 'center'}}>
-              PaymentRequest is not available in your browser.{' '}
-            </p>
-            {window.location.protocol !== 'https:' && (
-              <p style={{textAlign: 'center'}}>
-                Try using{' '}
-                <a
-                  href="https://ngrok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  ngrok
-                </a>{' '}
-                to view this demo over https.
-              </p>
-            )}
-          </Result>
-        );
+        setResult(<NotAvailableResult />);
       }
     });
   }, []);
@@ -69,11 +70,6 @@ const Checkout = () => {
     <form>
       {paymentRequest && (
         <PaymentRequestButtonElement
-          id="cardNumber"
-          onBlur={logEvent('blur')}
-          onChange={logEvent('change')}
-          onFocus={logEvent('focus')}
-          onReady={logEvent('ready')}
           onClick={(e) => {
             if (result) {
               e.preventDefault();
