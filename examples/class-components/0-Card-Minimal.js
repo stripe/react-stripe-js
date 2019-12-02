@@ -29,8 +29,8 @@ class MyCheckoutForm extends React.Component {
               // block native form submission
               event.preventDefault();
 
-              // Get a reference to a mounted CardElement. Elements will know how
-              // to find your CardElement since there can only ever be one of
+              // Get a reference to a mounted CardElement. Elements knows how
+              // to find your CardElement because there can only ever be one of
               // each type of element.
               const cardElement = elements.getElement('card');
 
