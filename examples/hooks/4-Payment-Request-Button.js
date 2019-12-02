@@ -16,11 +16,7 @@ const NotAvailableResult = () => (
     {window.location.protocol !== 'https:' && (
       <p style={{textAlign: 'center'}}>
         Try using{' '}
-        <a
-          href="https://ngrok.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://ngrok.com" target="_blank" rel="noopener noreferrer">
           ngrok
         </a>{' '}
         to view this demo over https.
