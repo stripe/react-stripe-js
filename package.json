@@ -21,7 +21,7 @@
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 "
   },
-  "keywords": [],
+  "keywords": ["React", "Stripe", "Elements"],
   "author": "Stripe (https://www.stripe.com)",
   "license": "MIT",
   "dependencies": {
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stripe/react-stripe-elements.git"
+    "url": "https://github.com/stripe/react-stripe.git"
   },
   "files": [
     "dist",
