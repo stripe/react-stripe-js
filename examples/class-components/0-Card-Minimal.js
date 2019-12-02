@@ -6,28 +6,6 @@ import '../styles/common.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
-const ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#424770',
-      '::placeholder': {
-        color: '#aab7c4',
-      },
-    },
-    invalid: {
-      color: '#9e2146',
-    },
-  },
-};
-
-const MyCardForm = () => (
-  <div>
-    <label htmlFor="card">Card details</label>
-    <CardElement id="card" options={ELEMENT_OPTIONS} />
-  </div>
-);
-
 class MyCheckoutForm extends React.Component {
   createPaymentMethod = async (cardElement) => {
     const {error, paymentMethod} = await stripe.createPaymentMethod({
@@ -59,7 +37,22 @@ class MyCheckoutForm extends React.Component {
               this.createPaymentMethod(cardElement);
             }}
           >
-            <MyCardForm />
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
+                  },
+                },
+              }}
+            />
             <button type="submit">Pay</button>
           </form>
         )}

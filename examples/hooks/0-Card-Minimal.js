@@ -7,28 +7,6 @@ import '../styles/common.css';
 
 const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
-const ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#424770',
-      '::placeholder': {
-        color: '#aab7c4',
-      },
-    },
-    invalid: {
-      color: '#9e2146',
-    },
-  },
-};
-
-const MyCardField = () => (
-  <div>
-    <label htmlFor="card">Card details</label>
-    <CardElement id="card" options={ELEMENT_OPTIONS} />
-  </div>
-);
-
 const Checkout = () => {
   const elements = useElements();
 
@@ -56,7 +34,22 @@ const Checkout = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <MyCardField />
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': {
+                color: '#aab7c4',
+              },
+            },
+            invalid: {
+              color: '#9e2146',
+            },
+          },
+        }}
+      />
       <button type="submit">Pay</button>
     </form>
   );

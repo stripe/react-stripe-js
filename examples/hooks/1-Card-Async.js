@@ -4,28 +4,6 @@ import React, {useState, useEffect} from 'react';
 import {CardElement, Elements, useElements} from '../../src';
 import '../styles/common.css';
 
-const ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#424770',
-      '::placeholder': {
-        color: '#aab7c4',
-      },
-    },
-    invalid: {
-      color: '#9e2146',
-    },
-  },
-};
-
-const CardField = () => (
-  <div>
-    <label htmlFor="card">Card details</label>
-    <CardElement id="card" options={ELEMENT_OPTIONS} />
-  </div>
-);
-
 const MyCheckoutForm = ({stripe}) => {
   const elements = useElements();
 
@@ -53,7 +31,22 @@ const MyCheckoutForm = ({stripe}) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <CardField />
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': {
+                color: '#aab7c4',
+              },
+            },
+            invalid: {
+              color: '#9e2146',
+            },
+          },
+        }}
+      />
       <button type="submit">Pay</button>
     </form>
   );
