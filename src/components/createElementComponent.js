@@ -57,7 +57,7 @@ const createElementComponent = (type: string) => {
       onClick,
     } = props;
 
-    const ctx = useElementsContextWithUseCase(`mounts <${displayName}>`);
+    const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = useRef();
     const domNode = useRef();
 
@@ -68,12 +68,8 @@ const createElementComponent = (type: string) => {
     const callOnChange = callbackReference(onChange);
 
     useLayoutEffect(() => {
-      if (
-        elementRef.current == null &&
-        ctx != null &&
-        domNode.current != null
-      ) {
-        const element = ctx.elements.create(type, options);
+      if (elementRef.current == null && elements && domNode.current != null) {
+        const element = elements.create(type, options);
         elementRef.current = element;
         element.mount(domNode.current);
         element.on('ready', () => callOnReady(element));

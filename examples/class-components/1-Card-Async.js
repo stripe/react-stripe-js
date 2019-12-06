@@ -62,7 +62,7 @@ class MyCheckoutForm extends React.Component {
 const InjectedCheckoutForm = () => {
   return (
     <ElementsConsumer>
-      {({elements, stripe}) => (
+      {({stripe, elements}) => (
         <MyCheckoutForm elements={elements} stripe={stripe} />
       )}
     </ElementsConsumer>

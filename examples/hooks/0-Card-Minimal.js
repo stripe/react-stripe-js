@@ -13,6 +13,8 @@ const Checkout = () => {
     // Block native form submission.
     event.preventDefault();
 
+    console.log('here!');
+
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
     // each type of element.
