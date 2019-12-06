@@ -2,7 +2,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
-import {useElementsWithUseCase} from './Elements';
+import {useElementsContextWithUseCase} from './Elements';
 import isEqual from '../utils/isEqual';
 
 type Props = {
@@ -57,7 +57,7 @@ const createElementComponent = (type: string) => {
       onClick,
     } = props;
 
-    const elements = useElementsWithUseCase(`mounting <${displayName}>`);
+    const ctx = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = useRef();
     const domNode = useRef();
 
@@ -70,10 +70,10 @@ const createElementComponent = (type: string) => {
     useLayoutEffect(() => {
       if (
         elementRef.current == null &&
-        elements != null &&
+        ctx != null &&
         domNode.current != null
       ) {
-        const element = elements.create(type, options);
+        const element = ctx.elements.create(type, options);
         elementRef.current = element;
         element.mount(domNode.current);
         element.on('ready', () => callOnReady(element));

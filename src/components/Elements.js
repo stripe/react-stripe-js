@@ -10,6 +10,7 @@ type ElementContext =
   | {|
       tag: 'ready',
       elements: ElementsShape,
+      stripe: StripeShape,
     |}
   | {|
       tag: 'loading',
@@ -27,6 +28,7 @@ export const createElementsContext = (
 
   return {
     tag: 'ready',
+    stripe,
     elements: stripe.elements(options || {}),
   };
 };
@@ -34,10 +36,10 @@ export const createElementsContext = (
 export const parseElementsContext = (
   ctx: ?ElementContext,
   useCase: string
-): null | ElementsShape => {
+): {|elements: ElementsShape, stripe: StripeShape|} | null => {
   if (!ctx) {
     throw new Error(
-      `Could not find elements context; You need to wrap the part of your app that is ${useCase} in an <Elements> provider.`
+      `Could not find Elements context; You need to wrap the part of your app that ${useCase} in an <Elements> provider.`
     );
   }
 
@@ -45,7 +47,9 @@ export const parseElementsContext = (
     return null;
   }
 
-  return ctx.elements;
+  const {stripe, elements} = ctx;
+
+  return {stripe, elements};
 };
 
 // We are using types to enforce the `stripe` prop in this lib,
@@ -119,21 +123,32 @@ Elements.propTypes = {
   options: PropTypes.object,
 };
 
-export const useElementsWithUseCase = (useCaseMessage: string) => {
+export const useElementsContextWithUseCase = (useCaseMessage: string) => {
   const ctx = useContext(ElementsContext);
   return parseElementsContext(ctx, useCaseMessage);
 };
 
-export const useElements = () =>
-  useElementsWithUseCase('calling useElements()');
+export const useElements = (): ElementsShape | null => {
+  const ctx = useElementsContextWithUseCase('calls useElements()');
+
+  return ctx && ctx.elements;
+};
+
+export const useStripe = (): StripeShape | null => {
+  const ctx = useElementsContextWithUseCase('calls useElements()');
+
+  return ctx && ctx.stripe;
+};
 
 export const ElementsConsumer = ({
   children,
 }: {|
-  children: (elements: ElementsShape | null) => React$Node,
+  children: (
+    elements: {|elements: ElementsShape, stripe: StripeShape|} | null
+  ) => React$Node,
 |}) => {
-  const elements = useElementsWithUseCase('mounting <ElementsConsumer>');
-  return children(elements);
+  const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
+  return children(ctx);
 };
 
 ElementsConsumer.propTypes = {

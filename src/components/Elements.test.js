@@ -1,13 +1,14 @@
 // @noflow
 import React from 'react';
 import {mount} from 'enzyme';
-import {Elements, useElements, ElementsConsumer} from './Elements';
+import {Elements, useElements, useStripe, ElementsConsumer} from './Elements';
 import {mockStripe} from '../../test/mocks';
 
 const TestComponent = () => <div>test</div>;
 const InjectedTestComponent = () => {
   const elements = useElements();
-  return <TestComponent elements={elements} />;
+  const stripe = useStripe();
+  return <TestComponent elements={elements} stripe={stripe} />;
 };
 
 describe('Elements', () => {
@@ -30,6 +31,16 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
+  it('injects stripe with the useStripe hook', () => {
+    const wrapper = mount(
+      <Elements stripe={stripe}>
+        <InjectedTestComponent />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
+  });
+
   it('only creates elements once', () => {
     mount(
       <Elements stripe={stripe}>
@@ -40,16 +51,19 @@ describe('Elements', () => {
     expect(stripe.elements.mock.calls).toHaveLength(1);
   });
 
-  it('provides elements with the ElementsConsumer component', () => {
+  it('provides elements and stripe with the ElementsConsumer component', () => {
     const wrapper = mount(
       <Elements stripe={stripe}>
         <ElementsConsumer>
-          {(elements) => <TestComponent elements={elements} />}
+          {(ctx) => (
+            <TestComponent elements={ctx.elements} stripe={ctx.stripe} />
+          )}
         </ElementsConsumer>
       </Elements>
     );
 
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
   });
 
   it('allows a transition from null to a valid stripe object', () => {
@@ -170,7 +184,7 @@ describe('Elements', () => {
     jest.spyOn(console, 'error');
     console.error.mockImplementation(() => {});
     expect(() => mount(<InjectedTestComponent />)).toThrow(
-      'Could not find elements context; You need to wrap the part of your app that is calling useElements() in an <Elements> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
     );
     console.error.mockRestore();
   });
@@ -186,7 +200,7 @@ describe('Elements', () => {
     );
 
     expect(() => mount(<WithAConsumer />)).toThrow(
-      'Could not find elements context; You need to wrap the part of your app that is mounting <ElementsConsumer> in an <Elements> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that mounts <ElementsConsumer> in an <Elements> provider.'
     );
     console.error.mockRestore();
   });
