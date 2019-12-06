@@ -149,6 +149,7 @@ const createElementComponent = (type: string) => {
   };
 
   Element.displayName = displayName;
+  Element.__elementType = type; // eslint-disable-line no-underscore-dangle
 
   return Element;
 };
