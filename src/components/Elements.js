@@ -135,7 +135,7 @@ export const useElements = (): ElementsShape | null => {
 };
 
 export const useStripe = (): StripeShape | null => {
-  const ctx = useElementsContextWithUseCase('calls useElements()');
+  const ctx = useElementsContextWithUseCase('calls useStripe()');
 
   return ctx && ctx.stripe;
 };

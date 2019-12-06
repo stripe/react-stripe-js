@@ -7,8 +7,12 @@ import {mockStripe} from '../../test/mocks';
 const TestComponent = () => <div>test</div>;
 const InjectedTestComponent = () => {
   const elements = useElements();
+  return <TestComponent elements={elements} />;
+};
+
+const StripeInjectedTestComponent = () => {
   const stripe = useStripe();
-  return <TestComponent elements={elements} stripe={stripe} />;
+  return <TestComponent stripe={stripe} />;
 };
 
 describe('Elements', () => {
@@ -31,16 +35,6 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
-  it('injects stripe with the useStripe hook', () => {
-    const wrapper = mount(
-      <Elements stripe={stripe}>
-        <InjectedTestComponent />
-      </Elements>
-    );
-
-    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
-  });
-
   it('only creates elements once', () => {
     mount(
       <Elements stripe={stripe}>
@@ -49,6 +43,16 @@ describe('Elements', () => {
     );
 
     expect(stripe.elements.mock.calls).toHaveLength(1);
+  });
+
+  it('injects stripe with the useStripe hook', () => {
+    const wrapper = mount(
+      <Elements stripe={stripe}>
+        <StripeInjectedTestComponent />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
   });
 
   it('provides elements and stripe with the ElementsConsumer component', () => {
@@ -185,6 +189,16 @@ describe('Elements', () => {
     console.error.mockImplementation(() => {});
     expect(() => mount(<InjectedTestComponent />)).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
+    );
+    console.error.mockRestore();
+  });
+
+  it('throws when trying to call useStripe outside of Elements context', () => {
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
+    expect(() => mount(<StripeInjectedTestComponent />)).toThrow(
+      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
     console.error.mockRestore();
   });
