@@ -1,20 +1,26 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
-import {CardElement, Elements, useElements} from '../../src';
+import {CardElement, Elements, useElements, useStripe} from '../../src';
 import '../styles/common.css';
 
-const MyCheckoutForm = ({stripe}) => {
+const MyCheckoutForm = () => {
+  const stripe = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (event) => {
-    // block native form submission
+    // Block native form submission.
     event.preventDefault();
+
+    // If Stripe has not loaded do nothing.
+    if (!stripe || !elements) {
+      return;
+    }
 
     // Get a reference to a mounted CardElement. Elements will know how
     // to find your CardElement since there can only ever be one of
     // each type of element.
-    const cardElement = elements.getElement('card');
+    const cardElement = elements.getElement(CardElement);
 
     // Use your card Element with other Stripe.js APIs
     const {error, paymentMethod} = stripe.createPaymentMethod({
@@ -47,7 +53,9 @@ const MyCheckoutForm = ({stripe}) => {
           },
         }}
       />
-      <button type="submit">Pay</button>
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
     </form>
   );
 };
@@ -75,7 +83,7 @@ const App = () => {
 
   return (
     <Elements stripe={stripe}>
-      {stripe ? <MyCheckoutForm stripe={stripe} /> : null}
+      <MyCheckoutForm />
     </Elements>
   );
 };

@@ -6,8 +6,23 @@ import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/common.css';
 
 class MyCheckoutForm extends React.Component {
-  createPaymentMethod = async (cardElement) => {
-    const {error, paymentMethod} = this.props.stripe.createPaymentMethod({
+  handleSubmit = async (event) => {
+    // Block native form submission.
+    event.preventDefault();
+
+    const {stripe, elements} = this.props;
+
+    // If Stripe has not loaded do nothing.
+    if (!stripe || !elements) {
+      return;
+    }
+
+    // Get a reference to a mounted CardElement. Elements knows how
+    // to find your CardElement because there can only ever be one of
+    // each type of element.
+    const cardElement = elements.getElement(CardElement);
+
+    const {error, paymentMethod} = await stripe.createPaymentMethod({
       type: 'card',
       card: cardElement,
     });
@@ -21,44 +36,38 @@ class MyCheckoutForm extends React.Component {
 
   render() {
     return (
-      <ElementsConsumer>
-        {(elements) => (
-          <form
-            onSubmit={(event) => {
-              // block native form submission
-              event.preventDefault();
-
-              // Get a reference to a mounted CardElement. Elements will know how
-              // to find your CardElement since there can only ever be one of
-              // each type of element.
-              const cardElement = elements.getElement('card');
-
-              this.createPaymentMethod(cardElement);
-            }}
-          >
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
-                  },
-                  invalid: {
-                    color: '#9e2146',
-                  },
+      <form onSubmit={this.handleSubmit}>
+        <CardElement
+          options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                  color: '#aab7c4',
                 },
-              }}
-            />
-            <button type="submit">Pay</button>
-          </form>
-        )}
-      </ElementsConsumer>
+              },
+              invalid: {
+                color: '#9e2146',
+              },
+            },
+          }}
+        />
+        <button type="submit">Pay</button>
+      </form>
     );
   }
 }
+
+const InjectedCheckoutForm = () => {
+  return (
+    <ElementsConsumer>
+      {({stripe, elements}) => (
+        <MyCheckoutForm elements={elements} stripe={stripe} />
+      )}
+    </ElementsConsumer>
+  );
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -89,7 +98,7 @@ class App extends React.Component {
     const {stripe} = this.state;
     return (
       <Elements stripe={stripe}>
-        {stripe ? <MyCheckoutForm stripe={stripe} /> : null}
+        <InjectedCheckoutForm />
       </Elements>
     );
   }

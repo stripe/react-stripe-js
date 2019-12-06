@@ -1,10 +1,8 @@
 // @noflow
 
 import React, {useState} from 'react';
-import {CardElement, Elements, useElements} from '../../src';
+import {CardElement, Elements, useElements, useStripe} from '../../src';
 import '../styles/2-Card-Detailed.css';
-
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const CARD_OPTIONS = {
   iconStyle: 'solid',
@@ -101,6 +99,7 @@ const ResetButton = ({onClick}) => (
 );
 
 const Checkout = () => {
+  const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
@@ -126,7 +125,7 @@ const Checkout = () => {
 
     const payload = await stripe.createPaymentMethod({
       type: 'card',
-      card: elements.getElement('card'),
+      card: elements.getElement(CardElement),
       billing_details: billingDetails,
     });
 
@@ -224,6 +223,8 @@ const ELEMENTS_OPTIONS = {
     },
   ],
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (

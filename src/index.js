@@ -1,8 +1,13 @@
 // @flow
 import createElementComponent from './components/createElementComponent';
-import {useElements, Elements, ElementsConsumer} from './components/Elements';
+import {
+  useElements,
+  useStripe,
+  Elements,
+  ElementsConsumer,
+} from './components/Elements';
 
-export {Elements, useElements, ElementsConsumer};
+export {Elements, useElements, useStripe, ElementsConsumer};
 export const CardElement = createElementComponent('card');
 export const CardNumberElement = createElementComponent('cardNumber');
 export const CardExpiryElement = createElementComponent('cardExpiry');

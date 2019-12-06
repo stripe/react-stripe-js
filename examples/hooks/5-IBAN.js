@@ -1,12 +1,10 @@
 // @noflow
 
 import React, {useState} from 'react';
-import {IbanElement, Elements, useElements} from '../../src';
+import {IbanElement, Elements, useElements, useStripe} from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
 import '../styles/common.css';
-
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const ELEMENT_OPTIONS = {
   supportedCountries: ['SEPA'],
@@ -26,6 +24,7 @@ const ELEMENT_OPTIONS = {
 };
 
 const Checkout = () => {
+  const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -34,7 +33,7 @@ const Checkout = () => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
 
-    const ibanElement = elements.getElement('iban');
+    const ibanElement = elements.getElement(IbanElement);
 
     const payload = await stripe.createPaymentMethod({
       type: 'sepa_debit',
@@ -89,6 +88,8 @@ const Checkout = () => {
     </form>
   );
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (

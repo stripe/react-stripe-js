@@ -7,12 +7,11 @@ import {
   CardExpiryElement,
   Elements,
   useElements,
+  useStripe,
 } from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
 import '../styles/common.css';
-
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const ELEMENT_OPTIONS = {
   style: {
@@ -32,6 +31,7 @@ const ELEMENT_OPTIONS = {
 
 const Checkout = () => {
   const elements = useElements();
+  const stripe = useStripe();
   const [name, setName] = useState('');
   const [postal, setPostal] = useState('');
   const [result, setResult] = useState(null);
@@ -39,7 +39,7 @@ const Checkout = () => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
 
-    const cardElement = elements.getElement('cardNumber');
+    const cardElement = elements.getElement(CardNumberElement);
 
     const payload = await stripe.createPaymentMethod({
       type: 'card',
@@ -113,6 +113,8 @@ const Checkout = () => {
     </form>
   );
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (

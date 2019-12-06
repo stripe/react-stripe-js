@@ -36,7 +36,7 @@ export const createElementsContext = (
 export const parseElementsContext = (
   ctx: ?ElementContext,
   useCase: string
-): {|elements: ElementsShape, stripe: StripeShape|} | null => {
+): {|elements: ElementsShape | null, stripe: StripeShape | null|} => {
   if (!ctx) {
     throw new Error(
       `Could not find Elements context; You need to wrap the part of your app that ${useCase} in an <Elements> provider.`
@@ -44,7 +44,7 @@ export const parseElementsContext = (
   }
 
   if (ctx.tag === 'loading') {
-    return null;
+    return {stripe: null, elements: null};
   }
 
   const {stripe, elements} = ctx;
@@ -129,23 +129,24 @@ export const useElementsContextWithUseCase = (useCaseMessage: string) => {
 };
 
 export const useElements = (): ElementsShape | null => {
-  const ctx = useElementsContextWithUseCase('calls useElements()');
+  const {elements} = useElementsContextWithUseCase('calls useElements()');
 
-  return ctx && ctx.elements;
+  return elements;
 };
 
 export const useStripe = (): StripeShape | null => {
-  const ctx = useElementsContextWithUseCase('calls useStripe()');
+  const {stripe} = useElementsContextWithUseCase('calls useStripe()');
 
-  return ctx && ctx.stripe;
+  return stripe;
 };
 
 export const ElementsConsumer = ({
   children,
 }: {|
-  children: (
-    elements: {|elements: ElementsShape, stripe: StripeShape|} | null
-  ) => React$Node,
+  children: ({|
+    elements: ElementsShape | null,
+    stripe: StripeShape | null,
+  |}) => React$Node,
 |}) => {
   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
   return children(ctx);

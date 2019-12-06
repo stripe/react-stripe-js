@@ -1,12 +1,10 @@
 // @noflow
 
 import React, {useState} from 'react';
-import {IdealBankElement, Elements, useElements} from '../../src';
+import {IdealBankElement, Elements, useElements, useStripe} from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
 import '../styles/common.css';
-
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const ELEMENT_OPTIONS = {
   classes: {
@@ -30,6 +28,7 @@ const ELEMENT_OPTIONS = {
 };
 
 const Checkout = () => {
+  const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
@@ -37,7 +36,7 @@ const Checkout = () => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
 
-    const idealBankElement = elements.getElement('idealBank');
+    const idealBankElement = elements.getElement(IdealBankElement);
 
     const payload = await stripe.createPaymentMethod({
       type: 'ideal',
@@ -81,6 +80,8 @@ const Checkout = () => {
     </form>
   );
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
