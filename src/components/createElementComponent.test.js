@@ -116,7 +116,7 @@ describe('createElementComponent', () => {
     jest.spyOn(console, 'error');
     console.error.mockImplementation(() => {});
     expect(() => mount(<CardElement />)).toThrow(
-      'Could not find elements context; You need to wrap the part of your app that is mounting <CardElement> in an <Elements> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
     );
     console.error.mockRestore();
   });

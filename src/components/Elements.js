@@ -1,16 +1,16 @@
 // @flow
 /* eslint-disable react/forbid-prop-types, react/require-default-props */
-import * as React from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 
 import isEqual from '../utils/isEqual';
-
-const {useContext, useEffect, useRef, useState} = React;
+import usePrevious from '../utils/usePrevious';
 
 type ElementContext =
   | {|
       tag: 'ready',
       elements: ElementsShape,
+      stripe: StripeShape,
     |}
   | {|
       tag: 'loading',
@@ -18,13 +18,48 @@ type ElementContext =
 
 const ElementsContext = React.createContext<?ElementContext>();
 
-type Props = {|
-  stripe: ?StripeShape,
-  options?: MixedObject,
-  children?: any,
-|};
+export const createElementsContext = (
+  stripe: null | StripeShape,
+  options: ?MixedObject
+): ElementContext => {
+  if (stripe === null) {
+    return {tag: 'loading'};
+  }
 
-const validateStripe = (maybeStripe: $NonMaybeType<mixed>) => {
+  return {
+    tag: 'ready',
+    stripe,
+    elements: stripe.elements(options || {}),
+  };
+};
+
+export const parseElementsContext = (
+  ctx: ?ElementContext,
+  useCase: string
+): {|elements: ElementsShape, stripe: StripeShape|} | null => {
+  if (!ctx) {
+    throw new Error(
+      `Could not find Elements context; You need to wrap the part of your app that ${useCase} in an <Elements> provider.`
+    );
+  }
+
+  if (ctx.tag === 'loading') {
+    return null;
+  }
+
+  const {stripe, elements} = ctx;
+
+  return {stripe, elements};
+};
+
+// We are using types to enforce the `stripe` prop in this lib,
+// but in a real integration `stripe` could be anything, so we need
+// to do some sanity validation to prevent type errors.
+const validateStripe = (maybeStripe: mixed): StripeShape | null => {
+  if (maybeStripe === null) {
+    return maybeStripe;
+  }
+
   if (
     typeof maybeStripe === 'object' &&
     maybeStripe.elements &&
@@ -32,50 +67,32 @@ const validateStripe = (maybeStripe: $NonMaybeType<mixed>) => {
     maybeStripe.createToken &&
     maybeStripe.createPaymentMethod
   ) {
-    return;
+    return ((maybeStripe: any): StripeShape);
   }
 
   throw new Error(
-    'Invalid prop `stripe` supplied to `Elements`. Please pass a valid Stripe object. ' +
+    'Invalid prop `stripe` supplied to `Elements`. Please pass a valid Stripe object or null. ' +
       'You can obtain a Stripe object by calling `window.Stripe(...)` with your publishable key.'
   );
 };
 
-const usePrevious = (value) => {
-  const ref = useRef();
+type Props = {|
+  stripe: StripeShape | null,
+  options?: MixedObject,
+  children?: any,
+|};
 
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-
-  return ref.current;
-};
-
-const createElementsContext = (
-  stripe: ?StripeShape,
-  options: ?MixedObject
-): ElementContext => {
-  if (stripe == null) {
-    return {tag: 'loading'};
-  }
-
+export const Elements = ({stripe: rawStripe, options, children}: Props) => {
   // We are using types to enforce the `stripe` prop in this lib,
   // but in a real integration, `stripe` could be anything, so we need
   // to do some sanity validation to prevent type errors.
-  validateStripe(stripe);
+  const stripe = useMemo(() => validateStripe(rawStripe), [rawStripe]);
 
-  return {
-    tag: 'ready',
-    elements: stripe.elements(options || {}),
-  };
-};
-
-export const Elements = ({stripe, options, children}: Props) => {
   const [elements, setElements] = useState(() =>
     createElementsContext(stripe, options)
   );
 
-  if (stripe != null && elements.tag === 'loading') {
+  if (stripe !== null && elements.tag === 'loading') {
     setElements(createElementsContext(stripe, options));
   }
 
@@ -87,7 +104,7 @@ export const Elements = ({stripe, options, children}: Props) => {
   }
 
   const prevOptions = usePrevious(options);
-  if (prevStripe != null && !isEqual(prevOptions, options)) {
+  if (prevStripe !== null && !isEqual(prevOptions, options)) {
     console.warn(
       'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
     );
@@ -102,44 +119,38 @@ export const Elements = ({stripe, options, children}: Props) => {
 
 Elements.propTypes = {
   stripe: PropTypes.any,
-  children: PropTypes.any,
+  children: PropTypes.node,
   options: PropTypes.object,
 };
 
-const parseElementsContext = (
-  ctx: ?ElementContext,
-  useCase: string
-): null | ElementsShape => {
-  if (!ctx) {
-    throw new Error(
-      `Could not find elements context; You need to wrap the part of your app that is ${useCase} in an <Elements> provider.`
-    );
-  }
-
-  if (ctx.tag === 'loading') {
-    return null;
-  }
-
-  return ctx.elements;
-};
-
-export const useElementsWithUseCase = (useCaseMessage: string) => {
+export const useElementsContextWithUseCase = (useCaseMessage: string) => {
   const ctx = useContext(ElementsContext);
   return parseElementsContext(ctx, useCaseMessage);
 };
 
-export const useElements = () =>
-  useElementsWithUseCase('calling useElements()');
+export const useElements = (): ElementsShape | null => {
+  const ctx = useElementsContextWithUseCase('calls useElements()');
+
+  return ctx && ctx.elements;
+};
+
+export const useStripe = (): StripeShape | null => {
+  const ctx = useElementsContextWithUseCase('calls useStripe()');
+
+  return ctx && ctx.stripe;
+};
 
 export const ElementsConsumer = ({
   children,
 }: {|
-  children: (elements: ElementsShape | null) => React$Node,
+  children: (
+    elements: {|elements: ElementsShape, stripe: StripeShape|} | null
+  ) => React$Node,
 |}) => {
-  const elements = useElementsWithUseCase('mounting <ElementsConsumer>');
-  return children(elements);
+  const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
+  return children(ctx);
 };
 
 ElementsConsumer.propTypes = {
-  children: PropTypes.func,
+  children: PropTypes.func.isRequired,
 };

@@ -1,13 +1,18 @@
 // @noflow
 import React from 'react';
 import {mount} from 'enzyme';
-import {Elements, useElements, ElementsConsumer} from './Elements';
+import {Elements, useElements, useStripe, ElementsConsumer} from './Elements';
 import {mockStripe} from '../../test/mocks';
 
 const TestComponent = () => <div>test</div>;
 const InjectedTestComponent = () => {
   const elements = useElements();
   return <TestComponent elements={elements} />;
+};
+
+const StripeInjectedTestComponent = () => {
+  const stripe = useStripe();
+  return <TestComponent stripe={stripe} />;
 };
 
 describe('Elements', () => {
@@ -40,16 +45,29 @@ describe('Elements', () => {
     expect(stripe.elements.mock.calls).toHaveLength(1);
   });
 
-  it('provides elements with the ElementsConsumer component', () => {
+  it('injects stripe with the useStripe hook', () => {
+    const wrapper = mount(
+      <Elements stripe={stripe}>
+        <StripeInjectedTestComponent />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
+  });
+
+  it('provides elements and stripe with the ElementsConsumer component', () => {
     const wrapper = mount(
       <Elements stripe={stripe}>
         <ElementsConsumer>
-          {(elements) => <TestComponent elements={elements} />}
+          {(ctx) => (
+            <TestComponent elements={ctx.elements} stripe={ctx.stripe} />
+          )}
         </ElementsConsumer>
       </Elements>
     );
 
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+    expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
   });
 
   it('allows a transition from null to a valid stripe object', () => {
@@ -65,19 +83,20 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
-  it('allows a transition from undefined to a valid stripe object', () => {
-    const wrapper = mount(
-      <Elements stripe={undefined}>
-        <InjectedTestComponent />
-      </Elements>
-    );
+  it('errors when props.stripe is `undefined`', () => {
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
 
-    expect(wrapper.find(TestComponent).prop('elements')).toBe(null);
-    wrapper.setProps({
-      stripe,
-    });
-    wrapper.update();
-    expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+    expect(() =>
+      mount(
+        <Elements>
+          <InjectedTestComponent />
+        </Elements>
+      )
+    ).toThrow('Invalid prop `stripe` supplied to `Elements`.');
+
+    console.error.mockRestore();
   });
 
   it('errors when props.stripe is `false`', () => {
@@ -169,7 +188,17 @@ describe('Elements', () => {
     jest.spyOn(console, 'error');
     console.error.mockImplementation(() => {});
     expect(() => mount(<InjectedTestComponent />)).toThrow(
-      'Could not find elements context; You need to wrap the part of your app that is calling useElements() in an <Elements> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
+    );
+    console.error.mockRestore();
+  });
+
+  it('throws when trying to call useStripe outside of Elements context', () => {
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
+    expect(() => mount(<StripeInjectedTestComponent />)).toThrow(
+      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
     console.error.mockRestore();
   });
@@ -185,7 +214,7 @@ describe('Elements', () => {
     );
 
     expect(() => mount(<WithAConsumer />)).toThrow(
-      'Could not find elements context; You need to wrap the part of your app that is mounting <ElementsConsumer> in an <Elements> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that mounts <ElementsConsumer> in an <Elements> provider.'
     );
     console.error.mockRestore();
   });
