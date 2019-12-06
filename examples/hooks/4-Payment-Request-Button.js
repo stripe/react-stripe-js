@@ -1,12 +1,10 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
-import {PaymentRequestButtonElement, Elements} from '../../src';
+import {PaymentRequestButtonElement, Elements, useStripe} from '../../src';
 
 import {Result, ErrorResult} from '../util';
 import '../styles/common.css';
-
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const NotAvailableResult = () => (
   <Result>
@@ -35,6 +33,7 @@ const ELEMENT_OPTIONS = {
 };
 
 const Checkout = () => {
+  const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [result, setResult] = useState(null);
 
@@ -87,6 +86,8 @@ const Checkout = () => {
     </form>
   );
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (

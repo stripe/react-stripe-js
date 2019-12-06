@@ -1,23 +1,22 @@
 // @noflow
 
 import React from 'react';
-import {CardElement, Elements, useElements} from '../../src';
+import {CardElement, Elements, useElements, useStripe} from '../../src';
 
 import '../styles/common.css';
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
-
 const Checkout = () => {
+  const stripe = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (event) => {
-    // block native form submission
+    // Block native form submission.
     event.preventDefault();
 
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
     // each type of element.
-    const cardElement = elements.getElement('card');
+    const cardElement = elements.getElement(CardElement);
 
     // Use your card Element with other Stripe.js APIs
     const {error, paymentMethod} = await stripe.createPaymentMethod({
@@ -54,6 +53,8 @@ const Checkout = () => {
     </form>
   );
 };
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (

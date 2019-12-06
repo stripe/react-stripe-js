@@ -4,10 +4,18 @@ import React from 'react';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/common.css';
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
-
 class MyCheckoutForm extends React.Component {
-  createPaymentMethod = async (cardElement) => {
+  handleSubmit = async (event) => {
+    // Block native form submission.
+    event.preventDefault();
+
+    const {stripe, elements} = this.props;
+
+    // Get a reference to a mounted CardElement. Elements knows how
+    // to find your CardElement because there can only ever be one of
+    // each type of element.
+    const cardElement = elements.getElement(CardElement);
+
     const {error, paymentMethod} = await stripe.createPaymentMethod({
       type: 'card',
       card: cardElement,
@@ -22,49 +30,45 @@ class MyCheckoutForm extends React.Component {
 
   render() {
     return (
-      <ElementsConsumer>
-        {(elements) => (
-          <form
-            onSubmit={(event) => {
-              // block native form submission
-              event.preventDefault();
-
-              // Get a reference to a mounted CardElement. Elements knows how
-              // to find your CardElement because there can only ever be one of
-              // each type of element.
-              const cardElement = elements.getElement('card');
-
-              this.createPaymentMethod(cardElement);
-            }}
-          >
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
-                  },
-                  invalid: {
-                    color: '#9e2146',
-                  },
+      <form onSubmit={this.handleSubmit}>
+        <CardElement
+          options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                  color: '#aab7c4',
                 },
-              }}
-            />
-            <button type="submit">Pay</button>
-          </form>
-        )}
-      </ElementsConsumer>
+              },
+              invalid: {
+                color: '#9e2146',
+              },
+            },
+          }}
+        />
+        <button type="submit">Pay</button>
+      </form>
     );
   }
 }
 
+const InjectedCheckoutForm = () => {
+  return (
+    <ElementsConsumer>
+      {({elements, stripe}) => (
+        <MyCheckoutForm elements={elements} stripe={stripe} />
+      )}
+    </ElementsConsumer>
+  );
+};
+
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
 const App = () => {
   return (
     <Elements stripe={stripe}>
-      <MyCheckoutForm />
+      <InjectedCheckoutForm />
     </Elements>
   );
 };
