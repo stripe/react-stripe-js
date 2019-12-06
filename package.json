@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe",
-  "version": "7.0.0-alpha.3",
+  "version": "7.0.0-alpha.4",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.js",
