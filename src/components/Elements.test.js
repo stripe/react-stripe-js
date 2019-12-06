@@ -65,19 +65,20 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
   });
 
-  it('allows a transition from undefined to a valid stripe object', () => {
-    const wrapper = mount(
-      <Elements stripe={undefined}>
-        <InjectedTestComponent />
-      </Elements>
-    );
+  it('errors when props.stripe is `undefined`', () => {
+    // Prevent the console.errors to keep the test output clean
+    jest.spyOn(console, 'error');
+    console.error.mockImplementation(() => {});
 
-    expect(wrapper.find(TestComponent).prop('elements')).toBe(null);
-    wrapper.setProps({
-      stripe,
-    });
-    wrapper.update();
-    expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+    expect(() =>
+      mount(
+        <Elements>
+          <InjectedTestComponent />
+        </Elements>
+      )
+    ).toThrow('Invalid prop `stripe` supplied to `Elements`.');
+
+    console.error.mockRestore();
   });
 
   it('errors when props.stripe is `false`', () => {
