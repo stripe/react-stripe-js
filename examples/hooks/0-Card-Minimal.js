@@ -5,7 +5,7 @@ import {CardElement, Elements, useElements, useStripe} from '../../src';
 
 import '../styles/common.css';
 
-const Checkout = () => {
+const MyCheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -59,7 +59,7 @@ const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 const App = () => {
   return (
     <Elements stripe={stripe}>
-      <Checkout />
+      <MyCheckoutForm />
     </Elements>
   );
 };
