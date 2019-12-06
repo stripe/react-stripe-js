@@ -50,6 +50,10 @@ describe('createElementComponent', () => {
     expect(CardElement.displayName).toBe('CardElement');
   });
 
+  it('stores the element component`s type as a static property', () => {
+    expect(CardElement.__elementType).toBe('card'); // eslint-disable-line no-underscore-dangle
+  });
+
   it('passes id to the wrapping DOM element', () => {
     const wrapper = mount(
       <Elements stripe={stripe}>
