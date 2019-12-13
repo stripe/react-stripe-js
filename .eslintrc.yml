@@ -17,6 +17,7 @@ env:
 rules:
   react/jsx-filename-extension: 0
   react/jsx-props-no-spreading: 0
+  react/require-default-props: 0
   no-duplicate-imports: 2 # doesn't support flow imports.
   no-console: 0
   func-style: 2
