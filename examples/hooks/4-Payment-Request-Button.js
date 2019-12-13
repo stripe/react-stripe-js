@@ -59,7 +59,7 @@ const Checkout = () => {
         setResult(<NotAvailableResult />);
       }
     });
-  }, []);
+  }, [stripe]);
 
   return (
     <form>
