@@ -134,8 +134,6 @@ const createElementComponent = (type: string) => {
   };
 
   Element.defaultProps = {
-    id: undefined,
-    className: undefined,
     onChange: noop,
     onBlur: noop,
     onFocus: noop,

@@ -1,5 +1,5 @@
 // @flow
-/* eslint-disable react/forbid-prop-types, react/require-default-props */
+/* eslint-disable react/forbid-prop-types */
 import React, {useContext, useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 
