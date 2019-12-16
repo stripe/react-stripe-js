@@ -21,7 +21,11 @@
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 "
   },
-  "keywords": ["React", "Stripe", "Elements"],
+  "keywords": [
+    "React",
+    "Stripe",
+    "Elements"
+  ],
   "author": "Stripe (https://www.stripe.com)",
   "license": "MIT",
   "dependencies": {
