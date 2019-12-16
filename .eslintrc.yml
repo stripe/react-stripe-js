@@ -11,10 +11,13 @@ parser: 'babel-eslint'
 plugins:
   - flowtype
   - jest
+  - react-hooks
 env:
   jest/globals: true
   browser: true
 rules:
+  react-hooks/rules-of-hooks: 2
+  react-hooks/exhaustive-deps: 1
   react/jsx-filename-extension: 0
   react/jsx-props-no-spreading: 0
   no-duplicate-imports: 2 # doesn't support flow imports.

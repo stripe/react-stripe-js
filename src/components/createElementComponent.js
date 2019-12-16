@@ -28,7 +28,7 @@ const extractUpdateableOptions = (options: ?MixedObject) => {
 
 const noop = () => {};
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-const callbackReference = (cb: MixedFunction) => {
+const useCallbackReference = (cb: MixedFunction) => {
   const cbStore = useRef(cb);
 
   useEffect(() => {
@@ -61,11 +61,11 @@ const createElementComponent = (type: string) => {
     const elementRef = useRef();
     const domNode = useRef();
 
-    const callOnReady = callbackReference(onReady);
-    const callOnBlur = callbackReference(onBlur);
-    const callOnFocus = callbackReference(onFocus);
-    const callOnClick = callbackReference(onClick);
-    const callOnChange = callbackReference(onChange);
+    const callOnReady = useCallbackReference(onReady);
+    const callOnBlur = useCallbackReference(onBlur);
+    const callOnFocus = useCallbackReference(onFocus);
+    const callOnClick = useCallbackReference(onClick);
+    const callOnChange = useCallbackReference(onChange);
 
     useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
