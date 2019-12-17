@@ -38,6 +38,18 @@ video][code-review] on "code review culture."
 
 ## Developing
 
+Install dependencies:
+
+```sh
+yarn install
+```
+
+Run the examples using [Storybook](https://storybook.js.org/):
+
+```sh
+yarn storybook
+```
+
 We use a number of automated checks:
 
 - Flow, for adding types to JavaScript
