@@ -1,20 +1,20 @@
-# Contributing to `react-stripe-elements`
+# Contributing to React Stripe
 
-Thanks for contributing to react-stripe-elements!
+Thanks for contributing to React Stripe!
 
 ## Issues
 
-`@stripe/react-stripe` is a thin wrapper around [Stripe.js] and [Stripe
+React Stripe is a thin wrapper around [Stripe.js] and [Stripe
 Elements][elements] for React. Please only file issues here that you believe
-represent bugs with @stripe/react-stripe, not Stripe.js itself.
+represent bugs with React Stripe, not Stripe.js itself.
 
 If you're having general trouble with Stripe.js or your Stripe integration,
 please reach out to us using the form at <https://support.stripe.com/email> or
 come chat with us at #stripe on freenode. We're very proud of our level of
 service, and we're more than happy to help you out with your integration.
 
-If you've found a bug in `@stripe/react-stripe`, please [let us know][issue]!
-You may also want to check out our [issue template][issue-template].
+If you've found a bug in React Stripe, please [let us know][issue]! You may also
+want to check out our [issue template][issue-template].
 
 ## API review
 
