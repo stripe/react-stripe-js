@@ -23,5 +23,5 @@ Elements to any React app.
 
 ### Contributing
 
-If you would like to contribute to React Stripe please make sure to read our
+If you would like to contribute to React Stripe, please make sure to read our
 [contributor guidelines](CONTRIBUTING.md).
