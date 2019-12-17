@@ -15,10 +15,9 @@ integration from
 ## Prerequisites
 
 `@stripe/react-stripe` depends on the React Hooks API. The minimum supported
-version of React is v16.8. If you are using hooks currently, then you should be
-fine. If you are on an older version of React, you will need to upgrade to use
-this library. If you do not wish to upgrade your React version, then feel free
-to continue using legacy
+version of React is v16.8. If you are on an older version of React, you will
+need to upgrade to use this library. If you do not wish to upgrade your React
+version, then feel free to continue using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
 ## 1. Install and fix imports
