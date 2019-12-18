@@ -30,6 +30,8 @@ to use this library. If you prefer not to upgrade your React version, we
 recommend using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
+<br />
+
 ### Contributing
 
 If you would like to contribute to React Stripe, please make sure to read our
