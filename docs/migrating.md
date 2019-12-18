@@ -1,23 +1,23 @@
 # Migrating from `react-stripe-elements`
 
-This guide includes of step by step instructions for migrating your Stripe
-integration from
+This guide will walk you through migrating your Stripe integration from
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements) to
 React Stripe.
 
 - Prefer something a little more comprehensive? Check out the official
   [React Stripe docs](https://stripe.com/docs/stripe-js/react-stripe).
-- Prefer something a little more light weight? Check out our
-  [existing examples](https://github.com/stripe/react-stripe/tree/master/examples).
+- Or take a look at some
+  [example integrations](https://github.com/stripe/react-stripe/tree/master/examples).
 
 ---
 
 ## Prerequisites
 
-React Stripe depends on the React Hooks API. The minimum supported version of
-React is v16.8. If you are on an older version of React, you will need to
-upgrade to use this library. If you do not wish to upgrade your React version,
-then feel free to continue using legacy
+React Stripe depends on the
+[React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
+supported version of React is v16.8. If you use an older version, upgrade React
+to use this library. If you prefer not to upgrade your React version, feel free
+to continue using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
 ## 1. Install and fix imports
@@ -30,8 +30,8 @@ npm uninstall react-stripe-elements
 npm install @stripe/react-stripe
 ```
 
-Once you have installed, you need to update your import statements. Anywhere you
-used to import from `react-stripe-elements` you will now want to import from
+After installing React Stripe, update your import statements. In places where
+you used to import from `react-stripe-elements`, adjust your code to import from
 `@stripe/react-stripe`.
 
 #### Before
@@ -153,7 +153,7 @@ const CheckoutForm = (props) => {
   // the rest of CheckoutForm...
 };
 
-// Inject stripe and elements with `injectStripe`.
+// Inject Stripe and Elements with `injectStripe`.
 const InjectedCheckoutForm = injectStripe(CheckoutForm);
 ```
 
@@ -163,7 +163,7 @@ const InjectedCheckoutForm = injectStripe(CheckoutForm);
 import {useStripe, useElements} from '@stripe/react-stripe';
 
 const CheckoutForm = (props) => {
-  // Get a reference to stripe or elements using hooks.
+  // Get a reference to Stripe or Elements using hooks.
   const stripe = useStripe();
   const elements = useElements();
 
