@@ -16,7 +16,7 @@ Elements to any React app.
 
 - [React Stripe Docs](https://stripe.com/docs/stripe-js/react-stripe)
 - [Migrate from `react-stripe-elements`](docs/migrating.md)
-- [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/)
+- [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
 ---
