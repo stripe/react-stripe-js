@@ -3,6 +3,13 @@
 React Stripe adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v7.0.0-beta.0 2019-12-18
+
+- No code changes from the last alpha release
+- Add official docs
+- Add a migration guide
+- Update Readme
+
 ## v7.0.0-alpha.5 2019-12-17
 
 - Fix a vulnerability in a build dependency
