@@ -1,45 +1,34 @@
-# @stripe/react-stripe
-
-[![build status](https://img.shields.io/travis/stripe/react-stripe/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe)
-[![npm version](https://img.shields.io/npm/v/@stripe/react-stripe.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe)
-
-> React components for Stripe.js and Stripe Elements
+# React Stripe
 
 React Stripe is a thin React wrapper around
 [Stripe Elements](https://stripe.com/docs/elements). It allows you to add
 Elements to any React app.
 
-## Docs
+[![build status](https://img.shields.io/travis/stripe/react-stripe/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe)
+[![npm version](https://img.shields.io/npm/v/@stripe/react-stripe.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe)
 
-TODO
+## Getting Started
 
-Looking for the legacy `react-stripe-elements` docs? You can find those
-[here](https://github.com/stripe/react-stripe-elements/).
+- [Add React Stripe to your React app](https://stripe.com/docs/stripe-js/react-stripe#setup)
+- [Try it out using CodeSandbox](https://codesandbox.io/s/react-stripe-official-q1loc?fontsize=14&hidenavigation=1&theme=dark)
 
-## Development
+## Documentation
 
-Install dependencies:
+- [React Stripe Docs](https://stripe.com/docs/stripe-js/react-stripe)
+- [Migrate from `react-stripe-elements`](docs/migrating.md)
+- [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
+- [Examples](examples)
 
-    yarn install
+### Minimum Requirements
 
-Run the examples using [Storybook](https://storybook.js.org/):
+React Stripe depends on the
+[React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
+supported version of React is v16.8. If you use an older version, upgrade React
+to use this library. If you prefer not to upgrade your React version, we
+recommend using legacy
+[`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
-    yarn storybook
+### Contributing
 
-Run the tests:
-
-    yarn run test
-
-Build:
-
-    yarn run build
-
-We use [prettier](https://github.com/prettier/prettier) for code formatting:
-
-    yarn run prettier
-
-Checks:
-
-    yarn test
-    yarn run lint
-    yarn run flow
+If you would like to contribute to React Stripe, please make sure to read our
+[contributor guidelines](CONTRIBUTING.md).
