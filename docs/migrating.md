@@ -9,9 +9,7 @@ React Stripe.
 - Or take a look at some
   [example integrations](https://github.com/stripe/react-stripe/tree/master/examples).
 
----
-
-## Prerequisites
+### Prerequisites
 
 React Stripe depends on the
 [React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
@@ -19,6 +17,8 @@ supported version of React is v16.8. If you use an older version, upgrade React
 to use this library. If you prefer not to upgrade your React version, feel free
 to continue using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
+
+<br />
 
 ## 1. Install and fix imports
 
@@ -45,6 +45,8 @@ import {CardElement} from 'react-stripe-elements';
 ```js
 import {CardElement} from '@stripe/react-stripe';
 ```
+
+<br />
 
 ## 2. Remove `<StripeProvider>`
 
@@ -82,6 +84,8 @@ const App = () => (
   <Elements stripe={stripe}>{/* Your checkout form */}</Elements>
 );
 ```
+
+<br />
 
 ## 3. Update Element component options
 
@@ -138,6 +142,8 @@ import {CardElement} from '@stripe/react-stripe';
 />;
 ```
 
+<br />
+
 ## 3. `useStripe` and `useElements` instead of `injectStripe`.
 
 React Stripe uses hooks and consumers rather than higher order components.
@@ -188,6 +194,8 @@ const InjectedCheckoutForm = () => (
   </ElementsConsumer>
 );
 ```
+
+<br />
 
 ## 4. Pass in the Element instance to other Stripe.js methods.
 
@@ -247,6 +255,8 @@ const CheckoutForm = (props) => {
   );
 };
 ```
+
+<br />
 
 ---
 
