@@ -21,6 +21,15 @@ Elements to any React app.
 
 ---
 
+### Minimum Requirements
+
+React Stripe depends on the
+[React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
+supported version of React is v16.8. If you use an older version, upgrade React
+to use this library. If you prefer not to upgrade your React version, we
+recommend using legacy
+[`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
+
 ### Contributing
 
 If you would like to contribute to React Stripe, please make sure to read our
