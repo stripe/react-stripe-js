@@ -19,8 +19,6 @@ Elements to any React app.
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
-<br />
-
 ### Minimum Requirements
 
 React Stripe depends on the
@@ -29,8 +27,6 @@ supported version of React is v16.8. If you use an older version, upgrade React
 to use this library. If you prefer not to upgrade your React version, we
 recommend using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
-
-<br />
 
 ### Contributing
 
