@@ -4,8 +4,6 @@ React Stripe is a thin React wrapper around
 [Stripe Elements](https://stripe.com/docs/elements). It allows you to add
 Elements to any React app.
 
-<br />
-
 ## Getting Started
 
 - [Add React Stripe to your React app](https://stripe.com/docs/stripe-js/react-stripe#setup)
