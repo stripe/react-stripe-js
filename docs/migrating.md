@@ -100,6 +100,7 @@ import {CardElement} from 'react-stripe-elements';
 
 <CardElement
   id="my-card"
+  onChange={handleChange}
   {/* Options are spread onto the component as props. */}
   iconStyle="solid"
   style={{
@@ -124,6 +125,7 @@ import {CardElement} from '@stripe/react-stripe';
 
 <CardElement
   id="my-card"
+  onChange={handleChange}
   {/* Options are passed in on their own prop. */}
   options={{
     iconStyle: 'solid',
