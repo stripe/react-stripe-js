@@ -19,7 +19,7 @@ Elements to any React app.
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
----
+<br />
 
 ### Minimum Requirements
 
