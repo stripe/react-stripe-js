@@ -2,7 +2,7 @@ Feature request or idea? Consider opening an
 [API review](https://github.com/stripe/react-stripe-js/tree/master/.github/API_REVIEW.md)!
 
 <!--
-.js is a thin wrapper around Stripe.js and Stripe
+React Stripe.js is a thin wrapper around Stripe.js and Stripe
 Elements for React. Please only file issues here that you believe
 represent bugs with React Stripe.js, not Stripe.js itself.
 
