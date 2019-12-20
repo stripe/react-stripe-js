@@ -214,8 +214,8 @@ const CheckoutForm = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Element will be inferred and is not passed to
-    // createToken or other Stripe.js methods.
+    // Element will be inferred and is not passed to Stripe.js methods.
+    // e.g. stripe.createToken
     stripe.createToken();
   };
 
@@ -242,11 +242,25 @@ const CheckoutForm = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Use elements.getElement to get a reference to the mounted
-    // Element and pass it to createToken or other Stripe.js
-    // methods directly.
-    const card = elements.getElement(CardElement);
-    stripe.createToken(card);
+    // Use elements.getElement to get a reference to the mounted Element.
+    const cardElement = elements.getElement(CardElement);
+
+    // Pass the Element directly to other Stripe.js methods:
+    // e.g. createToken - https://stripe.com/docs/js/tokens_sources/create_token?type=cardElement
+    stripe.createToken(cardElement);
+
+    // or createPaymentMethod - https://stripe.com/docs/js/payment_intents/create_payment_method
+    stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+    });
+
+    // or confirmCardPayment - https://stripe.com/docs/js/payment_intents/confirm_card_payment
+    stripe.confirmCardPayment({
+      payment_method: {
+        card: cardElement,
+      },
+    });
   };
 
   return (
