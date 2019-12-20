@@ -2,16 +2,16 @@
 
 This guide will walk you through migrating your Stripe integration from
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements) to
-React Stripe.
+React Stripe.js.
 
 - Prefer something a little more comprehensive? Check out the official
-  [React Stripe docs](https://stripe.com/docs/stripe-js/react-stripe).
+  [React Stripe.js docs](https://stripe.com/docs/stripe-js/react).
 - Or take a look at some
-  [example integrations](https://github.com/stripe/react-stripe/tree/master/examples).
+  [example integrations](https://github.com/stripe/react-stripe-js/tree/master/examples).
 
 ### Prerequisites
 
-React Stripe depends on the
+React Stripe.js depends on the
 [React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
 supported version of React is v16.8. If you use an older version, upgrade React
 to use this library. If you prefer not to upgrade your React version, feel free
@@ -23,16 +23,16 @@ to continue using legacy
 ## 1. Install and fix imports
 
 First, use `npm` or `yarn` to remove `react-stripe-elements` and install
-`@stripe/react-stripe`.
+`@stripe/react-stripe-js`.
 
 ```sh
 npm uninstall react-stripe-elements
-npm install @stripe/react-stripe
+npm install @stripe/react-stripe-js
 ```
 
-After installing React Stripe, update your import statements. In places where
+After installing React Stripe.js, update your import statements. In places where
 you used to import from `react-stripe-elements`, adjust your code to import from
-`@stripe/react-stripe`.
+`@stripe/react-stripe-js`.
 
 #### Before
 
@@ -43,14 +43,14 @@ import {CardElement} from 'react-stripe-elements';
 #### After
 
 ```js
-import {CardElement} from '@stripe/react-stripe';
+import {CardElement} from '@stripe/react-stripe-js';
 ```
 
 <br />
 
 ## 2. Remove `<StripeProvider>`
 
-React Stripe no longer has a `<StripeProvider>` component. Instead you will
+React Stripe.js no longer has a `<StripeProvider>` component. Instead you will
 instantiate the [Stripe object](https://stripe.com/docs/js/initializing)
 yourself and pass it directly to `<Elements>`. We've prefilled the examples
 below with a sample test [API key](https://stripe.com/docs/keys). Replace it
@@ -74,7 +74,7 @@ const App = () => (
 #### After
 
 ```jsx
-import {Elements} from 'react-stripe-elements';
+import {Elements} from '@stripe/react-stripe-js';
 
 // Create the Stripe object yourself...
 const stripe = window.Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
@@ -91,7 +91,7 @@ const App = () => (
 
 The way you pass in
 [Element options](https://stripe.com/docs/js/elements_object/create_element?type=card#elements_create-options)
-is different in React Stripe.
+is different in React Stripe.js.
 
 #### Before
 
@@ -120,7 +120,7 @@ import {CardElement} from 'react-stripe-elements';
 #### After
 
 ```jsx
-import {CardElement} from '@stripe/react-stripe';
+import {CardElement} from '@stripe/react-stripe-js';
 
 
 <CardElement
@@ -148,7 +148,7 @@ import {CardElement} from '@stripe/react-stripe';
 
 ## 3. `useStripe` and `useElements` instead of `injectStripe`.
 
-React Stripe uses hooks and consumers rather than higher order components.
+React Stripe.js uses hooks and consumers rather than higher order components.
 
 #### Before
 
@@ -168,7 +168,7 @@ const InjectedCheckoutForm = injectStripe(CheckoutForm);
 #### After
 
 ```jsx
-import {useStripe, useElements} from '@stripe/react-stripe';
+import {useStripe, useElements} from '@stripe/react-stripe-js';
 
 const CheckoutForm = (props) => {
   // Get a reference to Stripe or Elements using hooks.
@@ -180,7 +180,7 @@ const CheckoutForm = (props) => {
 
 // Or use `<ElementsConsumer>` if you do not want to use hooks.
 
-import {ElementsConsumer} from '@stripe/react-stripe';
+import {ElementsConsumer} from '@stripe/react-stripe-js';
 
 const CheckoutForm = (props) => {
   const {stripe, elements} = props;
@@ -201,7 +201,7 @@ const InjectedCheckoutForm = () => (
 
 ## 4. Pass in the Element instance to other Stripe.js methods.
 
-React Stripe does not have the automatic Element detection.
+React Stripe.js does not have the automatic Element detection.
 
 #### Before
 
@@ -233,7 +233,7 @@ const InjectedCheckoutForm = injectStripe(CheckoutForm);
 #### After
 
 ```jsx
-import {useStripe, useElements, CardElement} from 'react-stripe-elements';
+import {useStripe, useElements, CardElement} from '@stripe/react-stripe-js';
 
 const CheckoutForm = (props) => {
   const stripe = useStripe();
@@ -264,5 +264,5 @@ const CheckoutForm = (props) => {
 
 ### More Information
 
-- [React Stripe Docs](https://stripe.com/docs/stripe-js/react-stripe)
-- [Examples](https://github.com/stripe/react-stripe/tree/master/examples)
+- [React Stripe.js Docs](https://stripe.com/docs/stripe-js/react)
+- [Examples](https://github.com/stripe/react-stripe-js/tree/master/examples)

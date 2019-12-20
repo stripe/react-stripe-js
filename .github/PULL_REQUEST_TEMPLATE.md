@@ -9,7 +9,7 @@
 Copy [this template] **or** link to an API review issue.
 
 [this template]:
-  https://github.com/stripe/react-stripe/tree/master/.github/API_REVIEW.md
+  https://github.com/stripe/react-stripe-js/tree/master/.github/API_REVIEW.md
 
 ### Testing & documentation
 
