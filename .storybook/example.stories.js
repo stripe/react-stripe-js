@@ -68,7 +68,7 @@ const addDemo = (directory, file, stories) => {
   stories.add(name, () => <ExampleComponent file={`${directory}/${file}`} />);
 };
 
-const hooksStories = storiesOf('react-stripe/Hooks', module);
+const hooksStories = storiesOf('react-stripe-js/Hooks', module);
 require
   .context('../examples/hooks/', false, /\/\d-(.*).js$/)
   .keys()
@@ -76,7 +76,7 @@ require
     addDemo('hooks', key.slice(2), hooksStories);
   });
 
-const classStories = storiesOf('react-stripe/Class Components', module);
+const classStories = storiesOf('react-stripe-js/Class Components', module);
 require
   .context('../examples/class-components/', false, /\/\d-(.*).js$/)
   .keys()

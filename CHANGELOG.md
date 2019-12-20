@@ -1,6 +1,6 @@
 # Changelog
 
-React Stripe adheres to
+React Stripe.js adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## v7.0.0-beta.0 2019-12-18
