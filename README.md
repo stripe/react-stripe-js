@@ -18,7 +18,7 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
-## Minimal Example
+### Minimal Example
 
 ```jsx
 import React from "react";
