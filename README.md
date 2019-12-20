@@ -21,22 +21,27 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 ### Minimal Example
 
 ```jsx
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import {CardElement, Elements, useStripe, useElements} from "@stripe/react-stripe-js";
+import {
+  CardElement,
+  Elements,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
 
-const stripe = window.Stripe("pk_test_6pRNASCoBOKtIshFeQd4XMUh");
+const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const MyCheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit = async ev => {
+  const handleSubmit = async (event) => {
     ev.preventDefault();
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: elements.getElement(CardElement)
+    const {error, paymentMethod} = await stripe.createPaymentMethod({
+      type: 'card',
+      card: elements.getElement(CardElement),
     });
   };
 
