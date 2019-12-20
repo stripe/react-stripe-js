@@ -1,8 +1,7 @@
 # React Stripe.js
 
-React Stripe.js is a thin React wrapper around
-[Stripe Elements](https://stripe.com/docs/elements). It allows you to add
-Elements to any React app.
+React components for [Stripe.js](https://stripe.com/docs/stripe-js) and 
+[Stripe Elements](https://stripe.com/docs/elements).
 
 [![build status](https://img.shields.io/travis/stripe/react-stripe-js/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe-js)
 [![npm version](https://img.shields.io/npm/v/@stripe/react-stripe-js.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe-js)
