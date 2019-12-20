@@ -18,6 +18,47 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
+## Minimal Example
+
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+
+import {CardElement, Elements, useStripe, useElements} from "@stripe/react-stripe-js";
+
+const stripe = window.Stripe("pk_test_6pRNASCoBOKtIshFeQd4XMUh");
+
+const MyCheckoutForm = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async ev => {
+    ev.preventDefault();
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: "card",
+      card: elements.getElement(CardElement)
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement />
+      <button>Pay</button>
+    </form>
+  );
+};
+
+const App = () => {
+  return (
+    <Elements stripe={stripe}>
+      <MyCheckoutForm />
+    </Elements>
+  );
+};
+
+ReactDOM.render(<App />, document.body);
+```
+
 ### Minimum Requirements
 
 React Stripe.js depends on the
