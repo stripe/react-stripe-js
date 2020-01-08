@@ -69,39 +69,30 @@ const InjectedCheckoutForm = () => {
   );
 };
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      stripe: null,
-    };
+const stripePromise = new Promise((resolve) => {
+  if (typeof window === 'undefined') {
+    // We can also make this work with server side rendering (SSR) by
+    // resolving to null when not in a browser environment.
+    resolve(null);
   }
 
-  componentDidMount() {
-    // componentDidMount is only called in browser environments,
-    // so this will also work with server side rendering (SSR).
+  // You can inject a script tag manually like this, or you can just
+  // use the 'async' attribute on the Stripe.js v3 script tag.
+  const stripeJs = document.createElement('script');
+  stripeJs.src = 'https://js.stripe.com/v3/';
+  stripeJs.async = true;
+  stripeJs.onload = () => {
+    resolve(window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'));
+  };
+  document.body.appendChild(stripeJs);
+});
 
-    // You can inject a script tag manually like this, or you can just
-    // use the 'async' attribute on the Stripe.js v3 script tag.
-    const stripeJs = document.createElement('script');
-    stripeJs.src = 'https://js.stripe.com/v3/';
-    stripeJs.async = true;
-    stripeJs.onload = () => {
-      this.setState({
-        stripe: window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh'),
-      });
-    };
-    document.body.appendChild(stripeJs);
-  }
-
-  render() {
-    const {stripe} = this.state;
-    return (
-      <Elements stripe={stripe}>
-        <InjectedCheckoutForm />
-      </Elements>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <InjectedCheckoutForm />
+    </Elements>
+  );
+};
 
 export default App;

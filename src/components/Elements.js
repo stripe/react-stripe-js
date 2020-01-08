@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable react/forbid-prop-types */
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import isEqual from '../utils/isEqual';
@@ -76,39 +76,78 @@ const validateStripe = (maybeStripe: mixed): StripeShape | null => {
   );
 };
 
+const parseStripeProp = (
+  raw: mixed
+):
+  | {|tag: 'sync', value: StripeShape | null|}
+  | {|tag: 'async', value: Promise<StripeShape | null>|} => {
+  if (
+    typeof raw === 'object' &&
+    raw !== null &&
+    raw.then &&
+    typeof raw.then === 'function'
+  ) {
+    // We know this is a Promise, but Flow does not.
+    return {tag: 'async', value: (raw: any).then(validateStripe)};
+  }
+
+  return {tag: 'sync', value: validateStripe(raw)};
+};
+
 type Props = {|
-  stripe: StripeShape | null,
+  stripe: Promise<StripeShape | null> | StripeShape | null,
   options?: MixedObject,
   children?: any,
 |};
 
-export const Elements = ({stripe: rawStripe, options, children}: Props) => {
-  // We are using types to enforce the `stripe` prop in this lib,
-  // but in a real integration, `stripe` could be anything, so we need
-  // to do some sanity validation to prevent type errors.
-  const stripe = useMemo(() => validateStripe(rawStripe), [rawStripe]);
+export const Elements = ({stripe: rawStripeProp, options, children}: Props) => {
+  const prevStripeProp = usePrevious(rawStripeProp);
+  const prevOptionsProp = usePrevious(options);
 
-  const [elements, setElements] = useState(() =>
-    createElementsContext(stripe, options)
-  );
-
-  if (stripe !== null && elements.tag === 'loading') {
-    setElements(createElementsContext(stripe, options));
-  }
-
-  const prevStripe = usePrevious(stripe);
-  if (prevStripe != null && prevStripe !== stripe) {
+  if (prevStripeProp != null && prevStripeProp !== rawStripeProp) {
     console.warn(
       'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
     );
   }
 
-  const prevOptions = usePrevious(options);
-  if (prevStripe !== null && !isEqual(prevOptions, options)) {
+  if (prevStripeProp !== null && !isEqual(prevOptionsProp, options)) {
     console.warn(
       'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
     );
   }
+
+  const parsedStripeProp = useMemo(() => parseStripeProp(rawStripeProp), [
+    rawStripeProp,
+  ]);
+
+  const [elements, setElements] = useState(() => {
+    return parsedStripeProp.tag === 'sync'
+      ? createElementsContext(parsedStripeProp.value, options)
+      : createElementsContext(null, options);
+  });
+
+  // Handle user controlled async setting of the Stripe prop.
+  if (
+    parsedStripeProp.tag === 'sync' &&
+    parsedStripeProp.value !== null &&
+    elements.tag === 'loading'
+  ) {
+    setElements(createElementsContext(parsedStripeProp.value, options));
+  }
+
+  // Handle when the stripe prop is a Promise.
+  useEffect(() => {
+    if (parsedStripeProp.tag === 'async') {
+      Promise.resolve(parsedStripeProp.value).then((resolvedStripe) => {
+        // We allow the `stripe` prop to resolve to be null to make SSR easier.
+        // In a server environment the Stripe loading module will resolve to null.
+        if (resolvedStripe !== null && elements.tag === 'loading') {
+          const ctx = createElementsContext(resolvedStripe, options);
+          setElements(ctx);
+        }
+      });
+    }
+  }, [parsedStripeProp, options, elements.tag]);
 
   return (
     <ElementsContext.Provider value={elements}>

@@ -1,5 +1,6 @@
 // @noflow
 import React from 'react';
+import {act} from 'react-dom/test-utils';
 import {mount} from 'enzyme';
 import {Elements, useElements, useStripe, ElementsConsumer} from './Elements';
 import {mockStripe} from '../../test/mocks';
@@ -70,7 +71,7 @@ describe('Elements', () => {
     expect(wrapper.find(TestComponent).prop('stripe')).toBe(stripe);
   });
 
-  it('allows a transition from null to a valid stripe object', () => {
+  it('allows a transition from null to a valid Stripe object', () => {
     const wrapper = mount(
       <Elements stripe={null}>
         <InjectedTestComponent />
@@ -81,6 +82,40 @@ describe('Elements', () => {
     wrapper.setProps({stripe});
     wrapper.update();
     expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+  });
+
+  it('works with a Promise resolving to a valid Stripe object', () => {
+    const stripePromise = Promise.resolve(stripe);
+
+    const wrapper = mount(
+      <Elements stripe={stripePromise}>
+        <InjectedTestComponent />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('elements')).toBe(null);
+
+    return Promise.resolve(act(() => stripePromise)).then(() => {
+      wrapper.update();
+      expect(wrapper.find(TestComponent).prop('elements')).toBe(mockElements);
+    });
+  });
+
+  it('works with a Promise resolving to null for SSR safety', () => {
+    const stripePromise = Promise.resolve(null);
+
+    const wrapper = mount(
+      <Elements stripe={stripePromise}>
+        <InjectedTestComponent />
+      </Elements>
+    );
+
+    expect(wrapper.find(TestComponent).prop('elements')).toBe(null);
+
+    return Promise.resolve(act(() => stripePromise)).then(() => {
+      wrapper.update();
+      expect(wrapper.find(TestComponent).prop('elements')).toBe(null);
+    });
   });
 
   it('errors when props.stripe is `undefined`', () => {
