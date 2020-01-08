@@ -9,10 +9,24 @@ import pkg from './package.json';
 export default [
   {
     input: 'src/index.js',
-    external: ['react'],
+    external: ['react', 'prop-types'],
     output: [
       {file: pkg.main, format: 'cjs'},
       {file: pkg.module, format: 'es'},
+    ],
+    plugins: [
+      resolve(),
+      babel({
+        exclude: 'node_modules/**',
+      }),
+      commonjs(),
+    ],
+  },
+  // UMD build with inline PropTypes
+  {
+    input: 'src/index.js',
+    external: ['react'],
+    output: [
       {
         name: 'ReactStripe',
         file: pkg.browser,
@@ -23,10 +37,10 @@ export default [
       },
     ],
     plugins: [
+      resolve(),
       babel({
         exclude: 'node_modules/**',
       }),
-      resolve(),
       commonjs(),
     ],
   },
@@ -45,13 +59,13 @@ export default [
       },
     ],
     plugins: [
+      resolve(),
       babel({
         exclude: 'node_modules/**',
       }),
       replace({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-      resolve(),
       commonjs(),
       terser(),
     ],
