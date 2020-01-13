@@ -1,72 +1,33 @@
 // @flow
 /* eslint-disable react/forbid-prop-types */
-import React, {useContext, useMemo, useState, useEffect} from 'react';
+import React, {useContext, useMemo, useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 
 import isEqual from '../utils/isEqual';
 import usePrevious from '../utils/usePrevious';
 
-type ElementContext =
-  | {|
-      tag: 'ready',
-      elements: ElementsShape,
-      stripe: StripeShape,
-    |}
-  | {|
-      tag: 'loading',
-    |};
-
-const ElementsContext = React.createContext<?ElementContext>();
-
-export const createElementsContext = (
-  stripe: null | StripeShape,
-  options: ?MixedObject
-): ElementContext => {
-  if (stripe === null) {
-    return {tag: 'loading'};
-  }
-
-  return {
-    tag: 'ready',
-    stripe,
-    elements: stripe.elements(options || {}),
-  };
-};
-
-export const parseElementsContext = (
-  ctx: ?ElementContext,
-  useCase: string
-): {|elements: ElementsShape | null, stripe: StripeShape | null|} => {
-  if (!ctx) {
-    throw new Error(
-      `Could not find Elements context; You need to wrap the part of your app that ${useCase} in an <Elements> provider.`
-    );
-  }
-
-  if (ctx.tag === 'loading') {
-    return {stripe: null, elements: null};
-  }
-
-  const {stripe, elements} = ctx;
-
-  return {stripe, elements};
-};
+type ParsedStripeProp =
+  | {|tag: 'empty'|}
+  | {|tag: 'sync', stripe: StripeShape|}
+  | {|tag: 'async', stripePromise: Promise<StripeShape | null>|};
 
 // We are using types to enforce the `stripe` prop in this lib,
 // but in a real integration `stripe` could be anything, so we need
 // to do some sanity validation to prevent type errors.
-const validateStripe = (maybeStripe: mixed): StripeShape | null => {
+const validateStripe = (maybeStripe: mixed): null | StripeShape => {
   if (maybeStripe === null) {
     return maybeStripe;
   }
 
   if (
     typeof maybeStripe === 'object' &&
-    maybeStripe.elements &&
-    maybeStripe.createSource &&
-    maybeStripe.createToken &&
-    maybeStripe.createPaymentMethod
+    typeof maybeStripe.elements === 'function' &&
+    typeof maybeStripe.createSource === 'function' &&
+    typeof maybeStripe.createToken === 'function' &&
+    typeof maybeStripe.createPaymentMethod === 'function'
   ) {
+    // If the object appears to be roughly Stripe shaped,
+    // force cast it to the expected type.
     return ((maybeStripe: any): StripeShape);
   }
 
@@ -76,22 +37,46 @@ const validateStripe = (maybeStripe: mixed): StripeShape | null => {
   );
 };
 
-const parseStripeProp = (
-  raw: mixed
-):
-  | {|tag: 'sync', value: StripeShape | null|}
-  | {|tag: 'async', value: Promise<StripeShape | null>|} => {
+const parseStripeProp = (raw: mixed): ParsedStripeProp => {
   if (
-    typeof raw === 'object' &&
     raw !== null &&
+    typeof raw === 'object' &&
     raw.then &&
     typeof raw.then === 'function'
   ) {
-    // We know this is a Promise, but Flow does not.
-    return {tag: 'async', value: (raw: any).then(validateStripe)};
+    return {
+      tag: 'async',
+      stripePromise: Promise.resolve(raw).then(validateStripe),
+    };
   }
 
-  return {tag: 'sync', value: validateStripe(raw)};
+  const stripe = validateStripe(raw);
+
+  if (stripe === null) {
+    return {tag: 'empty'};
+  }
+
+  return {tag: 'sync', stripe};
+};
+
+type ElementContext = {|
+  elements: ElementsShape | null,
+  stripe: StripeShape | null,
+|};
+
+const ElementsContext = React.createContext<?ElementContext>();
+
+export const parseElementsContext = (
+  ctx: ?ElementContext,
+  useCase: string
+): ElementContext => {
+  if (!ctx) {
+    throw new Error(
+      `Could not find Elements context; You need to wrap the part of your app that ${useCase} in an <Elements> provider.`
+    );
+  }
+
+  return ctx;
 };
 
 type Props = {|
@@ -101,58 +86,63 @@ type Props = {|
 |};
 
 export const Elements = ({stripe: rawStripeProp, options, children}: Props) => {
-  const prevStripeProp = usePrevious(rawStripeProp);
-  const prevOptionsProp = usePrevious(options);
+  const final = useRef(false);
+  const isMounted = useRef(true);
+  const parsed = useMemo(() => parseStripeProp(rawStripeProp), [rawStripeProp]);
+  const [ctx, setContext] = useState<ElementContext>(() => ({
+    stripe: null,
+    elements: null,
+  }));
 
-  if (prevStripeProp != null && prevStripeProp !== rawStripeProp) {
-    console.warn(
-      'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
-    );
+  const prevStripe = usePrevious(rawStripeProp);
+  const prevOptions = usePrevious(options);
+  if (prevStripe !== null) {
+    if (prevStripe !== rawStripeProp) {
+      console.warn(
+        'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
+      );
+    }
+    if (!isEqual(options, prevOptions)) {
+      console.warn(
+        'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
+      );
+    }
   }
 
-  if (prevStripeProp !== null && !isEqual(prevOptionsProp, options)) {
-    console.warn(
-      'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
-    );
-  }
+  if (!final.current) {
+    if (parsed.tag === 'sync') {
+      final.current = true;
+      setContext({
+        stripe: parsed.stripe,
+        elements: parsed.stripe.elements(options),
+      });
+    }
 
-  const parsedStripeProp = useMemo(() => parseStripeProp(rawStripeProp), [
-    rawStripeProp,
-  ]);
-
-  const [elements, setElements] = useState(() => {
-    return parsedStripeProp.tag === 'sync'
-      ? createElementsContext(parsedStripeProp.value, options)
-      : createElementsContext(null, options);
-  });
-
-  // Handle user controlled async setting of the Stripe prop.
-  if (
-    parsedStripeProp.tag === 'sync' &&
-    parsedStripeProp.value !== null &&
-    elements.tag === 'loading'
-  ) {
-    setElements(createElementsContext(parsedStripeProp.value, options));
-  }
-
-  // Handle when the stripe prop is a Promise.
-  useEffect(() => {
-    if (parsedStripeProp.tag === 'async') {
-      Promise.resolve(parsedStripeProp.value).then((resolvedStripe) => {
-        // We allow the `stripe` prop to resolve to be null to make SSR easier.
-        // In a server environment the Stripe loading module will resolve to null.
-        if (resolvedStripe !== null && elements.tag === 'loading') {
-          const ctx = createElementsContext(resolvedStripe, options);
-          setElements(ctx);
+    if (parsed.tag === 'async') {
+      final.current = true;
+      parsed.stripePromise.then((stripe) => {
+        if (stripe && isMounted.current) {
+          // Only update Elements context if the component is still mounted
+          // and stripe is not null. We allow stripe to be null to make
+          // handling SSR easier.
+          setContext({
+            stripe,
+            elements: stripe.elements(options),
+          });
         }
       });
     }
-  }, [parsedStripeProp, options, elements.tag]);
+  }
+
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
 
   return (
-    <ElementsContext.Provider value={elements}>
-      {children}
-    </ElementsContext.Provider>
+    <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>
   );
 };
 
@@ -169,13 +159,11 @@ export const useElementsContextWithUseCase = (useCaseMessage: string) => {
 
 export const useElements = (): ElementsShape | null => {
   const {elements} = useElementsContextWithUseCase('calls useElements()');
-
   return elements;
 };
 
 export const useStripe = (): StripeShape | null => {
   const {stripe} = useElementsContextWithUseCase('calls useStripe()');
-
   return stripe;
 };
 
