@@ -38,7 +38,7 @@ const MyCheckoutForm = () => {
   const elements = useElements();
 
   const handleSubmit = async (event) => {
-    ev.preventDefault();
+    event.preventDefault();
     const {error, paymentMethod} = await stripe.createPaymentMethod({
       type: 'card',
       card: elements.getElement(CardElement),
@@ -48,7 +48,7 @@ const MyCheckoutForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />
-      <button>Pay</button>
+      <button type="submit">Pay</button>
     </form>
   );
 };
