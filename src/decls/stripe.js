@@ -19,7 +19,7 @@ declare type PaymentRequestShape = {
 };
 
 declare type StripeShape = {
-  elements: (options: MixedObject) => ElementsShape,
+  elements: (options: ?MixedObject) => ElementsShape,
   paymentRequest: (options: MixedObject) => PaymentRequestShape,
   createSource: (
     element: ElementShape | MixedObject,
