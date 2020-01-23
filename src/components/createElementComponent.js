@@ -1,5 +1,5 @@
 // @flow
-/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/forbid-prop-types, react/no-unused-prop-types */
 import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useElementsContextWithUseCase} from './Elements';
@@ -42,10 +42,10 @@ const useCallbackReference = (cb: MixedFunction) => {
   };
 };
 
-const createElementComponent = (type: string) => {
+const createElementComponent = (type: string, isServer: boolean) => {
   const displayName = `${capitalized(type)}Element`;
 
-  const Element = (props: Props) => {
+  const ClientElement = (props: Props) => {
     const {
       id,
       className,
@@ -121,6 +121,16 @@ const createElementComponent = (type: string) => {
 
     return <div id={id} className={className} ref={domNode} />;
   };
+
+  // Only render the Element wrapper in a server environment.
+  const ServerElement = (props: Props) => {
+    // Validate that we are in the right context by calling useElementsContextWithUseCase.
+    useElementsContextWithUseCase(`mounts <${displayName}>`);
+    const {id, className} = props;
+    return <div id={id} className={className} />;
+  };
+
+  const Element = isServer ? ServerElement : ClientElement;
 
   Element.propTypes = {
     id: PropTypes.string,

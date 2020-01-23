@@ -1,13 +1,17 @@
 // @noflow
-import React from 'react';
+import React, {useLayoutEffect} from 'react';
 import {mount} from 'enzyme';
 import {Elements} from './Elements';
 import createElementComponent from './createElementComponent';
 import {mockElements, mockElement, mockStripe} from '../../test/mocks';
 
-describe('createElementComponent', () => {
-  const CardElement = createElementComponent('card');
+jest.mock('react', () => {
+  const actual = jest.requireActual('react');
+  jest.spyOn(actual, 'useLayoutEffect');
+  return actual;
+});
 
+describe('createElementComponent', () => {
   let stripe;
   let elements;
   let element;
@@ -18,6 +22,7 @@ describe('createElementComponent', () => {
   let simulateClick;
 
   beforeEach(() => {
+    jest.restoreAllMocks();
     stripe = mockStripe();
     elements = mockElements();
     element = mockElement();
@@ -46,301 +51,355 @@ describe('createElementComponent', () => {
     });
   });
 
-  it('gives the element component a proper displayName', () => {
-    expect(CardElement.displayName).toBe('CardElement');
-  });
+  describe('on the server', () => {
+    const CardElement = createElementComponent('card', true);
 
-  it('stores the element component`s type as a static property', () => {
-    expect(CardElement.__elementType).toBe('card'); // eslint-disable-line no-underscore-dangle
-  });
-
-  it('passes id to the wrapping DOM element', () => {
-    const wrapper = mount(
-      <Elements stripe={stripe}>
-        <CardElement id="foo" />
-      </Elements>
-    );
-    expect(wrapper.find('div').prop('id')).toBe('foo');
-  });
-
-  it('passes className to the wrapping DOM element', () => {
-    const wrapper = mount(
-      <Elements stripe={stripe}>
-        <CardElement className="bar" />
-      </Elements>
-    );
-    expect(wrapper.find('div').prop('className')).toBe('bar');
-  });
-
-  it('creates the element with options', () => {
-    const options = {foo: 'foo'};
-    mount(
-      <Elements stripe={stripe}>
-        <CardElement options={options} />
-      </Elements>
-    );
-
-    expect(elements.create).toHaveBeenCalledWith('card', options);
-  });
-
-  it('mounts the element', () => {
-    const wrapper = mount(
-      <Elements stripe={stripe}>
-        <CardElement />
-      </Elements>
-    );
-
-    expect(element.mount).toHaveBeenCalledWith(
-      wrapper.find('div').getDOMNode()
-    );
-  });
-
-  it('does not create and mount until Elements has been instantiated', () => {
-    const wrapper = mount(
-      <Elements stripe={null}>
-        <CardElement />
-      </Elements>
-    );
-
-    expect(element.mount).not.toHaveBeenCalled();
-    expect(elements.create).not.toHaveBeenCalled();
-
-    wrapper.setProps({stripe});
-
-    expect(element.mount).toHaveBeenCalled();
-    expect(elements.create).toHaveBeenCalled();
-  });
-
-  it('throws when the Element is mounted outside of Elements context', () => {
-    // Prevent the console.errors to keep the test output clean
-    jest.spyOn(console, 'error');
-    console.error.mockImplementation(() => {});
-    expect(() => mount(<CardElement />)).toThrow(
-      'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
-    );
-    console.error.mockRestore();
-  });
-
-  it('propagates the Element`s ready event to the current onReady prop', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const onReady = jest.fn();
-    const onReady2 = jest.fn();
-    const wrapper = mount(<TestComponent onReady={onReady} />);
-
-    // when setting a new onReady prop (e.g. a lambda in the render),
-    // only the latest handler is called.
-    wrapper.setProps({
-      onReady: onReady2,
+    it('gives the element component a proper displayName', () => {
+      expect(CardElement.displayName).toBe('CardElement');
     });
 
-    simulateReady();
-    expect(onReady2).toHaveBeenCalledWith(element);
-    expect(onReady).not.toHaveBeenCalled();
-  });
-
-  it('propagates the Element`s change event to the current onChange prop', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const onChange = jest.fn();
-    const onChange2 = jest.fn();
-    const wrapper = mount(<TestComponent onChange={onChange} />);
-
-    // when setting a new onChange prop (e.g. a lambda in the render),
-    // only the latest handler is called.
-    wrapper.setProps({
-      onChange: onChange2,
+    it('stores the element component`s type as a static property', () => {
+      expect(CardElement.__elementType).toBe('card'); // eslint-disable-line no-underscore-dangle
     });
 
-    const changeEventMock = Symbol('change');
-    simulateChange(changeEventMock);
-    expect(onChange2).toHaveBeenCalledWith(changeEventMock);
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('propagates the Element`s blur event to the current onBlur prop', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const onBlur = jest.fn();
-    const onBlur2 = jest.fn();
-    const wrapper = mount(<TestComponent onBlur={onBlur} />);
-
-    // when setting a new onBlur prop (e.g. a lambda in the render),
-    // only the latest handler is called.
-    wrapper.setProps({
-      onBlur: onBlur2,
+    it('passes id to the wrapping DOM element', () => {
+      const wrapper = mount(
+        <Elements stripe={null}>
+          <CardElement id="foo" />
+        </Elements>
+      );
+      expect(wrapper.find('div').prop('id')).toBe('foo');
     });
 
-    simulateBlur();
-    expect(onBlur2).toHaveBeenCalled();
-    expect(onBlur).not.toHaveBeenCalled();
-  });
-
-  it('propagates the Element`s focus event to the current onFocus prop', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const onFocus = jest.fn();
-    const onFocus2 = jest.fn();
-    const wrapper = mount(<TestComponent onFocus={onFocus} />);
-
-    // when setting a new onFocus prop (e.g. a lambda in the render),
-    // only the latest handler is called.
-    wrapper.setProps({
-      onFocus: onFocus2,
+    it('passes className to the wrapping DOM element', () => {
+      const wrapper = mount(
+        <Elements stripe={null}>
+          <CardElement className="bar" />
+        </Elements>
+      );
+      expect(wrapper.find('div').prop('className')).toBe('bar');
     });
 
-    simulateFocus();
-    expect(onFocus2).toHaveBeenCalled();
-    expect(onFocus).not.toHaveBeenCalled();
-  });
-
-  // Users can pass an an onClick prop on any Element component
-  // just as they could listen for the `click` event on any Element,
-  // but only the PaymentRequestButton will actually trigger the event.
-  it('propagates the Element`s click event to the current onClick prop', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const onClick = jest.fn();
-    const onClick2 = jest.fn();
-    const wrapper = mount(<TestComponent onClick={onClick} />);
-
-    // when setting a new onClick prop (e.g. a lambda in the render),
-    // only the latest handler is called.
-    wrapper.setProps({
-      onClick: onClick2,
+    it('throws when the Element is mounted outside of Elements context', () => {
+      // Prevent the console.errors to keep the test output clean
+      jest.spyOn(console, 'error');
+      console.error.mockImplementation(() => {});
+      expect(() => mount(<CardElement />)).toThrow(
+        'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
+      );
+      console.error.mockRestore();
     });
 
-    const clickEventMock = Symbol('click');
-    simulateClick(clickEventMock);
-    expect(onClick2).toHaveBeenCalledWith(clickEventMock);
-    expect(onClick).not.toHaveBeenCalled();
-  });
+    it('does not call useLayoutEffect', () => {
+      mount(
+        <Elements stripe={null}>
+          <CardElement />
+        </Elements>
+      );
 
-  it('updates the Element when options change', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
-
-    const wrapper = mount(<TestComponent options={{style: {foo: 'foo'}}} />);
-
-    wrapper.setProps({
-      options: {style: {foo: 'bar'}},
-    });
-    expect(element.update).toHaveBeenCalledWith({
-      style: {foo: 'bar'},
+      expect(useLayoutEffect).not.toHaveBeenCalled();
     });
   });
 
-  it('does not trigger unecessary updates', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
+  describe('on the client', () => {
+    const CardElement = createElementComponent('card', false);
 
-    const wrapper = mount(
-      <TestComponent
-        options={{
+    it('gives the element component a proper displayName', () => {
+      expect(CardElement.displayName).toBe('CardElement');
+    });
+
+    it('stores the element component`s type as a static property', () => {
+      expect(CardElement.__elementType).toBe('card'); // eslint-disable-line no-underscore-dangle
+    });
+
+    it('passes id to the wrapping DOM element', () => {
+      const wrapper = mount(
+        <Elements stripe={stripe}>
+          <CardElement id="foo" />
+        </Elements>
+      );
+      expect(wrapper.find('div').prop('id')).toBe('foo');
+    });
+
+    it('passes className to the wrapping DOM element', () => {
+      const wrapper = mount(
+        <Elements stripe={stripe}>
+          <CardElement className="bar" />
+        </Elements>
+      );
+      expect(wrapper.find('div').prop('className')).toBe('bar');
+    });
+
+    it('creates the element with options', () => {
+      const options = {foo: 'foo'};
+      mount(
+        <Elements stripe={stripe}>
+          <CardElement options={options} />
+        </Elements>
+      );
+
+      expect(elements.create).toHaveBeenCalledWith('card', options);
+    });
+
+    it('mounts the element', () => {
+      const wrapper = mount(
+        <Elements stripe={stripe}>
+          <CardElement />
+        </Elements>
+      );
+
+      expect(element.mount).toHaveBeenCalledWith(
+        wrapper.find('div').getDOMNode()
+      );
+    });
+
+    it('does not create and mount until Elements has been instantiated', () => {
+      const wrapper = mount(
+        <Elements stripe={null}>
+          <CardElement />
+        </Elements>
+      );
+
+      expect(element.mount).not.toHaveBeenCalled();
+      expect(elements.create).not.toHaveBeenCalled();
+
+      wrapper.setProps({stripe});
+
+      expect(element.mount).toHaveBeenCalled();
+      expect(elements.create).toHaveBeenCalled();
+    });
+
+    it('throws when the Element is mounted outside of Elements context', () => {
+      // Prevent the console.errors to keep the test output clean
+      jest.spyOn(console, 'error');
+      console.error.mockImplementation(() => {});
+      expect(() => mount(<CardElement />)).toThrow(
+        'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
+      );
+      console.error.mockRestore();
+    });
+
+    it('propagates the Element`s ready event to the current onReady prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onReady = jest.fn();
+      const onReady2 = jest.fn();
+      const wrapper = mount(<TestComponent onReady={onReady} />);
+
+      // when setting a new onReady prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onReady: onReady2,
+      });
+
+      simulateReady();
+      expect(onReady2).toHaveBeenCalledWith(element);
+      expect(onReady).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s change event to the current onChange prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onChange = jest.fn();
+      const onChange2 = jest.fn();
+      const wrapper = mount(<TestComponent onChange={onChange} />);
+
+      // when setting a new onChange prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onChange: onChange2,
+      });
+
+      const changeEventMock = Symbol('change');
+      simulateChange(changeEventMock);
+      expect(onChange2).toHaveBeenCalledWith(changeEventMock);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s blur event to the current onBlur prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onBlur = jest.fn();
+      const onBlur2 = jest.fn();
+      const wrapper = mount(<TestComponent onBlur={onBlur} />);
+
+      // when setting a new onBlur prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onBlur: onBlur2,
+      });
+
+      simulateBlur();
+      expect(onBlur2).toHaveBeenCalled();
+      expect(onBlur).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s focus event to the current onFocus prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onFocus = jest.fn();
+      const onFocus2 = jest.fn();
+      const wrapper = mount(<TestComponent onFocus={onFocus} />);
+
+      // when setting a new onFocus prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onFocus: onFocus2,
+      });
+
+      simulateFocus();
+      expect(onFocus2).toHaveBeenCalled();
+      expect(onFocus).not.toHaveBeenCalled();
+    });
+
+    // Users can pass an an onClick prop on any Element component
+    // just as they could listen for the `click` event on any Element,
+    // but only the PaymentRequestButton will actually trigger the event.
+    it('propagates the Element`s click event to the current onClick prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onClick = jest.fn();
+      const onClick2 = jest.fn();
+      const wrapper = mount(<TestComponent onClick={onClick} />);
+
+      // when setting a new onClick prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onClick: onClick2,
+      });
+
+      const clickEventMock = Symbol('click');
+      simulateClick(clickEventMock);
+      expect(onClick2).toHaveBeenCalledWith(clickEventMock);
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('updates the Element when options change', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const wrapper = mount(<TestComponent options={{style: {foo: 'foo'}}} />);
+
+      wrapper.setProps({
+        options: {style: {foo: 'bar'}},
+      });
+      expect(element.update).toHaveBeenCalledWith({
+        style: {foo: 'bar'},
+      });
+    });
+
+    it('does not trigger unecessary updates', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const wrapper = mount(
+        <TestComponent
+          options={{
+            style: {foo: 'foo'},
+          }}
+        />
+      );
+
+      wrapper.setProps({
+        options: {
           style: {foo: 'foo'},
-        }}
-      />
-    );
-
-    wrapper.setProps({
-      options: {
-        style: {foo: 'foo'},
-      },
+        },
+      });
+      expect(element.update).not.toHaveBeenCalled();
     });
-    expect(element.update).not.toHaveBeenCalled();
-  });
 
-  it('warns on changes to non-updateable options', () => {
-    // We need to wrap so that we can update the CardElement's props later.
-    // Enzyme does not support calling setProps on child components.
-    const TestComponent = (props) => (
-      <Elements stripe={stripe}>
-        <CardElement {...props} />
-      </Elements>
-    );
+    it('warns on changes to non-updateable options', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
 
-    const wrapper = mount(
-      <TestComponent
-        options={{
+      const wrapper = mount(
+        <TestComponent
+          options={{
+            paymentRequest: Symbol('PaymentRequest'),
+          }}
+        />
+      );
+
+      jest.spyOn(console, 'warn');
+      console.warn.mockImplementation(() => {});
+      wrapper.setProps({
+        options: {
           paymentRequest: Symbol('PaymentRequest'),
-        }}
-      />
-    );
+        },
+      });
 
-    jest.spyOn(console, 'warn');
-    console.warn.mockImplementation(() => {});
-    wrapper.setProps({
-      options: {
-        paymentRequest: Symbol('PaymentRequest'),
-      },
+      expect(element.update).not.toHaveBeenCalled();
+      expect(console.warn).toHaveBeenCalledWith(
+        'Unsupported prop change: options.paymentRequest is not a customizable property.'
+      );
+
+      console.warn.mockRestore();
     });
 
-    expect(element.update).not.toHaveBeenCalled();
-    expect(console.warn).toHaveBeenCalledWith(
-      'Unsupported prop change: options.paymentRequest is not a customizable property.'
-    );
+    it('destroys an existing Element when the component unmounts', () => {
+      // not called when Element has not been mounted (because stripe is still loading)
+      const wrapper = mount(
+        <Elements stripe={null}>
+          <CardElement />
+        </Elements>
+      );
 
-    console.warn.mockRestore();
-  });
+      wrapper.unmount();
+      expect(element.destroy).not.toHaveBeenCalled();
 
-  it('destroys an existing Element when the component unmounts', () => {
-    // not called when Element has not been mounted (because stripe is still loading)
-    const wrapper = mount(
-      <Elements stripe={null}>
-        <CardElement />
-      </Elements>
-    );
+      const wrapper2 = mount(
+        <Elements stripe={stripe}>
+          <CardElement />
+        </Elements>
+      );
 
-    wrapper.unmount();
-    expect(element.destroy).not.toHaveBeenCalled();
-
-    const wrapper2 = mount(
-      <Elements stripe={stripe}>
-        <CardElement />
-      </Elements>
-    );
-
-    wrapper2.unmount();
-    expect(element.destroy).toHaveBeenCalled();
+      wrapper2.unmount();
+      expect(element.destroy).toHaveBeenCalled();
+    });
   });
 });

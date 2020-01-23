@@ -8,12 +8,16 @@ import {
 } from './components/Elements';
 
 export {Elements, useElements, useStripe, ElementsConsumer};
-export const CardElement = createElementComponent('card');
-export const CardNumberElement = createElementComponent('cardNumber');
-export const CardExpiryElement = createElementComponent('cardExpiry');
-export const CardCvcElement = createElementComponent('cardCvc');
-export const IbanElement = createElementComponent('iban');
-export const IdealBankElement = createElementComponent('idealBank');
+
+const isServer = typeof window === 'undefined';
+
+export const CardElement = createElementComponent('card', isServer);
+export const CardNumberElement = createElementComponent('cardNumber', isServer);
+export const CardExpiryElement = createElementComponent('cardExpiry', isServer);
+export const CardCvcElement = createElementComponent('cardCvc', isServer);
+export const IbanElement = createElementComponent('iban', isServer);
+export const IdealBankElement = createElementComponent('idealBank', isServer);
 export const PaymentRequestButtonElement = createElementComponent(
-  'paymentRequestButton'
+  'paymentRequestButton',
+  isServer
 );
