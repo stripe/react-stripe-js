@@ -1,7 +1,8 @@
 // @noflow
 
-import React, {useState} from 'react';
-import {CardElement, Elements, useElements, useStripe} from '../../src';
+import React from 'react';
+import {loadStripe} from '@stripe/stripe-js';
+import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/2-Card-Detailed.css';
 
 const CARD_OPTIONS = {
@@ -98,21 +99,33 @@ const ResetButton = ({onClick}) => (
   </button>
 );
 
-const Checkout = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [error, setError] = useState(null);
-  const [cardComplete, setCardComplete] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(null);
-  const [billingDetails, setBillingDetails] = useState({
-    email: '',
-    phone: '',
-    name: '',
-  });
+const DEFAULT_STATE = {
+  error: null,
+  cardComplete: false,
+  processing: false,
+  paymentMethod: null,
+  email: '',
+  phone: '',
+  name: '',
+};
 
-  const handleSubmit = async (event) => {
+class CheckoutForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = DEFAULT_STATE;
+  }
+
+  handleSubmit = async (event) => {
     event.preventDefault();
+
+    const {stripe, elements} = this.props;
+    const {email, phone, name, error, cardComplete} = this.state;
+
+    if (!stripe || !elements) {
+      // Stripe.js has not loaded yet. Make sure to disable
+      // form submission until Stripe.js has loaded.
+      return;
+    }
 
     if (error) {
       elements.getElement('card').focus();
@@ -120,101 +133,112 @@ const Checkout = () => {
     }
 
     if (cardComplete) {
-      setProcessing(true);
+      this.setState({processing: true});
     }
 
     const payload = await stripe.createPaymentMethod({
       type: 'card',
       card: elements.getElement(CardElement),
-      billing_details: billingDetails,
+      billing_details: {
+        email,
+        phone,
+        name,
+      },
     });
 
-    setProcessing(false);
+    this.setState({processing: false});
 
     if (payload.error) {
-      setError(payload.error);
+      this.setState({error: payload.error});
     } else {
-      setPaymentMethod(payload.paymentMethod);
+      this.setState({paymentMethod: payload.paymentMethod});
     }
   };
 
-  const reset = () => {
-    setError(null);
-    setProcessing(false);
-    setPaymentMethod(null);
-    setBillingDetails({
-      email: '',
-      phone: '',
-      name: '',
-    });
+  reset = () => {
+    this.setState(DEFAULT_STATE);
   };
 
-  return paymentMethod ? (
-    <div className="Result">
-      <div className="ResultTitle" role="alert">
-        Payment successful
+  render() {
+    const {error, processing, paymentMethod, name, email, phone} = this.state;
+    const {stripe} = this.props;
+    return paymentMethod ? (
+      <div className="Result">
+        <div className="ResultTitle" role="alert">
+          Payment successful
+        </div>
+        <div className="ResultMessage">
+          Thanks for trying Stripe Elements. No money was charged, but we
+          generated a PaymentMethod: {paymentMethod.id}
+        </div>
+        <ResetButton onClick={this.reset} />
       </div>
-      <div className="ResultMessage">
-        Thanks for trying Stripe Elements. No money was charged, but we
-        generated a PaymentMethod: {paymentMethod.id}
-      </div>
-      <ResetButton onClick={reset} />
-    </div>
-  ) : (
-    <form className="Form" onSubmit={handleSubmit}>
-      <fieldset className="FormGroup">
-        <Field
-          label="Name"
-          id="name"
-          type="text"
-          placeholder="Jane Doe"
-          required
-          autoComplete="name"
-          value={billingDetails.name}
-          onChange={(e) => {
-            setBillingDetails({...billingDetails, name: e.target.value});
-          }}
-        />
-        <Field
-          label="Email"
-          id="email"
-          type="email"
-          placeholder="janedoe@gmail.com"
-          required
-          autoComplete="email"
-          value={billingDetails.email}
-          onChange={(e) => {
-            setBillingDetails({...billingDetails, email: e.target.value});
-          }}
-        />
-        <Field
-          label="Phone"
-          id="phone"
-          type="tel"
-          placeholder="(941) 555-0123"
-          required
-          autoComplete="tel"
-          value={billingDetails.phone}
-          onChange={(e) => {
-            setBillingDetails({...billingDetails, phone: e.target.value});
-          }}
-        />
-      </fieldset>
-      <fieldset className="FormGroup">
-        <CardField
-          onChange={(e) => {
-            setError(e.error);
-            setCardComplete(e.complete);
-          }}
-        />
-      </fieldset>
-      {error && <ErrorMessage>{error.message}</ErrorMessage>}
-      <SubmitButton processing={processing} error={error}>
-        Pay $25
-      </SubmitButton>
-    </form>
-  );
-};
+    ) : (
+      <form className="Form" onSubmit={this.handleSubmit}>
+        <fieldset className="FormGroup">
+          <Field
+            label="Name"
+            id="name"
+            type="text"
+            placeholder="Jane Doe"
+            required
+            autoComplete="name"
+            value={name}
+            onChange={(event) => {
+              this.setState({name: event.target.value});
+            }}
+          />
+          <Field
+            label="Email"
+            id="email"
+            type="email"
+            placeholder="janedoe@gmail.com"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(event) => {
+              this.setState({email: event.target.value});
+            }}
+          />
+          <Field
+            label="Phone"
+            id="phone"
+            type="tel"
+            placeholder="(941) 555-0123"
+            required
+            autoComplete="tel"
+            value={phone}
+            onChange={(event) => {
+              this.setState({phone: event.target.value});
+            }}
+          />
+        </fieldset>
+        <fieldset className="FormGroup">
+          <CardField
+            onChange={(event) => {
+              this.setState({
+                error: event.error,
+                cardComplete: event.complete,
+              });
+            }}
+          />
+        </fieldset>
+        {error && <ErrorMessage>{error.message}</ErrorMessage>}
+        <SubmitButton processing={processing} error={error} disabled={!stripe}>
+          Pay $25
+        </SubmitButton>
+      </form>
+    );
+  }
+}
+
+const InjectedCheckoutForm = () => (
+  <ElementsConsumer>
+    {({stripe, elements}) => (
+      <CheckoutForm stripe={stripe} elements={elements} />
+    )}
+  </ElementsConsumer>
+);
 
 const ELEMENTS_OPTIONS = {
   fonts: [
@@ -224,13 +248,13 @@ const ELEMENTS_OPTIONS = {
   ],
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
     <div className="AppWrapper">
-      <Elements stripe={stripe} options={ELEMENTS_OPTIONS}>
-        <Checkout />
+      <Elements stripe={stripePromise} options={ELEMENTS_OPTIONS}>
+        <InjectedCheckoutForm />
       </Elements>
     </div>
   );

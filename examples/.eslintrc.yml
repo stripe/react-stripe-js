@@ -1,0 +1,4 @@
+---
+extends: '../.eslintrc.yml'
+rules:
+  import/no-extraneous-dependencies: 0

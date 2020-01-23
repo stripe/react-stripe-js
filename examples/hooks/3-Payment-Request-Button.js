@@ -1,6 +1,7 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {PaymentRequestButtonElement, Elements, useStripe} from '../../src';
 
 import {Result, ErrorResult} from '../util';
@@ -32,12 +33,17 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-const Checkout = () => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
+    if (!stripe) {
+      // We can't create a PaymentRequest until Stripe.js loads.
+      return;
+    }
+
     const pr = stripe.paymentRequest({
       country: 'US',
       currency: 'usd',
@@ -65,9 +71,9 @@ const Checkout = () => {
     <form>
       {paymentRequest && (
         <PaymentRequestButtonElement
-          onClick={(e) => {
+          onClick={(event) => {
             if (result) {
-              e.preventDefault();
+              event.preventDefault();
               setResult(
                 <ErrorResult>
                   You can only use the PaymentRequest button once. Refresh the
@@ -87,12 +93,12 @@ const Checkout = () => {
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
-      <Checkout />
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
     </Elements>
   );
 };

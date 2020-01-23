@@ -1,6 +1,7 @@
 // @noflow
 
 import React, {useState} from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {
   CardNumberElement,
   CardCvcElement,
@@ -29,15 +30,21 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-const Checkout = () => {
+const CheckoutForm = () => {
   const elements = useElements();
   const stripe = useStripe();
   const [name, setName] = useState('');
   const [postal, setPostal] = useState('');
   const [result, setResult] = useState(null);
 
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      // Stripe.js has not loaded yet. Make sure to disable
+      // form submission until Stripe.js has loaded.
+      return;
+    }
 
     const cardElement = elements.getElement(CardNumberElement);
 
@@ -67,6 +74,7 @@ const Checkout = () => {
       <input
         id="name"
         required
+        placeholder="Jenny Rosen"
         value={name}
         onChange={(e) => {
           setName(e.target.value);
@@ -103,23 +111,26 @@ const Checkout = () => {
       <input
         id="postal"
         required
+        placeholder="12345"
         value={postal}
         onChange={(e) => {
           setPostal(e.target.value);
         }}
       />
       {result}
-      <button type="submit">Pay</button>
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
     </form>
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
-      <Checkout />
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
     </Elements>
   );
 };

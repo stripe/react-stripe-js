@@ -76,6 +76,10 @@ input {
   width: 500px;
 }
 
+input::placeholder {
+  color: #aab7c4;
+}
+
 .result,
 .error {
   font-size: 16px;
