@@ -1,17 +1,24 @@
 // @noflow
 
 import React from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, useElements, useStripe} from '../../src';
 
 import '../styles/common.css';
 
-const MyCheckoutForm = () => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (event) => {
     // Block native form submission.
     event.preventDefault();
+
+    if (!stripe || !elements) {
+      // Stripe.js has not loaded yet. Make sure to disable
+      // form submission until Stripe.js has loaded.
+      return;
+    }
 
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
@@ -54,12 +61,12 @@ const MyCheckoutForm = () => {
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
-      <MyCheckoutForm />
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
     </Elements>
   );
 };

@@ -1,6 +1,7 @@
 // @noflow
 
 import React, {useState, useEffect} from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {PaymentRequestButtonElement, Elements, useStripe} from '../../src';
 
 import {Result, ErrorResult} from '../util';
@@ -32,12 +33,19 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-const Checkout = () => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
-  const [result, setResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [notAvailable, setNotAvailable] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
   useEffect(() => {
+    if (!stripe) {
+      // We can't create a PaymentRequest until Stripe.js loads.
+      return;
+    }
+
     const pr = stripe.paymentRequest({
       country: 'US',
       currency: 'usd',
@@ -47,16 +55,16 @@ const Checkout = () => {
       },
     });
 
-    pr.on('paymentmethod', async (e) => {
-      setResult(<Result>Got PaymentMethod: {e.paymentMethod.id}</Result>);
-      e.complete('success');
+    pr.on('paymentmethod', async (event) => {
+      setPaymentMethod(event.paymentMethod);
+      event.complete('success');
     });
 
     pr.canMakePayment().then((canMakePaymentRes) => {
       if (canMakePaymentRes) {
         setPaymentRequest(pr);
       } else {
-        setResult(<NotAvailableResult />);
+        setNotAvailable(true);
       }
     });
   }, [stripe]);
@@ -65,14 +73,11 @@ const Checkout = () => {
     <form>
       {paymentRequest && (
         <PaymentRequestButtonElement
-          onClick={(e) => {
-            if (result) {
-              e.preventDefault();
-              setResult(
-                <ErrorResult>
-                  You can only use the PaymentRequest button once. Refresh the
-                  page to start over.
-                </ErrorResult>
+          onClick={(event) => {
+            if (paymentMethod) {
+              event.preventDefault();
+              setErrorMessage(
+                'You can only use the PaymentRequest button once. Refresh the page to start over.'
               );
             }
           }}
@@ -82,17 +87,19 @@ const Checkout = () => {
           }}
         />
       )}
-      {result}
+      {notAvailable && <NotAvailableResult />}
+      {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+      {paymentMethod && <Result>Got PaymentMethod: {paymentMethod.id}</Result>}
     </form>
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
-      <Checkout />
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
     </Elements>
   );
 };

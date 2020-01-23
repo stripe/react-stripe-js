@@ -1,6 +1,7 @@
 // @noflow
 
 import React, {useState} from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {IbanElement, Elements, useElements, useStripe} from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
@@ -23,15 +24,22 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-const Checkout = () => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [result, setResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      // Stripe.js has not loaded yet. Make sure to disable
+      // form submission until Stripe.js has loaded.
+      return;
+    }
 
     const ibanElement = elements.getElement(IbanElement);
 
@@ -46,10 +54,12 @@ const Checkout = () => {
 
     if (payload.error) {
       console.log('[error]', payload.error);
-      setResult(<ErrorResult>payload.error.message</ErrorResult>);
+      setErrorMessage(payload.error.message);
+      setPaymentMethod(null);
     } else {
       console.log('[PaymentMethod]', payload.paymentMethod);
-      setResult(<Result>Got PaymentMethod: {payload.paymentMethod.id}</Result>);
+      setPaymentMethod(payload.paymentMethod);
+      setErrorMessage(null);
     }
   };
 
@@ -59,6 +69,7 @@ const Checkout = () => {
       <input
         id="name"
         required
+        placeholder="Jenny Rosen"
         value={name}
         onChange={(e) => {
           setName(e.target.value);
@@ -68,6 +79,7 @@ const Checkout = () => {
       <input
         id="email"
         type="email"
+        placeholder="jenny@example.com"
         required
         value={email}
         onChange={(e) => {
@@ -83,18 +95,21 @@ const Checkout = () => {
         onReady={logEvent('ready')}
         options={ELEMENT_OPTIONS}
       />
-      {result}
-      <button type="submit">Pay</button>
+      {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+      {paymentMethod && <Result>Got PaymentMethod: {paymentMethod.id}</Result>}
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
     </form>
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
-      <Checkout />
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
     </Elements>
   );
 };

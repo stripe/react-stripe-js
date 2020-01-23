@@ -20,10 +20,16 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 
 ### Minimal Example
 
+```sh
+npm install @stripe/react-stripe-js @stripe/stripe-js
+```
+
+#### Using Hooks
+
 ```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-
+import {loadStripe} from '@stripe/react-stripe-js';
 import {
   CardElement,
   Elements,
@@ -31,9 +37,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
-
-const MyCheckoutForm = () => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -48,29 +52,79 @@ const MyCheckoutForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />
-      <button type="submit">Pay</button>
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
     </form>
   );
 };
 
-const App = () => {
-  return (
-    <Elements stripe={stripe}>
-      <MyCheckoutForm />
-    </Elements>
-  );
-};
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
+const App = () => (
+  <Elements stripe={stripePromise}>
+    <CheckoutForm />
+  </Elements>
+);
+
+ReactDOM.render(<App />, document.body);
+```
+
+#### Using Class Components
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {loadStripe} from '@stripe/react-stripe-js';
+import {CardElement, Elements, ElementsConsumer} from '@stripe/react-stripe-js';
+
+class CheckoutForm extends React.Component {
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const {stripe, elements} = this.props;
+    const {error, paymentMethod} = await stripe.createPaymentMethod({
+      type: 'card',
+      card: elements.getElement(CardElement),
+    });
+  };
+
+  render() {
+    const {stripe} = this.props;
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <CardElement />
+        <button type="submit" disabled={!stripe}>
+          Pay
+        </button>
+      </form>
+    );
+  }
+}
+
+const InjectedCheckoutForm = () => (
+  <ElementsConsumer>
+    {({stripe, elements}) => (
+      <CheckoutForm stripe={stripe} elements={elements} />
+    )}
+  </ElementsConsumer>
+);
+
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
+const App = () => (
+  <Elements stripe={stripePromise}>
+    <InjectedCheckoutForm />
+  </Elements>
+);
 
 ReactDOM.render(<App />, document.body);
 ```
 
 ### Minimum Requirements
 
-React Stripe.js depends on the
-[React Hooks API](https://reactjs.org/docs/hooks-intro.html). The minimum
-supported version of React is v16.8. If you use an older version, upgrade React
-to use this library. If you prefer not to upgrade your React version, we
-recommend using legacy
+The minimum supported version of React is v16.8. If you use an older version,
+upgrade React to use this library. If you prefer not to upgrade your React
+version, we recommend using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
 ### Contributing

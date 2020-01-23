@@ -1,15 +1,22 @@
 // @noflow
 
 import React from 'react';
+import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/common.css';
 
-class MyCheckoutForm extends React.Component {
+class CheckoutForm extends React.Component {
   handleSubmit = async (event) => {
     // Block native form submission.
     event.preventDefault();
 
     const {stripe, elements} = this.props;
+
+    if (!stripe || !elements) {
+      // Stripe.js has not loaded yet. Make sure to disable
+      // form submission until Stripe.js has loaded.
+      return;
+    }
 
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
@@ -29,6 +36,7 @@ class MyCheckoutForm extends React.Component {
   };
 
   render() {
+    const {stripe} = this.props;
     return (
       <form onSubmit={this.handleSubmit}>
         <CardElement
@@ -47,7 +55,9 @@ class MyCheckoutForm extends React.Component {
             },
           }}
         />
-        <button type="submit">Pay</button>
+        <button type="submit" disabled={!stripe}>
+          Pay
+        </button>
       </form>
     );
   }
@@ -57,17 +67,17 @@ const InjectedCheckoutForm = () => {
   return (
     <ElementsConsumer>
       {({elements, stripe}) => (
-        <MyCheckoutForm elements={elements} stripe={stripe} />
+        <CheckoutForm elements={elements} stripe={stripe} />
       )}
     </ElementsConsumer>
   );
 };
 
-const stripe = window.Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => {
   return (
-    <Elements stripe={stripe}>
+    <Elements stripe={stripePromise}>
       <InjectedCheckoutForm />
     </Elements>
   );
