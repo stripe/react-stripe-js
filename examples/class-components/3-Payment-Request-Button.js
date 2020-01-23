@@ -40,18 +40,24 @@ const ELEMENT_OPTIONS = {
 class CheckoutForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {paymentRequest: null, result: null};
+    this.state = {
+      canMakePayment: false,
+      hasCheckedAvailability: false,
+      errorMessage: null,
+    };
   }
 
-  async componentDidMount() {
+  async componentDidUpdate() {
     const {stripe} = this.props;
 
-    if (!stripe) {
-      // We can't create a PaymentRequest until Stripe.js loads.
-      return;
+    if (stripe && !this.paymentRequest) {
+      // Create PaymentRequest after Stripe.js loads.
+      this.createPaymentRequest(stripe);
     }
+  }
 
-    const pr = stripe.paymentRequest({
+  async createPaymentRequest(stripe) {
+    this.paymentRequest = stripe.paymentRequest({
       country: 'US',
       currency: 'usd',
       total: {
@@ -60,46 +66,50 @@ class CheckoutForm extends React.Component {
       },
     });
 
-    pr.on('paymentmethod', async (event) => {
-      const {id} = event.paymentMethod;
-      this.setState({result: <Result>Got PaymentMethod: {id}</Result>});
+    this.paymentRequest.on('paymentmethod', async (event) => {
+      this.setState({paymentMethod: event.paymentMethod});
       event.complete('success');
     });
 
-    const canMakePaymentRes = await pr.canMakePayment();
+    const canMakePaymentRes = await this.paymentRequest.canMakePayment();
     if (canMakePaymentRes) {
-      this.setState({paymentRequest: pr});
+      this.setState({canMakePayment: true, hasCheckedAvailability: true});
     } else {
-      this.setState({result: <NotAvailableResult />});
+      this.setState({canMakePayment: false, hasCheckedAvailability: true});
     }
   }
 
   render() {
-    const {paymentRequest, result} = this.state;
+    const {
+      canMakePayment,
+      hasCheckedAvailability,
+      errorMessage,
+      paymentMethod,
+    } = this.state;
     return (
       <form>
-        {paymentRequest && (
+        {canMakePayment && (
           <PaymentRequestButtonElement
             onClick={(event) => {
-              if (result) {
+              if (paymentMethod) {
                 event.preventDefault();
                 this.setState({
-                  result: (
-                    <ErrorResult>
-                      You can only use the PaymentRequest button once. Refresh
-                      the page to start over.
-                    </ErrorResult>
-                  ),
+                  errorMessage:
+                    'You can only use the PaymentRequest button once. Refresh the page to start over.',
                 });
               }
             }}
             options={{
               ...ELEMENT_OPTIONS,
-              paymentRequest,
+              paymentRequest: this.paymentRequest,
             }}
           />
         )}
-        {result}
+        {!canMakePayment && hasCheckedAvailability && <NotAvailableResult />}
+        {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+        {paymentMethod && (
+          <Result>Got PaymentMethod: {paymentMethod.id}</Result>
+        )}
       </form>
     );
   }

@@ -32,7 +32,12 @@ const ELEMENT_OPTIONS = {
 class CheckoutForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {name: '', postal: '', result: null};
+    this.state = {
+      name: '',
+      postal: '',
+      errorMessage: null,
+      paymentMethod: null,
+    };
   }
 
   handleSubmit = async (event) => {
@@ -62,19 +67,21 @@ class CheckoutForm extends React.Component {
     if (payload.error) {
       console.log('[error]', payload.error);
       this.setState({
-        result: <ErrorResult>{payload.error.message}</ErrorResult>,
+        errorMessage: payload.error.message,
+        paymentMethod: null,
       });
     } else {
       console.log('[PaymentMethod]', payload.paymentMethod);
       this.setState({
-        result: <Result>Got PaymentMethod: {payload.paymentMethod.id}</Result>,
+        paymentMethod: payload.paymentMethod,
+        errorMessage: null,
       });
     }
   };
 
   render() {
     const {stripe} = this.props;
-    const {postal, name, result} = this.state;
+    const {postal, name, paymentMethod, errorMessage} = this.state;
 
     return (
       <form onSubmit={this.handleSubmit}>
@@ -125,7 +132,10 @@ class CheckoutForm extends React.Component {
             this.setState({postal: event.target.value});
           }}
         />
-        {result}
+        {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+        {paymentMethod && (
+          <Result>Got PaymentMethod: {paymentMethod.id}</Result>
+        )}
         <button type="submit" disabled={!stripe}>
           Pay
         </button>

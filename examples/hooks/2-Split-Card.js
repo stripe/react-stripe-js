@@ -35,7 +35,8 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const [name, setName] = useState('');
   const [postal, setPostal] = useState('');
-  const [result, setResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -61,10 +62,12 @@ const CheckoutForm = () => {
 
     if (payload.error) {
       console.log('[error]', payload.error);
-      setResult(<ErrorResult>{payload.error.message}</ErrorResult>);
+      setErrorMessage(payload.error.message);
+      setPaymentMethod(null);
     } else {
       console.log('[PaymentMethod]', payload.paymentMethod);
-      setResult(<Result>Got PaymentMethod: {payload.paymentMethod.id}</Result>);
+      setPaymentMethod(payload.paymentMethod);
+      setErrorMessage(null);
     }
   };
 
@@ -117,7 +120,8 @@ const CheckoutForm = () => {
           setPostal(e.target.value);
         }}
       />
-      {result}
+      {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+      {paymentMethod && <Result>Got PaymentMethod: {paymentMethod.id}</Result>}
       <button type="submit" disabled={!stripe}>
         Pay
       </button>

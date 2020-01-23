@@ -36,7 +36,9 @@ const ELEMENT_OPTIONS = {
 const CheckoutForm = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
-  const [result, setResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [notAvailable, setNotAvailable] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
   useEffect(() => {
     if (!stripe) {
@@ -53,16 +55,16 @@ const CheckoutForm = () => {
       },
     });
 
-    pr.on('paymentmethod', async (e) => {
-      setResult(<Result>Got PaymentMethod: {e.paymentMethod.id}</Result>);
-      e.complete('success');
+    pr.on('paymentmethod', async (event) => {
+      setPaymentMethod(event.paymentMethod);
+      event.complete('success');
     });
 
     pr.canMakePayment().then((canMakePaymentRes) => {
       if (canMakePaymentRes) {
         setPaymentRequest(pr);
       } else {
-        setResult(<NotAvailableResult />);
+        setNotAvailable(true);
       }
     });
   }, [stripe]);
@@ -72,13 +74,10 @@ const CheckoutForm = () => {
       {paymentRequest && (
         <PaymentRequestButtonElement
           onClick={(event) => {
-            if (result) {
+            if (paymentMethod) {
               event.preventDefault();
-              setResult(
-                <ErrorResult>
-                  You can only use the PaymentRequest button once. Refresh the
-                  page to start over.
-                </ErrorResult>
+              setErrorMessage(
+                'You can only use the PaymentRequest button once. Refresh the page to start over.'
               );
             }
           }}
@@ -88,7 +87,9 @@ const CheckoutForm = () => {
           }}
         />
       )}
-      {result}
+      {notAvailable && <NotAvailableResult />}
+      {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
+      {paymentMethod && <Result>Got PaymentMethod: {paymentMethod.id}</Result>}
     </form>
   );
 };
