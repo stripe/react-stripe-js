@@ -6,14 +6,17 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 [![build status](https://img.shields.io/travis/stripe/react-stripe-js/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe-js)
 [![npm version](https://img.shields.io/npm/v/@stripe/react-stripe-js.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe-js)
 
+### We’re currently beta-testing this library.
+
+Please contact us at stripejs-feedback@stripe.com and provide your Stripe
+account ID for access to new documentation!
+
 ## Getting Started
 
 - [Add React Stripe.js to your React app](https://stripe.com/docs/stripe-js/react#setup)
 - [Try it out using CodeSandbox](https://codesandbox.io/s/react-stripe-official-q1loc?fontsize=14&hidenavigation=1&theme=dark)
 
 ## Documentation
-
-### We’re currently beta-testing improved documentation for this new library. Please contact us at stripejs-feedback@stripe.com and provide your Stripe account ID to get access to the new documentation!
 
 - [React Stripe.js Docs](https://stripe.com/docs/stripe-js/react)
 - [Migrate from `react-stripe-elements`](docs/migrating.md)
