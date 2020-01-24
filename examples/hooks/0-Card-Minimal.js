@@ -56,7 +56,9 @@ const CheckoutForm = () => {
           },
         }}
       />
-      <button type="submit">Pay</button>
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
     </form>
   );
 };
