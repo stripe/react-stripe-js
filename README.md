@@ -13,6 +13,8 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 
 ## Documentation
 
+### We’re currently beta-testing improved documentation for this new library. Please contact us at stripejs-feedback@stripe.com and provide your Stripe account ID to get access to the new documentation!
+
 - [React Stripe.js Docs](https://stripe.com/docs/stripe-js/react)
 - [Migrate from `react-stripe-elements`](docs/migrating.md)
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)

@@ -3,6 +3,39 @@
 React Stripe.js adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.0.0-beta.3 2020-01-24
+
+More examples and miscellaneous documentation updates.
+
+### Fixes
+
+- Removes a warning about `useLayoutEffect` when using React Stripe.js with
+  server side rendering.
+
+## v1.0.0-beta.2 2020-01-21
+
+Reversion to v1.
+
+### New Features
+
+- Add support for passing `Promise<StripeObject | null>` to the stripe prop of
+  `Elements`. This removes the need for users to create and manage their own
+  state when asynchronously loading Stripe.js and can be used with the
+  `loadStripe` function from the
+  [Stripe.js module](https://github.com/stripe/stripe-js).
+
+```jsx
+import {loadStripe} from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
+const App = () => <Elements stripe={stripePromise}>{/* ... */}</Elements>;
+```
+
+## v1.0.0-beta.1 2019-12-20
+
+Rename from @stripe/react-stripe to @stripe/react-stripe-js
+
 ## v7.0.0-beta.0 2019-12-18
 
 - No code changes from the last alpha release
