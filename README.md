@@ -29,7 +29,7 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 ```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {loadStripe} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
 import {
   CardElement,
   Elements,
@@ -75,7 +75,7 @@ ReactDOM.render(<App />, document.body);
 ```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {loadStripe} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, ElementsConsumer} from '@stripe/react-stripe-js';
 
 class CheckoutForm extends React.Component {
