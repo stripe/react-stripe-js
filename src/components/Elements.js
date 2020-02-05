@@ -65,6 +65,7 @@ type ElementContext = {|
 |};
 
 const ElementsContext = React.createContext<?ElementContext>();
+ElementsContext.displayName = 'ElementsContext';
 
 export const parseElementsContext = (
   ctx: ?ElementContext,
