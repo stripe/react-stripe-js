@@ -65,7 +65,7 @@ type ElementContext = {|
 |};
 
 const ElementsContext = React.createContext<?ElementContext>();
-ElementsContext.displayName = 'Stripe';
+ElementsContext.displayName = 'ElementsContext';
 
 export const parseElementsContext = (
   ctx: ?ElementContext,
