@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe-js",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.js",
@@ -38,8 +38,18 @@
   ],
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",
-    "setupFilesAfterEnv": ["<rootDir>/test/setupJest.js"],
-    "globals": {"ts-jest": {"diagnostics": {"ignoreCodes": [151001]}}}
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setupJest.js"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": {
+          "ignoreCodes": [
+            151001
+          ]
+        }
+      }
+    }
   },
   "dependencies": {
     "prop-types": "^15.7.2"
