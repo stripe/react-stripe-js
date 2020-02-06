@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  createContext,
   useContext,
   useMemo,
   useState,
@@ -56,7 +57,7 @@ interface ElementsContextValue {
   stripe: stripeJs.Stripe | null;
 }
 
-const ElementsContext = React.createContext<ElementsContextValue | null>(null);
+const ElementsContext = createContext<ElementsContextValue | null>(null);
 ElementsContext.displayName = 'ElementsContext';
 
 export const parseElementsContext = (
