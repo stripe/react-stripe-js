@@ -30,7 +30,14 @@ export default [
         },
       },
     ],
-    plugins: [ts(), resolve(), babel(), commonjs()],
+    plugins: [
+      ts(),
+      resolve(),
+      babel(),
+      commonjs({
+        namedExports: {'prop-types': ['func', 'object', 'any', 'string']},
+      }),
+    ],
   },
   // Minified UMD Build without PropTypes
   {
@@ -51,7 +58,9 @@ export default [
       resolve(),
       babel(),
       replace({'process.env.NODE_ENV': JSON.stringify('production')}),
-      commonjs(),
+      commonjs({
+        namedExports: {'prop-types': ['func', 'object', 'any', 'string']},
+      }),
       terser(),
     ],
   },

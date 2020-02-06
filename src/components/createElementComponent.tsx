@@ -1,5 +1,6 @@
-import React, {useRef, useEffect, useLayoutEffect} from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import {useRef, useEffect, useLayoutEffect} from 'react';
+import * as PropTypes from 'prop-types';
 import * as stripeJs from '@stripe/stripe-js';
 
 import {useElementsContextWithUseCase} from './Elements';

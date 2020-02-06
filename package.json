@@ -38,9 +38,8 @@
   ],
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",
-    "setupFilesAfterEnv": [
-      "<rootDir>/test/setupJest.js"
-    ]
+    "setupFilesAfterEnv": ["<rootDir>/test/setupJest.js"],
+    "globals": {"ts-jest": {"diagnostics": {"ignoreCodes": [151001]}}}
   },
   "dependencies": {
     "prop-types": "^15.7.2"

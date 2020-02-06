@@ -1,14 +1,9 @@
-import React, {useLayoutEffect} from 'react';
+import * as React from 'react';
+import {useLayoutEffect} from 'react';
 import {mount} from 'enzyme';
 import {Elements} from './Elements';
 import createElementComponent from './createElementComponent';
 import {mockElements, mockElement, mockStripe} from '../../test/mocks';
-
-jest.mock('react', () => {
-  const actual = jest.requireActual('react');
-  jest.spyOn(actual, 'useLayoutEffect');
-  return actual;
-});
 
 describe('createElementComponent', () => {
   let stripe;
@@ -27,6 +22,7 @@ describe('createElementComponent', () => {
     element = mockElement();
     stripe.elements.mockReturnValue(elements);
     elements.create.mockReturnValue(element);
+    jest.spyOn(React, 'useLayoutEffect');
     element.on = jest.fn((event, fn) => {
       switch (event) {
         case 'change':
