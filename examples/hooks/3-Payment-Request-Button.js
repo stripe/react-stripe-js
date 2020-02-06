@@ -1,5 +1,3 @@
-// @noflow
-
 import React, {useState, useEffect} from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {PaymentRequestButtonElement, Elements, useStripe} from '../../src';

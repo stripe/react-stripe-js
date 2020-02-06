@@ -133,6 +133,16 @@ upgrade React to use this library. If you prefer not to upgrade your React
 version, we recommend using legacy
 [`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
+### TypeScript support
+
+React Stripe.js is packaged with TypeScript declarations. Some types are pulled
+from [`@stripe/stripe-js`](https://github.com/stripe/stripe-js)—be sure to add
+`@stripe/stripe-js` as a dependency to your project for full TypeScript support.
+
+Typings in React Stripe.js follow the same
+[versioning policy](https://github.com/stripe/stripe-js#typescript-support) as
+`@stripe/stripe-js`.
+
 ### Contributing
 
 If you would like to contribute to React Stripe.js, please make sure to read our

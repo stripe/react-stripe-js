@@ -1,5 +1,4 @@
-// @noflow
-import isEqual from './isEqual';
+import {isEqual} from './isEqual';
 
 describe('isEqual', () => {
   [

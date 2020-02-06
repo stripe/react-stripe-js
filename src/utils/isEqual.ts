@@ -1,12 +1,11 @@
-// @flow
+import {isUnknownObject} from './guards';
+
 const PLAIN_OBJECT_STR = '[object Object]';
 
-const isEqual = (left: mixed, right: mixed): boolean => {
-  if (typeof left !== 'object' || typeof right !== 'object') {
+export const isEqual = (left: unknown, right: unknown): boolean => {
+  if (!isUnknownObject(left) || !isUnknownObject(right)) {
     return left === right;
   }
-
-  if (left === null || right === null) return left === right;
 
   const leftArray = Array.isArray(left);
   const rightArray = Array.isArray(right);
@@ -27,7 +26,7 @@ const isEqual = (left: mixed, right: mixed): boolean => {
 
   if (leftKeys.length !== rightKeys.length) return false;
 
-  const keySet = {};
+  const keySet: {[key: string]: boolean} = {};
   for (let i = 0; i < leftKeys.length; i += 1) {
     keySet[leftKeys[i]] = true;
   }
@@ -41,11 +40,9 @@ const isEqual = (left: mixed, right: mixed): boolean => {
 
   const l = left;
   const r = right;
-  const pred = (key) => {
+  const pred = (key: string): boolean => {
     return isEqual(l[key], r[key]);
   };
 
   return allKeys.every(pred);
 };
-
-export default isEqual;

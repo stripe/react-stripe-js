@@ -1,5 +1,3 @@
-// @noflow
-
 export const mockElement = () => ({
   mount: jest.fn(),
   destroy: jest.fn(),

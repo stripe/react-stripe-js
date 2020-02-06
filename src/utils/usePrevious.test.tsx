@@ -1,9 +1,8 @@
-// @noflow
 import React from 'react';
 import {mount} from 'enzyme';
-import usePrevious from './usePrevious';
+import {usePrevious} from './usePrevious';
 
-const TestComponent = ({foo}) => {
+const TestComponent: React.FC<{foo: string}> = ({foo}) => {
   const lastFoo = usePrevious(foo);
   return <div>{lastFoo}</div>;
 };

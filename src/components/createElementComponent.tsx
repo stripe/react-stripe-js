@@ -1,65 +1,60 @@
-// @flow
-/* eslint-disable react/forbid-prop-types, react/no-unused-prop-types */
 import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
+import * as stripeJs from '@stripe/stripe-js';
+
 import {useElementsContextWithUseCase} from './Elements';
-import isEqual from '../utils/isEqual';
+import {useCallbackReference} from '../utils/useCallbackReference';
+import {isEqual} from '../utils/isEqual';
+import {ElementProps} from '../types';
+import {isUnknownObject} from '../utils/guards';
 
-type Props = {
-  id?: string,
-  className?: string,
-  onChange: MixedFunction,
-  onBlur: MixedFunction,
-  onFocus: MixedFunction,
-  onReady: MixedFunction,
-  onClick: MixedFunction,
-  options: MixedObject,
-};
+type UnknownCallback = (...args: unknown[]) => any;
+type UnknownOptions = {[k: string]: unknown};
 
-const extractUpdateableOptions = (options: ?MixedObject) => {
-  if (!options) {
+interface PrivateElementProps {
+  id?: string;
+  className?: string;
+  onChange?: UnknownCallback;
+  onBlur?: UnknownCallback;
+  onFocus?: UnknownCallback;
+  onReady?: UnknownCallback;
+  onClick?: UnknownCallback;
+  options?: UnknownOptions;
+}
+
+const extractUpdateableOptions = (options?: UnknownOptions): UnknownOptions => {
+  if (!isUnknownObject(options)) {
     return {};
   }
 
-  const {paymentRequest, ...rest} = options;
+  const {paymentRequest: _, ...rest} = options;
 
   return rest;
 };
 
 const noop = () => {};
+
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-const useCallbackReference = (cb: MixedFunction) => {
-  const cbStore = useRef(cb);
 
-  useEffect(() => {
-    cbStore.current = cb;
-  }, [cb]);
-
-  return (...args) => {
-    if (cbStore.current) {
-      cbStore.current(...args);
-    }
-  };
-};
-
-const createElementComponent = (type: string, isServer: boolean) => {
+const createElementComponent = (
+  type: stripeJs.StripeElementType,
+  isServer: boolean
+): React.FC<ElementProps> => {
   const displayName = `${capitalized(type)}Element`;
 
-  const ClientElement = (props: Props) => {
-    const {
-      id,
-      className,
-      options,
-      onBlur,
-      onFocus,
-      onReady,
-      onChange,
-      onClick,
-    } = props;
-
+  const ClientElement: React.FC<PrivateElementProps> = ({
+    id,
+    className,
+    options = {},
+    onBlur = noop,
+    onFocus = noop,
+    onReady = noop,
+    onChange = noop,
+    onClick = noop,
+  }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
-    const elementRef = useRef();
-    const domNode = useRef();
+    const elementRef = useRef<stripeJs.StripeElement | null>(null);
+    const domNode = useRef<HTMLDivElement | null>(null);
 
     const callOnReady = useCallbackReference(onReady);
     const callOnBlur = useCallbackReference(onBlur);
@@ -69,17 +64,18 @@ const createElementComponent = (type: string, isServer: boolean) => {
 
     useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
-        const element = elements.create(type, options);
+        const element = elements.create(type as any, options);
         elementRef.current = element;
         element.mount(domNode.current);
         element.on('ready', () => callOnReady(element));
         element.on('change', callOnChange);
         element.on('blur', callOnBlur);
         element.on('focus', callOnFocus);
+
         // Users can pass an an onClick prop on any Element component
         // just as they could listen for the `click` event on any Element,
         // but only the PaymentRequestButton will actually trigger the event.
-        element.on('click', callOnClick);
+        (element as any).on('click', callOnClick);
       }
     });
 
@@ -123,7 +119,7 @@ const createElementComponent = (type: string, isServer: boolean) => {
   };
 
   // Only render the Element wrapper in a server environment.
-  const ServerElement = (props: Props) => {
+  const ServerElement: React.FC<PrivateElementProps> = (props) => {
     // Validate that we are in the right context by calling useElementsContextWithUseCase.
     useElementsContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
@@ -140,22 +136,13 @@ const createElementComponent = (type: string, isServer: boolean) => {
     onFocus: PropTypes.func,
     onReady: PropTypes.func,
     onClick: PropTypes.func,
-    options: PropTypes.object,
-  };
-
-  Element.defaultProps = {
-    onChange: noop,
-    onBlur: noop,
-    onFocus: noop,
-    onReady: noop,
-    onClick: noop,
-    options: {},
+    options: PropTypes.object as any,
   };
 
   Element.displayName = displayName;
-  Element.__elementType = type; // eslint-disable-line no-underscore-dangle
+  (Element as any).__elementType = type;
 
-  return Element;
+  return Element as React.FC<ElementProps>;
 };
 
 export default createElementComponent;

@@ -1,4 +1,3 @@
-// @noflow
 import React, {useLayoutEffect} from 'react';
 import {mount} from 'enzyme';
 import {Elements} from './Elements';

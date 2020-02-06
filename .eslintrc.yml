@@ -1,43 +1,47 @@
 ---
+root: true
 extends:
-  - airbnb
-  - plugin:flowtype/recommended
-  # overwrite any rules that may conflict with prettier
-  - prettier
-  - prettier/flowtype
-  - prettier/react
-  - prettier/standard
-parser: 'babel-eslint'
+  - eslint:recommended
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:react/recommended
+parser: '@typescript-eslint/parser'
+parserOptions:
+  # project: './tsconfig.json'
+  ecmaFeatures:
+    jsx: true
 plugins:
-  - flowtype
+  - '@typescript-eslint'
   - jest
+  - react
   - react-hooks
+settings:
+  react:
+    version: detect
 env:
   jest/globals: true
   browser: true
+  es6: true
 rules:
-  react-hooks/rules-of-hooks: 2
-  react-hooks/exhaustive-deps: 1
-  react/jsx-filename-extension: 0
-  react/jsx-props-no-spreading: 0
-  react/require-default-props: 0
-  no-duplicate-imports: 2 # doesn't support flow imports.
   no-console: 0
   func-style: 2
   consistent-return: 2
-  jsx-a11y/label-has-associated-control: 0
-  react/prop-types: 0
   prefer-arrow-callback:
     - 2
     - allowNamedFunctions: false
       allowUnboundThis: false
-  flowtype/no-primitive-constructor-types: 2
-  flowtype/require-valid-file-annotation:
-    - 2
-    - 'always'
-    - annotationStyle: 'line'
-  no-unused-vars:
-    - 2
-    - ignoreRestSiblings: true
   jest/no-disabled-tests: 2
   jest/no-focused-tests: 2
+  react/prop-types: 0
+  react/forbid-prop-types: 0
+  react/no-unused-prop-types: 0
+  react-hooks/rules-of-hooks: 2
+  react-hooks/exhaustive-deps: 1
+  '@typescript-eslint/no-explicit-any': 0
+  '@typescript-eslint/no-empty-interface': 0
+  '@typescript-eslint/explicit-function-return-type': 0
+  '@typescript-eslint/camelcase': 0
+  '@typescript-eslint/no-empty-function': 0
+  '@typescript-eslint/no-unused-vars':
+    - 2
+    - varsIgnorePattern: ^_

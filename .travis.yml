@@ -1,9 +1,5 @@
 language: node_js
-node_js:
-  - '8'
+node_js: 'lts/*'
 script:
-  - npm run lint
-  - npm run flow
-  - npm run test
-  - npm run prettier-list-different
+  - yarn run ci
 cache: yarn
