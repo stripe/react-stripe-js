@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe-js",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.js",
@@ -50,12 +50,12 @@
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
-    "@stripe/stripe-js": "1.0.0-beta.5",
     "@storybook/addon-actions": "^5.2.6",
     "@storybook/addon-links": "^5.2.6",
     "@storybook/addons": "^5.2.6",
     "@storybook/preset-typescript": "^1.2.0",
     "@storybook/react": "^5.2.6",
+    "@stripe/stripe-js": "1.0.0-beta.5",
     "@types/enzyme": "^3.10.4",
     "@types/jest": "^25.1.1",
     "@types/react": "^16.9.19",
@@ -95,8 +95,8 @@
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
+    "@stripe/stripe-js": "1.0.0-beta.5",
     "react": "^16.8.0",
-    "react-dom": "^16.8.0",
-    "@stripe/stripe-js": "1.0.0-beta.5"
+    "react-dom": "^16.8.0"
   }
 }
