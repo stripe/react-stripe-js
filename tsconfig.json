@@ -10,7 +10,7 @@
     "removeComments": false,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true
+    "esModuleInterop": false // Must remain `false` to emit types compatible with other projects not using `esModuleInterop`
   },
   "include": ["./src"]
 }

@@ -1,4 +1,5 @@
-import React, {
+import * as React from 'react';
+import {
   useContext,
   useMemo,
   useState,
@@ -7,7 +8,7 @@ import React, {
   ReactNode,
   ReactElement,
 } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import * as stripeJs from '@stripe/stripe-js';
 
 import {isEqual} from '../utils/isEqual';
