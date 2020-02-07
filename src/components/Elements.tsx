@@ -1,4 +1,7 @@
+// Must use `import *` or named imports for React's types
 import * as React from 'react';
+import * as stripeJs from '@stripe/stripe-js';
+
 import {
   createContext,
   useContext,
@@ -6,11 +9,8 @@ import {
   useState,
   useEffect,
   useRef,
-  ReactNode,
-  ReactElement,
 } from 'react';
-import * as PropTypes from 'prop-types';
-import * as stripeJs from '@stripe/stripe-js';
+import PropTypes from 'prop-types';
 
 import {isEqual} from '../utils/isEqual';
 import {usePrevious} from '../utils/usePrevious';
@@ -93,7 +93,7 @@ interface ElementsProps {
 interface PrivateElementsProps {
   stripe: unknown;
   options?: stripeJs.StripeElementsOptions;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 /**
@@ -199,7 +199,7 @@ export const useStripe = (): stripeJs.Stripe | null => {
 };
 
 interface ElementsConsumerProps {
-  children: (props: ElementsContextValue) => ReactNode;
+  children: (props: ElementsContextValue) => React.ReactNode;
 }
 
 /**
@@ -211,7 +211,7 @@ export const ElementsConsumer: React.FC<ElementsConsumerProps> = ({
   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
 
   // Assert to satsify the busted React.FC return type (it should be ReactNode)
-  return children(ctx) as ReactElement | null;
+  return children(ctx) as React.ReactElement | null;
 };
 
 ElementsConsumer.propTypes = {
