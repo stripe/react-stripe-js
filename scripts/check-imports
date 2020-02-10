@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Generated type definitions should not include default imports.
+
+BASE_DIR="$(dirname "$0")/..";
+
+OUTPUT_FILE="/dist/react-stripe.d.ts"
+
+grep 'import [^*{]' "${BASE_DIR}${OUTPUT_FILE}"
+
+case $? in
+    1) true
+        ;; 
+    0) 
+        echo "Found disallowed default import in ${OUTPUT_FILE}"
+        echo 'Please only use * or named imports for types'
+        false
+        ;;
+    *)
+        false
+        ;;
+esac

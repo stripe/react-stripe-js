@@ -14,9 +14,10 @@
     "lint:prettier": "prettier './**/*.js' './**/*.css' './**/*.md' --list-different",
     "typecheck": "tsc",
     "build": "yarn run clean && yarn run rollup -c",
+    "checkimport": "scripts/check-imports",
     "clean": "rimraf dist",
     "prettier:fix": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
-    "ci": "yarn run lint && yarn run lint:prettier && yarn run test && yarn run typecheck && yarn run build",
+    "ci": "yarn run lint && yarn run lint:prettier && yarn run test && yarn run typecheck && yarn run build && yarn run checkimport",
     "prepublish": "yarn run ci",
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 "
