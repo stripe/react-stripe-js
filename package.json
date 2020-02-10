@@ -14,7 +14,7 @@
     "lint:prettier": "prettier './**/*.js' './**/*.css' './**/*.md' --list-different",
     "typecheck": "tsc",
     "build": "yarn run clean && yarn run rollup -c",
-    "checkimport": "grep 'import [^*{]' dist/react-stripe.d.ts; case $? in 1) true ;; 0) echo Found invalid import; false ;; *) false ;; esac",
+    "checkimport": "scripts/check-imports",
     "clean": "rimraf dist",
     "prettier:fix": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
     "ci": "yarn run lint && yarn run lint:prettier && yarn run test && yarn run typecheck && yarn run build && yarn run checkimport",
