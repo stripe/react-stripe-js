@@ -7,6 +7,7 @@ import {
   IbanElementComponent,
   IdealBankElementComponent,
   PaymentRequestButtonElementComponent,
+  AuBankAccountElementComponent,
 } from './types';
 
 export {
@@ -71,5 +72,13 @@ export const IdealBankElement: IdealBankElementComponent = createElementComponen
  */
 export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
   'paymentRequestButton',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AuBankAccountElement: AuBankAccountElementComponent = createElementComponent(
+  'auBankAccount',
   isServer
 );
