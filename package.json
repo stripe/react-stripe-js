@@ -65,7 +65,7 @@
     "@storybook/addons": "^5.2.6",
     "@storybook/preset-typescript": "^1.2.0",
     "@storybook/react": "^5.2.6",
-    "@stripe/stripe-js": "1.0.0-beta.5",
+    "@stripe/stripe-js": "1.0.0-beta.8",
     "@types/enzyme": "^3.10.4",
     "@types/jest": "^25.1.1",
     "@types/react": "^16.9.19",
@@ -105,7 +105,7 @@
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": "1.0.0-beta.5",
+    "@stripe/stripe-js": "1.0.0-beta.8",
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   }
