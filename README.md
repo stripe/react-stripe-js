@@ -26,6 +26,9 @@ your Stripe account ID for access to new documentation!
 
 ### Minimal Example
 
+First, install React Stripe.js and
+[Stripe.js](https://github.com/stripe/stripe-js).
+
 ```sh
 npm install @stripe/react-stripe-js @stripe/stripe-js
 ```
