@@ -175,13 +175,13 @@ export type PaymentRequestButtonElementComponent = React.FC<
 
 export interface AuBankAccountElementProps extends ElementProps {
   /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton).
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=auBankAccount).
    */
   options?: stripeJs.StripeAuBankAccountElementOptions;
 
   /**
    * Triggered when data exposed by this Element is changed (e.g., when there is an error).
-   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=ibanElement).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=auBankAccount).
    */
   onChange?: (event: stripeJs.StripeAuBankAccountElementChangeEvent) => any;
 
@@ -256,7 +256,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripePaymentRequestButtonElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IdealBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=auBankAccount) for the `AuBankAccountElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `AuBankAccountElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
