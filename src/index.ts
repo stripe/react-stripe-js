@@ -1,5 +1,6 @@
 import createElementComponent from './components/createElementComponent';
 import {
+  AuBankAccountElementComponent,
   CardElementComponent,
   CardNumberElementComponent,
   CardExpiryElementComponent,
@@ -18,6 +19,17 @@ export {
 } from './components/Elements';
 
 const isServer = typeof window === 'undefined';
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AuBankAccountElement: AuBankAccountElementComponent = createElementComponent(
+  'auBankAccount',
+  isServer
+);
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
