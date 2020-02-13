@@ -1,9 +1,9 @@
-import * as ReactType from 'react';
+import {FunctionComponent} from 'react';
 import React from 'react';
 import {mount} from 'enzyme';
 import {usePrevious} from './usePrevious';
 
-const TestComponent: ReactType.FC<{foo: string}> = ({foo}) => {
+const TestComponent: FunctionComponent<{foo: string}> = ({foo}) => {
   const lastFoo = usePrevious(foo);
   return <div>{lastFoo}</div>;
 };

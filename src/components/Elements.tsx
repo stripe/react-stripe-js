@@ -1,5 +1,5 @@
 // Must use `import *` or named imports for React's types
-import * as ReactType from 'react';
+import {FunctionComponent, ReactElement, ReactNode} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
 import React from 'react';
@@ -86,7 +86,7 @@ interface ElementsProps {
 interface PrivateElementsProps {
   stripe: unknown;
   options?: stripeJs.StripeElementsOptions;
-  children?: ReactType.ReactNode;
+  children?: ReactNode;
 }
 
 /**
@@ -99,7 +99,7 @@ interface PrivateElementsProps {
  *
  * @docs https://stripe.com/docs/stripe-js/react#elements-provider
  */
-export const Elements: ReactType.FC<ElementsProps> = ({
+export const Elements: FunctionComponent<ElementsProps> = ({
   stripe: rawStripeProp,
   options,
   children,
@@ -194,19 +194,19 @@ export const useStripe = (): stripeJs.Stripe | null => {
 };
 
 interface ElementsConsumerProps {
-  children: (props: ElementsContextValue) => ReactType.ReactNode;
+  children: (props: ElementsContextValue) => ReactNode;
 }
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#elements-consumer
  */
-export const ElementsConsumer: ReactType.FC<ElementsConsumerProps> = ({
+export const ElementsConsumer: FunctionComponent<ElementsConsumerProps> = ({
   children,
 }) => {
   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
 
   // Assert to satsify the busted React.FC return type (it should be ReactNode)
-  return children(ctx) as ReactType.ReactElement | null;
+  return children(ctx) as ReactElement | null;
 };
 
 ElementsConsumer.propTypes = {

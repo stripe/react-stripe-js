@@ -1,5 +1,5 @@
 // Must use `import *` or named imports for React's types
-import * as ReactType from 'react';
+import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
 import React from 'react';
@@ -43,10 +43,10 @@ const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 const createElementComponent = (
   type: stripeJs.StripeElementType,
   isServer: boolean
-): ReactType.FC<ElementProps> => {
+): FunctionComponent<ElementProps> => {
   const displayName = `${capitalized(type)}Element`;
 
-  const ClientElement: ReactType.FC<PrivateElementProps> = ({
+  const ClientElement: FunctionComponent<PrivateElementProps> = ({
     id,
     className,
     options = {},
@@ -123,7 +123,7 @@ const createElementComponent = (
   };
 
   // Only render the Element wrapper in a server environment.
-  const ServerElement: ReactType.FC<PrivateElementProps> = (props) => {
+  const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
     // Validate that we are in the right context by calling useElementsContextWithUseCase.
     useElementsContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
@@ -146,7 +146,7 @@ const createElementComponent = (
   Element.displayName = displayName;
   (Element as any).__elementType = type;
 
-  return Element as ReactType.FC<ElementProps>;
+  return Element as FunctionComponent<ElementProps>;
 };
 
 export default createElementComponent;
