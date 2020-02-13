@@ -4,6 +4,7 @@ import {
   CardNumberElementComponent,
   CardExpiryElementComponent,
   CardCvcElementComponent,
+  FpxBankElementComponent,
   IbanElementComponent,
   IdealBankElementComponent,
   PaymentRequestButtonElementComponent,
@@ -47,6 +48,14 @@ export const CardExpiryElement: CardExpiryElementComponent = createElementCompon
  */
 export const CardCvcElement: CardCvcElementComponent = createElementComponent(
   'cardCvc',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const FpxBankElement: FpxBankElementComponent = createElementComponent(
+  'fpxBank',
   isServer
 );
 

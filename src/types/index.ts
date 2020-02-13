@@ -111,6 +111,27 @@ export interface CardCvcElementProps extends ElementProps {
 
 export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
 
+export interface FpxBankElementProps extends ElementProps {
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank).
+   */
+  options?: stripeJs.StripeFpxBankElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=fpxBankElement).
+   */
+  onChange?: (event: stripeJs.StripeFpxBankElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeFpxBankElement) => any;
+}
+
+export type FpxBankElementComponent = FunctionComponent<FpxBankElementProps>;
+
 export interface IbanElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=iban).
@@ -212,6 +233,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: CardExpiryElementComponent
     ): stripeJs.StripeCardExpiryElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `FpxBankElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: FpxBankElementComponent
+    ): stripeJs.StripeFpxBankElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IbanElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
