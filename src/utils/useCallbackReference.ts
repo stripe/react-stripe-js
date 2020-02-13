@@ -1,11 +1,11 @@
-import {useRef, useEffect} from 'react';
+import React from 'react';
 
 export const useCallbackReference = <A extends unknown[]>(
   cb?: (...args: A) => any
 ): ((...args: A) => void) => {
-  const ref = useRef(cb);
+  const ref = React.useRef(cb);
 
-  useEffect(() => {
+  React.useEffect(() => {
     ref.current = cb;
   }, [cb]);
 

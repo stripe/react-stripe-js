@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
 export interface ElementProps {
@@ -42,7 +42,7 @@ export interface CardElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeCardElement) => any;
 }
 
-export type CardElementComponent = React.FC<CardElementProps>;
+export type CardElementComponent = FunctionComponent<CardElementProps>;
 
 export interface CardNumberElementProps extends ElementProps {
   /**
@@ -63,7 +63,9 @@ export interface CardNumberElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeCardNumberElement) => any;
 }
 
-export type CardNumberElementComponent = React.FC<CardNumberElementProps>;
+export type CardNumberElementComponent = FunctionComponent<
+  CardNumberElementProps
+>;
 
 export interface CardExpiryElementProps extends ElementProps {
   /**
@@ -84,7 +86,9 @@ export interface CardExpiryElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeCardExpiryElement) => any;
 }
 
-export type CardExpiryElementComponent = React.FC<CardExpiryElementProps>;
+export type CardExpiryElementComponent = FunctionComponent<
+  CardExpiryElementProps
+>;
 
 export interface CardCvcElementProps extends ElementProps {
   /**
@@ -105,7 +109,7 @@ export interface CardCvcElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeCardCvcElement) => any;
 }
 
-export type CardCvcElementComponent = React.FC<CardCvcElementProps>;
+export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
 
 export interface IbanElementProps extends ElementProps {
   /**
@@ -126,7 +130,7 @@ export interface IbanElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIbanElement) => any;
 }
 
-export type IbanElementComponent = React.FC<IbanElementProps>;
+export type IbanElementComponent = FunctionComponent<IbanElementProps>;
 
 export interface IdealBankElementProps extends ElementProps {
   /**
@@ -147,7 +151,9 @@ export interface IdealBankElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIdealBankElement) => any;
 }
 
-export type IdealBankElementComponent = React.FC<IdealBankElementProps>;
+export type IdealBankElementComponent = FunctionComponent<
+  IdealBankElementProps
+>;
 
 export interface PaymentRequestButtonElementProps extends ElementProps {
   /**
@@ -169,7 +175,7 @@ export interface PaymentRequestButtonElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripePaymentRequestButtonElement) => any;
 }
 
-export type PaymentRequestButtonElementComponent = React.FC<
+export type PaymentRequestButtonElementComponent = FunctionComponent<
   PaymentRequestButtonElementProps
 >;
 
@@ -193,7 +199,7 @@ export interface AuBankAccountElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeAuBankAccountElement) => any;
 }
 
-export type AuBankAccountElementComponent = React.FC<
+export type AuBankAccountElementComponent = FunctionComponent<
   AuBankAccountElementProps
 >;
 

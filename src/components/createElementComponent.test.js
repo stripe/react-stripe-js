@@ -1,14 +1,8 @@
-import React, {useLayoutEffect} from 'react';
+import React from 'react';
 import {mount} from 'enzyme';
 import {Elements} from './Elements';
 import createElementComponent from './createElementComponent';
 import {mockElements, mockElement, mockStripe} from '../../test/mocks';
-
-jest.mock('react', () => {
-  const actual = jest.requireActual('react');
-  jest.spyOn(actual, 'useLayoutEffect');
-  return actual;
-});
 
 describe('createElementComponent', () => {
   let stripe;
@@ -27,7 +21,7 @@ describe('createElementComponent', () => {
     element = mockElement();
     stripe.elements.mockReturnValue(elements);
     elements.create.mockReturnValue(element);
-    useLayoutEffect.mockClear();
+    jest.spyOn(React, 'useLayoutEffect');
     element.on = jest.fn((event, fn) => {
       switch (event) {
         case 'change':
@@ -97,7 +91,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      expect(useLayoutEffect).not.toHaveBeenCalled();
+      expect(React.useLayoutEffect).not.toHaveBeenCalled();
     });
   });
 
@@ -151,6 +145,8 @@ describe('createElementComponent', () => {
       expect(element.mount).toHaveBeenCalledWith(
         wrapper.find('div').getDOMNode()
       );
+
+      expect(React.useLayoutEffect).toHaveBeenCalled();
     });
 
     it('does not create and mount until Elements has been instantiated', () => {
