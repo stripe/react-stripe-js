@@ -2,8 +2,7 @@
 
 BASE_DIR="$(dirname "$0")/..";
 
-# Generated type definitions should not include default imports.
-function checkImport {
+checkImport() {
     file=$1
     regexp=$2
     message=$3
