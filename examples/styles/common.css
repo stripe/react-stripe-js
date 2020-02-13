@@ -102,7 +102,8 @@ More info: https://stripe.com/docs/stripe-js/reference#element-options
 */
 
 .StripeElement,
-.StripeElementIdeal {
+.StripeElementIdeal,
+.StripeElementFpx {
   display: block;
   margin: 10px 0 20px 0;
   max-width: 500px;
@@ -114,7 +115,8 @@ More info: https://stripe.com/docs/stripe-js/reference#element-options
 }
 
 .StripeElement--focus,
-.StripeElementIdeal--focus {
+.StripeElementIdeal--focus,
+.StripeElementFpx--focus {
   box-shadow: rgba(50, 50, 93, 0.109804) 0px 4px 6px,
     rgba(0, 0, 0, 0.0784314) 0px 1px 3px;
   -webkit-transition: all 150ms ease;
@@ -126,6 +128,7 @@ More info: https://stripe.com/docs/stripe-js/reference#element-options
   opacity: 0.6;
 }
 
-.StripeElementIdeal {
+.StripeElementIdeal,
+.StripeElementFpx {
   padding: 0;
 }

@@ -1,9 +1,11 @@
 import createElementComponent from './components/createElementComponent';
 import {
+  AuBankAccountElementComponent,
   CardElementComponent,
   CardNumberElementComponent,
   CardExpiryElementComponent,
   CardCvcElementComponent,
+  FpxBankElementComponent,
   IbanElementComponent,
   IdealBankElementComponent,
   PaymentRequestButtonElementComponent,
@@ -17,6 +19,17 @@ export {
 } from './components/Elements';
 
 const isServer = typeof window === 'undefined';
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AuBankAccountElement: AuBankAccountElementComponent = createElementComponent(
+  'auBankAccount',
+  isServer
+);
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
@@ -47,6 +60,14 @@ export const CardExpiryElement: CardExpiryElementComponent = createElementCompon
  */
 export const CardCvcElement: CardCvcElementComponent = createElementComponent(
   'cardCvc',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const FpxBankElement: FpxBankElementComponent = createElementComponent(
+  'fpxBank',
   isServer
 );
 
