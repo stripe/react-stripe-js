@@ -1,15 +1,8 @@
 // Must use `import *` or named imports for React's types
-import * as React from 'react';
+import {FunctionComponent, ReactElement, ReactNode} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-  useEffect,
-  useRef,
-} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import {isEqual} from '../utils/isEqual';
@@ -57,7 +50,7 @@ interface ElementsContextValue {
   stripe: stripeJs.Stripe | null;
 }
 
-const ElementsContext = createContext<ElementsContextValue | null>(null);
+const ElementsContext = React.createContext<ElementsContextValue | null>(null);
 ElementsContext.displayName = 'ElementsContext';
 
 export const parseElementsContext = (
@@ -93,7 +86,7 @@ interface ElementsProps {
 interface PrivateElementsProps {
   stripe: unknown;
   options?: stripeJs.StripeElementsOptions;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 /**
@@ -106,15 +99,17 @@ interface PrivateElementsProps {
  *
  * @docs https://stripe.com/docs/stripe-js/react#elements-provider
  */
-export const Elements: React.FC<ElementsProps> = ({
+export const Elements: FunctionComponent<ElementsProps> = ({
   stripe: rawStripeProp,
   options,
   children,
 }: PrivateElementsProps) => {
-  const final = useRef(false);
-  const isMounted = useRef(true);
-  const parsed = useMemo(() => parseStripeProp(rawStripeProp), [rawStripeProp]);
-  const [ctx, setContext] = useState<ElementsContextValue>(() => ({
+  const final = React.useRef(false);
+  const isMounted = React.useRef(true);
+  const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
+    rawStripeProp,
+  ]);
+  const [ctx, setContext] = React.useState<ElementsContextValue>(() => ({
     stripe: null,
     elements: null,
   }));
@@ -159,7 +154,7 @@ export const Elements: React.FC<ElementsProps> = ({
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     return (): void => {
       isMounted.current = false;
     };
@@ -178,7 +173,7 @@ Elements.propTypes = {
 export const useElementsContextWithUseCase = (
   useCaseMessage: string
 ): ElementsContextValue => {
-  const ctx = useContext(ElementsContext);
+  const ctx = React.useContext(ElementsContext);
   return parseElementsContext(ctx, useCaseMessage);
 };
 
@@ -199,19 +194,19 @@ export const useStripe = (): stripeJs.Stripe | null => {
 };
 
 interface ElementsConsumerProps {
-  children: (props: ElementsContextValue) => React.ReactNode;
+  children: (props: ElementsContextValue) => ReactNode;
 }
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#elements-consumer
  */
-export const ElementsConsumer: React.FC<ElementsConsumerProps> = ({
+export const ElementsConsumer: FunctionComponent<ElementsConsumerProps> = ({
   children,
 }) => {
   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
 
   // Assert to satsify the busted React.FC return type (it should be ReactNode)
-  return children(ctx) as React.ReactElement | null;
+  return children(ctx) as ReactElement | null;
 };
 
 ElementsConsumer.propTypes = {

@@ -1,8 +1,9 @@
 // Must use `import *` or named imports for React's types
-import * as React from 'react';
+import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
-import {useRef, useEffect, useLayoutEffect} from 'react';
+import React from 'react';
+
 import PropTypes from 'prop-types';
 
 import {useElementsContextWithUseCase} from './Elements';
@@ -42,10 +43,10 @@ const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 const createElementComponent = (
   type: stripeJs.StripeElementType,
   isServer: boolean
-): React.FC<ElementProps> => {
+): FunctionComponent<ElementProps> => {
   const displayName = `${capitalized(type)}Element`;
 
-  const ClientElement: React.FC<PrivateElementProps> = ({
+  const ClientElement: FunctionComponent<PrivateElementProps> = ({
     id,
     className,
     options = {},
@@ -56,8 +57,8 @@ const createElementComponent = (
     onClick = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
-    const elementRef = useRef<stripeJs.StripeElement | null>(null);
-    const domNode = useRef<HTMLDivElement | null>(null);
+    const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
+    const domNode = React.useRef<HTMLDivElement | null>(null);
 
     const callOnReady = useCallbackReference(onReady);
     const callOnBlur = useCallbackReference(onBlur);
@@ -65,7 +66,7 @@ const createElementComponent = (
     const callOnClick = useCallbackReference(onClick);
     const callOnChange = useCallbackReference(onChange);
 
-    useLayoutEffect(() => {
+    React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
         const element = elements.create(type as any, options);
         elementRef.current = element;
@@ -82,8 +83,8 @@ const createElementComponent = (
       }
     });
 
-    const prevOptions = useRef(options);
-    useEffect(() => {
+    const prevOptions = React.useRef(options);
+    React.useEffect(() => {
       if (
         prevOptions.current &&
         prevOptions.current.paymentRequest !== options.paymentRequest
@@ -109,7 +110,7 @@ const createElementComponent = (
       }
     }, [options]);
 
-    useEffect(
+    React.useEffect(
       () => () => {
         if (elementRef.current) {
           elementRef.current.destroy();
@@ -122,7 +123,7 @@ const createElementComponent = (
   };
 
   // Only render the Element wrapper in a server environment.
-  const ServerElement: React.FC<PrivateElementProps> = (props) => {
+  const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
     // Validate that we are in the right context by calling useElementsContextWithUseCase.
     useElementsContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
@@ -145,7 +146,7 @@ const createElementComponent = (
   Element.displayName = displayName;
   (Element as any).__elementType = type;
 
-  return Element as React.FC<ElementProps>;
+  return Element as FunctionComponent<ElementProps>;
 };
 
 export default createElementComponent;
