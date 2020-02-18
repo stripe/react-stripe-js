@@ -19,7 +19,7 @@ your Stripe account ID for access to new documentation!
 
 ## Documentation
 
-- [React Stripe.js Docs](https://stripe.com/docs/stripe-js/react)
+- [React Stripe.js docs](https://stripe.com/docs/stripe-js/react)
 - [Migrate from `react-stripe-elements`](docs/migrating.md)
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
