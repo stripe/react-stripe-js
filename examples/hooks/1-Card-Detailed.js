@@ -17,12 +17,12 @@ const CARD_OPTIONS = {
         color: '#fce883',
       },
       '::placeholder': {
-        color: '#87BBFD',
+        color: '#87bbfd',
       },
     },
     invalid: {
-      iconColor: '#FFC7EE',
-      color: '#FFC7EE',
+      iconColor: '#ffc7ee',
+      color: '#ffc7ee',
     },
   },
 };
