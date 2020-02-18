@@ -12,7 +12,7 @@ Please contact us at
 [stripejs-feedback@stripe.com](mailto:stripejs-feedback@stripe.com) and provide
 your Stripe account ID for access to new documentation!
 
-## Getting Started
+## Getting started
 
 - [Add React Stripe.js to your React app](https://stripe.com/docs/stripe-js/react#setup)
 - [Try it out using CodeSandbox](https://codesandbox.io/s/react-stripe-official-q1loc?fontsize=14&hidenavigation=1&theme=dark)
@@ -24,7 +24,7 @@ your Stripe account ID for access to new documentation!
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
-### Minimal Example
+### Minimal example
 
 First, install React Stripe.js and
 [Stripe.js](https://github.com/stripe/stripe-js).
@@ -33,7 +33,7 @@ First, install React Stripe.js and
 npm install @stripe/react-stripe-js @stripe/stripe-js
 ```
 
-#### Using Hooks
+#### Using hooks
 
 ```jsx
 import React from 'react';
@@ -79,7 +79,7 @@ const App = () => (
 ReactDOM.render(<App />, document.body);
 ```
 
-#### Using Class Components
+#### Using class components
 
 ```jsx
 import React from 'react';
@@ -129,7 +129,7 @@ const App = () => (
 ReactDOM.render(<App />, document.body);
 ```
 
-### Minimum Requirements
+### Minimum requirements
 
 The minimum supported version of React is v16.8. If you use an older version,
 upgrade React to use this library. If you prefer not to upgrade your React
