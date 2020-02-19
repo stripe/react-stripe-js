@@ -1,3 +1,7 @@
+// This example shows you how to set up React Stripe.js and use Elements.
+// Learn how to accept an iDEAL payment using the offical Stripe docs.
+// https://stripe.com/docs/payments/fpx#web
+
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {FpxBankElement, Elements, ElementsConsumer} from '../../src';

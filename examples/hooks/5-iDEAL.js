@@ -1,3 +1,7 @@
+// This example shows you how to set up React Stripe.js and use Elements.
+// Learn how to accept an iDEAL payment using the offical Stripe docs.
+// https://stripe.com/docs/payments/ideal
+
 import React, {useState} from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {IdealBankElement, Elements, useElements, useStripe} from '../../src';

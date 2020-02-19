@@ -1,3 +1,7 @@
+// This example shows you how to set up React Stripe.js and use Elements.
+// Learn how to accept a payment with the PaymentRequestButton using the offical Stripe docs.
+// https://stripe.com/docs/stripe-js/elements/payment-request-button#react
+
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
