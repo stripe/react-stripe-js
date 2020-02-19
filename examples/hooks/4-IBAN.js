@@ -1,3 +1,7 @@
+// This example shows you how to set up React Stripe.js and use Elements.
+// Learn how to accept a SEPA Debit payment using the offical Stripe docs.
+// https://stripe.com/docs/payments/sepa-debit/accept-a-payment
+
 import React, {useState} from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {IbanElement, Elements, useElements, useStripe} from '../../src';

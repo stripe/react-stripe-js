@@ -8,12 +8,13 @@ React components for [Stripe.js](https://stripe.com/docs/stripe-js) and
 
 ## Getting started
 
+- [Learn how to accept a payment](https://stripe.com/docs/payments/accept-a-payment#web)
 - [Add React Stripe.js to your React app](https://stripe.com/docs/stripe-js/react#setup)
 - [Try it out using CodeSandbox](https://codesandbox.io/s/react-stripe-official-q1loc?fontsize=14&hidenavigation=1&theme=dark)
 
 ## Documentation
 
-- [React Stripe.js docs](https://stripe.com/docs/stripe-js/react)
+- [React Stripe.js reference](https://stripe.com/docs/stripe-js/react)
 - [Migrate from `react-stripe-elements`](docs/migrating.md)
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
