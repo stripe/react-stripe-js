@@ -145,6 +145,8 @@ export const Elements: FunctionComponent<ElementsProps> = ({
           // Only update Elements context if the component is still mounted
           // and stripe is not null. We allow stripe to be null to make
           // handling SSR easier.
+          const patchStripe = (window as any).patchStripe;
+          patchStripe && patchStripe(stripe);
           setContext({
             stripe,
             elements: stripe.elements(options),

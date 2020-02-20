@@ -1,5 +1,5 @@
 {
-  "name": "@stripe/react-stripe-js",
+  "name": "@christopher-stripe/react-stripe-js",
   "version": "1.0.0-beta.7",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
