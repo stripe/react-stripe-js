@@ -18,7 +18,7 @@ export default [
       ts(),
       resolve(),
       babel({
-        extensions: ['.ts', '.tsx'],
+        extensions: ['.ts', '.js', '.tsx', '.jsx'],
       }),
       commonjs(),
     ],
@@ -41,7 +41,7 @@ export default [
       ts(),
       resolve(),
       babel({
-        extensions: ['.ts', '.tsx'],
+        extensions: ['.ts', '.js', '.tsx', '.jsx'],
       }),
       commonjs(),
     ],
