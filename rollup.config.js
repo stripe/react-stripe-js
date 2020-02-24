@@ -64,7 +64,7 @@ export default [
       ts(),
       resolve(),
       babel({
-        extensions: ['.ts', '.tsx'],
+        extensions: ['.ts', '.js', '.tsx', '.jsx'],
       }),
       replace({'process.env.NODE_ENV': JSON.stringify('production')}),
       commonjs(),
