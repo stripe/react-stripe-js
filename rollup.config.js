@@ -14,7 +14,14 @@ export default [
       {file: pkg.main, format: 'cjs'},
       {file: pkg.module, format: 'es'},
     ],
-    plugins: [ts(), resolve(), babel(), commonjs()],
+    plugins: [
+      ts(),
+      resolve(),
+      babel({
+        extensions: ['.ts', '.tsx'],
+      }),
+      commonjs(),
+    ],
   },
   // UMD build with inline PropTypes
   {
@@ -30,7 +37,14 @@ export default [
         },
       },
     ],
-    plugins: [ts(), resolve(), babel(), commonjs()],
+    plugins: [
+      ts(),
+      resolve(),
+      babel({
+        extensions: ['.ts', '.tsx'],
+      }),
+      commonjs(),
+    ],
   },
   // Minified UMD Build without PropTypes
   {
@@ -49,7 +63,9 @@ export default [
     plugins: [
       ts(),
       resolve(),
-      babel(),
+      babel({
+        extensions: ['.ts', '.js', '.tsx', '.jsx'],
+      }),
       replace({'process.env.NODE_ENV': JSON.stringify('production')}),
       commonjs(),
       terser(),
