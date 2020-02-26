@@ -23,11 +23,11 @@ to continue using legacy
 ## 1. Install and fix imports
 
 First, use `npm` or `yarn` to remove `react-stripe-elements` and install
-`@stripe/react-stripe-js`.
+`@stripe/react-stripe-js` and `@stripe/stripe-js`.
 
 ```sh
 npm uninstall react-stripe-elements
-npm install @stripe/react-stripe-js
+npm install @stripe/react-stripe-js @stripe/stripe-js
 ```
 
 After installing React Stripe.js, update your import statements. In places where
@@ -74,14 +74,15 @@ const App = () => (
 #### After
 
 ```jsx
+import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 
 // Create the Stripe object yourself...
-const stripe = window.Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 
 const App = () => (
   // ...and pass it directly to <Elements>.
-  <Elements stripe={stripe}>{/* Your checkout form */}</Elements>
+  <Elements stripe={stripePromise}>{/* Your checkout form */}</Elements>
 );
 ```
 
