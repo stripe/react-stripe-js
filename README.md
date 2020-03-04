@@ -1,6 +1,6 @@
 # React Stripe.js
 
-React components for 
+React components for
 [Stripe.js and Elements](https://stripe.com/docs/stripe-js).
 
 [![build status](https://img.shields.io/travis/stripe/react-stripe-js/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe-js)
