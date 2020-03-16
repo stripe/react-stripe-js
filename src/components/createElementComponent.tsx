@@ -21,6 +21,7 @@ interface PrivateElementProps {
   onChange?: UnknownCallback;
   onBlur?: UnknownCallback;
   onFocus?: UnknownCallback;
+  onEscape?: UnknownCallback;
   onReady?: UnknownCallback;
   onClick?: UnknownCallback;
   options?: UnknownOptions;
@@ -54,6 +55,7 @@ const createElementComponent = (
     onFocus = noop,
     onReady = noop,
     onChange = noop,
+    onEscape = noop,
     onClick = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
@@ -65,6 +67,7 @@ const createElementComponent = (
     const callOnFocus = useCallbackReference(onFocus);
     const callOnClick = useCallbackReference(onClick);
     const callOnChange = useCallbackReference(onChange);
+    const callOnEscape = useCallbackReference(onEscape);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
@@ -75,6 +78,7 @@ const createElementComponent = (
         element.on('change', callOnChange);
         element.on('blur', callOnBlur);
         element.on('focus', callOnFocus);
+        element.on('escape', callOnEscape);
 
         // Users can pass an an onClick prop on any Element component
         // just as they could listen for the `click` event on any Element,

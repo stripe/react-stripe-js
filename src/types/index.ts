@@ -40,6 +40,11 @@ export interface AuBankAccountElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeAuBankAccountElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type AuBankAccountElementComponent = FunctionComponent<
@@ -63,6 +68,11 @@ export interface CardElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeCardElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type CardElementComponent = FunctionComponent<CardElementProps>;
@@ -84,6 +94,11 @@ export interface CardNumberElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeCardNumberElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type CardNumberElementComponent = FunctionComponent<
@@ -107,6 +122,11 @@ export interface CardExpiryElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeCardExpiryElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type CardExpiryElementComponent = FunctionComponent<
@@ -130,6 +150,11 @@ export interface CardCvcElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeCardCvcElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
@@ -151,6 +176,11 @@ export interface FpxBankElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeFpxBankElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type FpxBankElementComponent = FunctionComponent<FpxBankElementProps>;
@@ -172,6 +202,11 @@ export interface IbanElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeIbanElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type IbanElementComponent = FunctionComponent<IbanElementProps>;
@@ -193,6 +228,11 @@ export interface IdealBankElementProps extends ElementProps {
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
   onReady?: (element: stripeJs.StripeIdealBankElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type IdealBankElementComponent = FunctionComponent<

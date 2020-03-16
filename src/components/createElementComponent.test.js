@@ -11,6 +11,7 @@ describe('createElementComponent', () => {
   let simulateChange;
   let simulateBlur;
   let simulateFocus;
+  let simulateEscape;
   let simulateReady;
   let simulateClick;
 
@@ -32,6 +33,9 @@ describe('createElementComponent', () => {
           break;
         case 'focus':
           simulateFocus = fn;
+          break;
+        case 'escape':
+          simulateEscape = fn;
           break;
         case 'ready':
           simulateReady = fn;
@@ -270,6 +274,30 @@ describe('createElementComponent', () => {
       simulateFocus();
       expect(onFocus2).toHaveBeenCalled();
       expect(onFocus).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s escape event to the current onEscape prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onEscape = jest.fn();
+      const onEscape2 = jest.fn();
+      const wrapper = mount(<TestComponent onEscape={onEscape} />);
+
+      // when setting a new onEscape prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onEscape: onEscape2,
+      });
+
+      simulateEscape();
+      expect(onEscape2).toHaveBeenCalled();
+      expect(onEscape).not.toHaveBeenCalled();
     });
 
     // Users can pass an an onClick prop on any Element component
