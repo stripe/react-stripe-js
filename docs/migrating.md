@@ -147,7 +147,7 @@ import {CardElement} from '@stripe/react-stripe-js';
 
 <br />
 
-## 3. `useStripe` and `useElements` instead of `injectStripe`.
+## 4. `useStripe` and `useElements` instead of `injectStripe`.
 
 React Stripe.js uses hooks and consumers rather than higher order components.
 
@@ -200,7 +200,7 @@ const InjectedCheckoutForm = () => (
 
 <br />
 
-## 4. Pass in the Element instance to other Stripe.js methods.
+## 5. Pass in the Element instance to other Stripe.js methods.
 
 React Stripe.js does not have the automatic Element detection.
 
