@@ -1635,10 +1635,10 @@
     telejson "^3.2.0"
     util-deprecate "^1.0.2"
 
-"@stripe/stripe-js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.0.0.tgz#58286eb8e49263311507db2a5521e77cfd500d44"
-  integrity sha512-i1ICazKQycR5hkGvL71CfXRVUz3Fm7huT555dw8n5pKOtSSm6As+nSVlez7TTcTcF9mh+vZ+Zh0r6Oe5Ly+SHQ==
+"@stripe/stripe-js@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.2.0.tgz#60ab1f1acee27708ae286bec4473643aa32ffa84"
+  integrity sha512-z9N0ue1JDJSFL260uNqnEqyFzEVU9XMExEtTZNl02pH8/YBkbEu18cN9XTjAfs+qfPS/LQGOurGb7r5krIpWNQ==
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
   version "4.2.0"
