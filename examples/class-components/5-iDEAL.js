@@ -1,5 +1,5 @@
 // This example shows you how to set up React Stripe.js and use Elements.
-// Learn how to accept an iDEAL payment using the offical Stripe docs.
+// Learn how to accept an iDEAL payment using the official Stripe docs.
 // https://stripe.com/docs/payments/ideal
 
 import React from 'react';

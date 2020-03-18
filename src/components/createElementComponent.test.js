@@ -319,7 +319,7 @@ describe('createElementComponent', () => {
       });
     });
 
-    it('does not trigger unecessary updates', () => {
+    it('does not trigger unnecessary updates', () => {
       // We need to wrap so that we can update the CardElement's props later.
       // Enzyme does not support calling setProps on child components.
       const TestComponent = (props) => (
@@ -344,7 +344,7 @@ describe('createElementComponent', () => {
       expect(element.update).not.toHaveBeenCalled();
     });
 
-    it('warns on changes to non-updateable options', () => {
+    it('warns on changes to non-updatable options', () => {
       // We need to wrap so that we can update the CardElement's props later.
       // Enzyme does not support calling setProps on child components.
       const TestComponent = (props) => (
