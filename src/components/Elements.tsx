@@ -205,7 +205,7 @@ export const ElementsConsumer: FunctionComponent<ElementsConsumerProps> = ({
 }) => {
   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
 
-  // Assert to satsify the busted React.FC return type (it should be ReactNode)
+  // Assert to satisfy the busted React.FC return type (it should be ReactNode)
   return children(ctx) as ReactElement | null;
 };
 
