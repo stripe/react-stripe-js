@@ -8,44 +8,40 @@ describe('createElementComponent', () => {
   let stripe;
   let elements;
   let element;
-  let simulateChange;
-  let simulateBlur;
-  let simulateFocus;
-  let simulateEscape;
-  let simulateReady;
-  let simulateClick;
+  let simulatedEvents;
+
+  const getSimulatedEventHandlers = function(event) {
+    let handlers = simulatedEvents.get(event);
+    if (!handlers) {
+      handlers = new Set();
+      simulatedEvents.set(event, handlers);
+    }
+    return handlers;
+  };
+
+  const simulateEvent = function(event, ...args) {
+    const handlers = getSimulatedEventHandlers(event);
+    for (const handler of handlers) {
+      handler(...args);
+    }
+  };
 
   beforeEach(() => {
     jest.restoreAllMocks();
     stripe = mockStripe();
     elements = mockElements();
     element = mockElement();
+    simulatedEvents = new Map();
     stripe.elements.mockReturnValue(elements);
     elements.create.mockReturnValue(element);
     jest.spyOn(React, 'useLayoutEffect');
     element.on = jest.fn((event, fn) => {
-      switch (event) {
-        case 'change':
-          simulateChange = fn;
-          break;
-        case 'blur':
-          simulateBlur = fn;
-          break;
-        case 'focus':
-          simulateFocus = fn;
-          break;
-        case 'escape':
-          simulateEscape = fn;
-          break;
-        case 'ready':
-          simulateReady = fn;
-          break;
-        case 'click':
-          simulateClick = fn;
-          break;
-        default:
-          throw new Error('TestSetupError: Unexpected event registration.');
-      }
+      const handlers = getSimulatedEventHandlers(event);
+      handlers.add(fn);
+    });
+    element.off = jest.fn((event, fn) => {
+      const handlers = getSimulatedEventHandlers(event);
+      handlers.delete(fn);
     });
   });
 
@@ -198,7 +194,7 @@ describe('createElementComponent', () => {
         onReady: onReady2,
       });
 
-      simulateReady();
+      simulateEvent('ready');
       expect(onReady2).toHaveBeenCalledWith(element);
       expect(onReady).not.toHaveBeenCalled();
     });
@@ -223,7 +219,7 @@ describe('createElementComponent', () => {
       });
 
       const changeEventMock = Symbol('change');
-      simulateChange(changeEventMock);
+      simulateEvent('change', changeEventMock);
       expect(onChange2).toHaveBeenCalledWith(changeEventMock);
       expect(onChange).not.toHaveBeenCalled();
     });
@@ -247,7 +243,7 @@ describe('createElementComponent', () => {
         onBlur: onBlur2,
       });
 
-      simulateBlur();
+      simulateEvent('blur');
       expect(onBlur2).toHaveBeenCalled();
       expect(onBlur).not.toHaveBeenCalled();
     });
@@ -271,7 +267,7 @@ describe('createElementComponent', () => {
         onFocus: onFocus2,
       });
 
-      simulateFocus();
+      simulateEvent('focus');
       expect(onFocus2).toHaveBeenCalled();
       expect(onFocus).not.toHaveBeenCalled();
     });
@@ -295,9 +291,33 @@ describe('createElementComponent', () => {
         onEscape: onEscape2,
       });
 
-      simulateEscape();
+      simulateEvent('escape');
       expect(onEscape2).toHaveBeenCalled();
       expect(onEscape).not.toHaveBeenCalled();
+    });
+
+    it('propagates an unknown Element`s event to undocumented on prop', () => {
+      // We need to wrap so that we can update the CardElement's props later.
+      // Enzyme does not support calling setProps on child components.
+      const TestComponent = (props) => (
+        <Elements stripe={stripe}>
+          <CardElement {...props} />
+        </Elements>
+      );
+
+      const onUndocumented = jest.fn();
+      const onUndocumented2 = jest.fn();
+      const wrapper = mount(<TestComponent onEscape={onUndocumented} />);
+
+      // when setting a new onEscape prop (e.g. a lambda in the render),
+      // only the latest handler is called.
+      wrapper.setProps({
+        onUndocumented: onUndocumented2,
+      });
+
+      simulateEvent('undocumented');
+      expect(onUndocumented2).toHaveBeenCalled();
+      expect(onUndocumented).not.toHaveBeenCalled();
     });
 
     // Users can pass an an onClick prop on any Element component
@@ -323,7 +343,7 @@ describe('createElementComponent', () => {
       });
 
       const clickEventMock = Symbol('click');
-      simulateClick(clickEventMock);
+      simulateEvent('click', clickEventMock);
       expect(onClick2).toHaveBeenCalledWith(clickEventMock);
       expect(onClick).not.toHaveBeenCalled();
     });

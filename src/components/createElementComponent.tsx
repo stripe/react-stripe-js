@@ -7,12 +7,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {useElementsContextWithUseCase} from './Elements';
-import {useCallbackReference} from '../utils/useCallbackReference';
+import {useEvents} from '../utils/useEvents';
 import {isEqual} from '../utils/isEqual';
 import {ElementProps} from '../types';
 import {isUnknownObject} from '../utils/guards';
 
-type UnknownCallback = (...args: unknown[]) => any;
+type UnknownCallback = (...args: unknown[]) => void;
 type UnknownOptions = {[k: string]: unknown};
 
 interface PrivateElementProps {
@@ -37,8 +37,6 @@ const extractUpdateableOptions = (options?: UnknownOptions): UnknownOptions => {
   return rest;
 };
 
-const noop = () => {};
-
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
@@ -51,40 +49,26 @@ const createElementComponent = (
     id,
     className,
     options = {},
-    onBlur = noop,
-    onFocus = noop,
-    onReady = noop,
-    onChange = noop,
-    onEscape = noop,
-    onClick = noop,
+    children, //eslint-disable-line @typescript-eslint/no-unused-vars
+    ...eventProps
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
-
-    const callOnReady = useCallbackReference(onReady);
-    const callOnBlur = useCallbackReference(onBlur);
-    const callOnFocus = useCallbackReference(onFocus);
-    const callOnClick = useCallbackReference(onClick);
-    const callOnChange = useCallbackReference(onChange);
-    const callOnEscape = useCallbackReference(onEscape);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
         const element = elements.create(type as any, options);
         elementRef.current = element;
         element.mount(domNode.current);
-        element.on('ready', () => callOnReady(element));
-        element.on('change', callOnChange);
-        element.on('blur', callOnBlur);
-        element.on('focus', callOnFocus);
-        element.on('escape', callOnEscape);
-
-        // Users can pass an an onClick prop on any Element component
-        // just as they could listen for the `click` event on any Element,
-        // but only the PaymentRequestButton will actually trigger the event.
-        (element as any).on('click', callOnClick);
       }
+    });
+
+    useEvents(eventProps, elementRef, {
+      ready: (
+        handler: (element: stripeJs.StripeElement) => void,
+        element: stripeJs.StripeElement
+      ) => () => handler(element),
     });
 
     const prevOptions = React.useRef(options);
