@@ -11,6 +11,8 @@ import {
   PaymentRequestButtonElementComponent,
 } from './types';
 
+export * from './types'
+
 export {
   useElements,
   useStripe,
