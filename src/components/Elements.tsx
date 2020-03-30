@@ -160,6 +160,16 @@ export const Elements: FunctionComponent<ElementsProps> = ({
     };
   }, []);
 
+  React.useEffect(() => {
+    const anyStripe: any = ctx.stripe;
+
+    if (!anyStripe || !anyStripe._registerWrapper) {
+      return;
+    }
+
+    anyStripe._registerWrapper({name: 'react-stripe-js', version: _VERSION});
+  }, [ctx.stripe]);
+
   return (
     <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>
   );
