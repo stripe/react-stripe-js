@@ -6,6 +6,19 @@ import replace from 'rollup-plugin-replace';
 import ts from '@wessberg/rollup-plugin-ts';
 import pkg from './package.json';
 
+const PLUGINS = [
+  ts(),
+  resolve(),
+  babel({
+    extensions: ['.ts', '.js', '.tsx', '.jsx'],
+  }),
+  replace({
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    _VERSION: JSON.stringify(pkg.version),
+  }),
+  commonjs(),
+];
+
 export default [
   {
     input: 'src/index.ts',
@@ -14,14 +27,7 @@ export default [
       {file: pkg.main, format: 'cjs'},
       {file: pkg.module, format: 'es'},
     ],
-    plugins: [
-      ts(),
-      resolve(),
-      babel({
-        extensions: ['.ts', '.js', '.tsx', '.jsx'],
-      }),
-      commonjs(),
-    ],
+    plugins: PLUGINS,
   },
   // UMD build with inline PropTypes
   {
@@ -37,14 +43,7 @@ export default [
         },
       },
     ],
-    plugins: [
-      ts(),
-      resolve(),
-      babel({
-        extensions: ['.ts', '.js', '.tsx', '.jsx'],
-      }),
-      commonjs(),
-    ],
+    plugins: PLUGINS,
   },
   // Minified UMD Build without PropTypes
   {
@@ -60,15 +59,6 @@ export default [
         },
       },
     ],
-    plugins: [
-      ts(),
-      resolve(),
-      babel({
-        extensions: ['.ts', '.js', '.tsx', '.jsx'],
-      }),
-      replace({'process.env.NODE_ENV': JSON.stringify('production')}),
-      commonjs(),
-      terser(),
-    ],
+    plugins: [...PLUGINS, terser()],
   },
 ];
