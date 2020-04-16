@@ -18,7 +18,7 @@
     "clean": "rimraf dist",
     "prettier:fix": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
     "ci": "yarn run lint && yarn run lint:prettier && yarn run test && yarn run typecheck && yarn run build",
-    "prepublishOnly": "yarn run ci",
+    "prepublishOnly": "echo \"\nPlease use ./scripts/publish instead\n\" && exit 1",
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 "
   },
