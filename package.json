@@ -9,7 +9,8 @@
   "browser": "dist/react-stripe.umd.js",
   "types": "dist/react-stripe.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "yarn run lint && yarn run lint:prettier && yarn run test:unit && yarn run typecheck",
+    "test:unit": "jest",
     "lint": "eslint '{src,examples}/**/*.{ts,tsx,js}'",
     "lint:prettier": "prettier './**/*.js' './**/*.css' './**/*.md' --list-different",
     "typecheck": "tsc",
@@ -17,7 +18,6 @@
     "checkimport": "scripts/check-imports",
     "clean": "rimraf dist",
     "prettier:fix": "prettier './**/*.js' './**/*.css' './**/*.md' --write",
-    "ci": "yarn run lint && yarn run lint:prettier && yarn run test && yarn run typecheck && yarn run build",
     "prepublishOnly": "echo \"\nPlease use ./scripts/publish instead\n\" && exit 1",
     "doctoc": "doctoc README.md",
     "storybook": "start-storybook -p 6006 "
