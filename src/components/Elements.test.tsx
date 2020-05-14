@@ -152,6 +152,30 @@ describe('Elements', () => {
     expect(result.current).toBe(mockElements);
   });
 
+  test('allows a transition from null to a valid Stripe object in StrictMode', async () => {
+    let stripeProp: any = null;
+    const spy = jest.fn();
+    const TestComponent = () => (
+      <React.StrictMode>
+        <Elements stripe={stripeProp}>
+          <ElementsConsumer>
+            {({stripe, elements}) => {
+              spy({stripe, elements});
+              return null;
+            }}
+          </ElementsConsumer>
+        </Elements>
+      </React.StrictMode>
+    );
+
+    const {rerender} = render(<TestComponent />);
+    expect(spy).toBeCalledWith({stripe: null, elements: null});
+
+    stripeProp = mockStripe;
+    rerender(<TestComponent />);
+    expect(spy).toBeCalledWith({stripe: mockStripe, elements: mockElements});
+  });
+
   test('works with a Promise resolving to a valid Stripe object', async () => {
     const wrapper = ({children}: any) => (
       <Elements stripe={mockStripePromise}>{children}</Elements>
@@ -225,9 +249,7 @@ describe('Elements', () => {
     expect(mockStripe.elements).toHaveBeenCalledWith({foo: 'foo'});
   });
 
-  // TODO(christopher): support Strict Mode first
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('does not allow updates to options after the Stripe Promise is set in StrictMode', async () => {
+  test('does not allow updates to options after the Stripe Promise is set in StrictMode', async () => {
     // Silence console output so test output is less noisy
     consoleWarn.mockImplementation(() => {});
 

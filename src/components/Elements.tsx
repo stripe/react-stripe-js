@@ -6,8 +6,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {isEqual} from '../utils/isEqual';
-import {usePrevious} from '../utils/usePrevious';
-import {isStripe, isPromise} from '../utils/guards';
+import {usePromiseResolver} from '../utils/usePromiseResolver';
+import {isStripe} from '../utils/guards';
 
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `Elements`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
@@ -21,28 +21,6 @@ const validateStripe = (maybeStripe: unknown): null | stripeJs.Stripe => {
   }
 
   throw new Error(INVALID_STRIPE_ERROR);
-};
-
-type ParsedStripeProp =
-  | {tag: 'empty'}
-  | {tag: 'sync'; stripe: stripeJs.Stripe}
-  | {tag: 'async'; stripePromise: Promise<stripeJs.Stripe | null>};
-
-const parseStripeProp = (raw: unknown): ParsedStripeProp => {
-  if (isPromise(raw)) {
-    return {
-      tag: 'async',
-      stripePromise: Promise.resolve(raw).then(validateStripe),
-    };
-  }
-
-  const stripe = validateStripe(raw);
-
-  if (stripe === null) {
-    return {tag: 'empty'};
-  }
-
-  return {tag: 'sync', stripe};
 };
 
 interface ElementsContextValue {
@@ -65,6 +43,14 @@ export const parseElementsContext = (
 
   return ctx;
 };
+
+const createElementsContext = (stripe: stripeJs.Stripe | null, options?: stripeJs.StripeElementsOptions) => {
+  const elements = stripe ? stripe.elements(options) : null
+  return {
+    stripe,
+    elements
+  }
+}
 
 interface ElementsProps {
   /**
@@ -99,66 +85,44 @@ interface PrivateElementsProps {
  *
  * @docs https://stripe.com/docs/stripe-js/react#elements-provider
  */
-export const Elements: FunctionComponent<ElementsProps> = ({
-  stripe: rawStripeProp,
-  options,
-  children,
-}: PrivateElementsProps) => {
-  const final = React.useRef(false);
-  const isMounted = React.useRef(true);
-  const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
-    rawStripeProp,
-  ]);
-  const [ctx, setContext] = React.useState<ElementsContextValue>(() => ({
-    stripe: null,
-    elements: null,
-  }));
+export const Elements: FunctionComponent<ElementsProps> = (props: PrivateElementsProps) => {
+  const { children } = props
 
-  const prevStripe = usePrevious(rawStripeProp);
-  const prevOptions = usePrevious(options);
-  if (prevStripe !== null) {
-    if (prevStripe !== rawStripeProp) {
+  if (props.stripe === undefined) throw new Error(INVALID_STRIPE_ERROR);
+
+  const [inputs, setInputs] = React.useState({ rawStripe: props.stripe, options: props.options })
+  React.useEffect(() => {
+    const { rawStripe, options } = inputs
+    const { stripe: nextRawStripe, options: nextOptions } = props
+
+    const canUpdate = rawStripe === null
+    const hasRawStripeChanged = rawStripe !== nextRawStripe
+    const hasOptionsChanged = !isEqual(options, nextOptions)
+
+    if (hasRawStripeChanged && !canUpdate) {
       console.warn(
         'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
       );
     }
-    if (!isEqual(options, prevOptions)) {
+
+    if (hasOptionsChanged && !canUpdate) {
       console.warn(
         'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
       );
     }
-  }
 
-  if (!final.current) {
-    if (parsed.tag === 'sync') {
-      final.current = true;
-      setContext({
-        stripe: parsed.stripe,
-        elements: parsed.stripe.elements(options),
-      });
-    }
+    const nextInputs = { rawStripe: nextRawStripe, options: nextOptions }
+    if (hasRawStripeChanged && canUpdate) setInputs(nextInputs)
+  }, [inputs, props])
 
-    if (parsed.tag === 'async') {
-      final.current = true;
-      parsed.stripePromise.then((stripe) => {
-        if (stripe && isMounted.current) {
-          // Only update Elements context if the component is still mounted
-          // and stripe is not null. We allow stripe to be null to make
-          // handling SSR easier.
-          setContext({
-            stripe,
-            elements: stripe.elements(options),
-          });
-        }
-      });
-    }
-  }
+  const [maybeStripe = null] = usePromiseResolver(inputs.rawStripe)
+  const resolvedStripe = validateStripe(maybeStripe)
+  const [ctx, setContext] = React.useState(() => createElementsContext(resolvedStripe, inputs.options));
 
+  const shouldInitialize = resolvedStripe !== null && ctx.stripe === null
   React.useEffect(() => {
-    return (): void => {
-      isMounted.current = false;
-    };
-  }, []);
+    if (shouldInitialize) setContext(createElementsContext(resolvedStripe, inputs.options))
+  }, [shouldInitialize, resolvedStripe, inputs.options])
 
   React.useEffect(() => {
     const anyStripe: any = ctx.stripe;
