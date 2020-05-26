@@ -1,27 +1,30 @@
-import {FunctionComponent} from 'react';
-import React from 'react';
-import {mount} from 'enzyme';
-import {usePrevious} from './usePrevious';
+import {renderHook} from '@testing-library/react-hooks';
 
-const TestComponent: FunctionComponent<{foo: string}> = ({foo}) => {
-  const lastFoo = usePrevious(foo);
-  return <div>{lastFoo}</div>;
-};
+import {usePrevious} from './usePrevious';
 
 describe('usePrevious', () => {
   it('returns the initial value if it has not yet been changed', () => {
-    const wrapper = mount(<TestComponent foo="foo" />);
+    const {result} = renderHook(() => usePrevious('foo'));
 
-    expect(wrapper.find('div').text()).toEqual('foo');
+    expect(result.current).toEqual('foo');
   });
 
   it('returns the previous value after the it has been changed', () => {
-    const wrapper = mount(<TestComponent foo="foo" />);
-    wrapper.setProps({foo: 'bar'});
-    expect(wrapper.find('div').text()).toEqual('foo');
-    wrapper.setProps({foo: 'baz'});
-    expect(wrapper.find('div').text()).toEqual('bar');
-    wrapper.setProps({foo: 'buz'});
-    expect(wrapper.find('div').text()).toEqual('baz');
+    let val = 'foo';
+    const {result, rerender} = renderHook(() => usePrevious(val));
+
+    expect(result.current).toEqual('foo');
+
+    val = 'bar';
+    rerender();
+    expect(result.current).toEqual('foo');
+
+    val = 'baz';
+    rerender();
+    expect(result.current).toEqual('bar');
+
+    val = 'buz';
+    rerender();
+    expect(result.current).toEqual('baz');
   });
 });
