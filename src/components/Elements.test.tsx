@@ -103,16 +103,18 @@ describe('Elements', () => {
     expect.assertions(2);
 
     render(
-      <Elements stripe={mockStripe}>
-        <ElementsConsumer>
-          {(ctx) => {
-            expect(ctx.elements).toBe(mockElements);
-            expect(ctx.stripe).toBe(mockStripe);
+      <React.StrictMode>
+        <Elements stripe={mockStripe}>
+          <ElementsConsumer>
+            {(ctx) => {
+              expect(ctx.elements).toBe(mockElements);
+              expect(ctx.stripe).toBe(mockStripe);
 
-            return null;
-          }}
-        </ElementsConsumer>
-      </Elements>
+              return null;
+            }}
+          </ElementsConsumer>
+        </Elements>
+      </React.StrictMode>
     );
   });
 
