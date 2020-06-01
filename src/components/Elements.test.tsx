@@ -139,17 +139,35 @@ describe('Elements', () => {
   });
 
   test('allows a transition from null to a valid Stripe object', () => {
-    let stripeProp: any = null;
-    const wrapper = ({children}: any) => (
-      <Elements stripe={stripeProp}>{children}</Elements>
+    const TestComponent = () => {
+      const elements = useElements();
+
+      if (!elements) {
+        return null;
+      }
+
+      if (elements === mockElements) {
+        return <>expected</>;
+      }
+
+      throw new Error(`unexpected useElements value: ${elements}`);
+    };
+
+    const {container, rerender} = render(
+      <Elements stripe={null}>
+        <TestComponent />
+      </Elements>
     );
 
-    const {result, rerender} = renderHook(() => useElements(), {wrapper});
-    expect(result.current).toBe(null);
+    expect(container).toBeEmpty();
 
-    stripeProp = mockStripe;
-    rerender();
-    expect(result.current).toBe(mockElements);
+    rerender(
+      <Elements stripe={mockStripe}>
+        <TestComponent />
+      </Elements>
+    );
+
+    expect(container).toHaveTextContent('expected');
   });
 
   test('works with a Promise resolving to a valid Stripe object', async () => {
@@ -169,24 +187,37 @@ describe('Elements', () => {
   });
 
   test('allows a transition from null to a valid Promise', async () => {
-    let stripeProp: any = null;
-    const wrapper = ({children}: any) => (
-      <Elements stripe={stripeProp}>{children}</Elements>
+    const TestComponent = () => {
+      const elements = useElements();
+
+      if (!elements) {
+        return null;
+      }
+
+      if (elements === mockElements) {
+        return <>expected</>;
+      }
+
+      throw new Error(`unexpected useElements value: ${elements}`);
+    };
+
+    const {container, rerender, findByText} = render(
+      <Elements stripe={null}>
+        <TestComponent />
+      </Elements>
     );
 
-    const {result, rerender, waitForNextUpdate} = renderHook(
-      () => useElements(),
-      {wrapper}
+    expect(container).toBeEmpty();
+
+    rerender(
+      <Elements stripe={mockStripePromise}>
+        <TestComponent />
+      </Elements>
     );
-    expect(result.current).toBe(null);
 
-    stripeProp = mockStripePromise;
-    rerender();
-    expect(result.current).toBe(null);
+    expect(container).toBeEmpty();
 
-    await waitForNextUpdate();
-
-    expect(result.current).toBe(mockElements);
+    await findByText('expected');
   });
 
   test('does not set context if Promise resolves after Elements is unmounted', async () => {
