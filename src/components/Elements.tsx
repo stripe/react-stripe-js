@@ -44,14 +44,6 @@ export const parseElementsContext = (
   return ctx;
 };
 
-const createElementsContext = (stripe: stripeJs.Stripe | null, options?: stripeJs.StripeElementsOptions) => {
-  const elements = stripe ? stripe.elements(options) : null
-  return {
-    stripe,
-    elements
-  }
-}
-
 interface ElementsProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise` resolving to a `Stripe` object.
@@ -116,24 +108,24 @@ export const Elements: FunctionComponent<ElementsProps> = (props: PrivateElement
   }, [inputs, props])
 
   const [maybeStripe = null] = usePromiseResolver(inputs.rawStripe)
-  const resolvedStripe = validateStripe(maybeStripe)
-  const [ctx, setContext] = React.useState(() => createElementsContext(resolvedStripe, inputs.options));
-
-  const shouldInitialize = resolvedStripe !== null && ctx.stripe === null
-  React.useEffect(() => {
-    if (shouldInitialize) setContext(createElementsContext(resolvedStripe, inputs.options))
-  }, [shouldInitialize, resolvedStripe, inputs.options])
+  const stripe = validateStripe(maybeStripe)
+  const [elements, setElements] = React.useState<stripeJs.StripeElements | null>(null);
 
   React.useEffect(() => {
-    const anyStripe: any = ctx.stripe;
+    if (stripe) setElements(stripe.elements(inputs.options))
+  }, [stripe, inputs.options])
+
+  React.useEffect(() => {
+    const anyStripe: any = stripe;
 
     if (!anyStripe || !anyStripe._registerWrapper) {
       return;
     }
 
     anyStripe._registerWrapper({name: 'react-stripe-js', version: _VERSION});
-  }, [ctx.stripe]);
+  }, [stripe]);
 
+  const ctx: ElementsContextValue = { stripe, elements }
   return (
     <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>
   );

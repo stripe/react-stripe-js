@@ -53,9 +53,7 @@ describe('Elements', () => {
     expect(mockStripe.elements).toHaveBeenCalledTimes(1);
   });
 
-  // TODO(christopher): support Strict Mode first
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('only creates elements once in Strict Mode', () => {
+  test('only creates elements once in Strict Mode', () => {
     const TestComponent = () => {
       const _ = useElements();
       return <div />;
@@ -83,39 +81,39 @@ describe('Elements', () => {
   });
 
   test('provides elements and stripe with the ElementsConsumer component', () => {
-    expect.assertions(2);
+    const spy = jest.fn()
 
     render(
       <Elements stripe={mockStripe}>
         <ElementsConsumer>
           {(ctx) => {
-            expect(ctx.elements).toBe(mockElements);
-            expect(ctx.stripe).toBe(mockStripe);
-
+            spy(ctx)
             return null;
           }}
         </ElementsConsumer>
       </Elements>
     );
+
+    expect(spy).toBeCalledWith({ stripe: mockStripe, elements: mockElements });
   });
 
   test('provides elements and stripe with the ElementsConsumer component in Strict Mode', () => {
-    expect.assertions(2);
+    const spy = jest.fn()
 
     render(
       <React.StrictMode>
-        <Elements stripe={mockStripe}>
-          <ElementsConsumer>
-            {(ctx) => {
-              expect(ctx.elements).toBe(mockElements);
-              expect(ctx.stripe).toBe(mockStripe);
-
-              return null;
-            }}
-          </ElementsConsumer>
-        </Elements>
+      <Elements stripe={mockStripe}>
+        <ElementsConsumer>
+          {(ctx) => {
+            spy(ctx)
+            return null;
+          }}
+        </ElementsConsumer>
+      </Elements>
       </React.StrictMode>
     );
+
+    expect(spy).toBeCalledWith({ stripe: mockStripe, elements: mockElements });
   });
 
   test('provides given stripe instance on mount', () => {
@@ -159,8 +157,8 @@ describe('Elements', () => {
       <React.StrictMode>
         <Elements stripe={stripeProp}>
           <ElementsConsumer>
-            {({stripe, elements}) => {
-              spy({stripe, elements});
+            {(ctx) => {
+              spy(ctx)
               return null;
             }}
           </ElementsConsumer>
