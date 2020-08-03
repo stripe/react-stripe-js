@@ -34,6 +34,8 @@ After installing React Stripe.js, update your import statements. In places where
 you used to import from `react-stripe-elements`, adjust your code to import from
 `@stripe/react-stripe-js`.
 
+**Note** Using the method for loading the Stripe script as outlined in the [`react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements#loading-stripejs-asynchronously) will continue to work but be aware [`@stripe/stripe-js` has expanded options](https://github.com/stripe/stripe-js#ensuring-stripejs-is-available-everywhere) in conjunction with `loadStripe`.
+
 #### Before
 
 ```js
