@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 
 import {Elements} from './Elements';
 import createElementComponent from './createElementComponent';
@@ -384,7 +384,7 @@ describe('createElementComponent', () => {
       );
     });
 
-    it('destroys an existing Element when the component unmounts', () => {
+    it('destroys an existing Element when the component unmounts', async () => {
       const {unmount} = render(
         <Elements stripe={null}>
           <CardElement />
@@ -403,7 +403,9 @@ describe('createElementComponent', () => {
       );
 
       unmount2();
-      expect(mockElement.destroy).toHaveBeenCalled();
+      // Cleanup happens asynchronously in React 17
+      // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
+      await waitFor(() => expect(mockElement.destroy).toHaveBeenCalled());
     });
   });
 });

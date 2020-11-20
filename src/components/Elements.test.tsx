@@ -100,7 +100,9 @@ describe('Elements', () => {
   });
 
   test('provides elements and stripe with the ElementsConsumer component in Strict Mode', () => {
-    expect.assertions(2);
+    // render is invoked twice in strict mode in React 17
+    // https://github.com/facebook/react/pull/18430
+    expect.assertions(4);
 
     render(
       <React.StrictMode>
