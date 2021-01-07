@@ -114,14 +114,15 @@ const createElementComponent = (
       }
     }, [options]);
 
-    React.useEffect(
-      () => () => {
-        if (elementRef.current) {
-          elementRef.current.destroy();
+    React.useEffect(() => {
+      const element = elementRef.current;
+
+      return () => {
+        if (element) {
+          element.destroy();
         }
-      },
-      []
-    );
+      };
+    }, []);
 
     return <div id={id} className={className} ref={domNode} />;
   };
