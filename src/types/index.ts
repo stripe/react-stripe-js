@@ -267,6 +267,34 @@ export type P24BankElementComponent = FunctionComponent<
   P24BankElementProps
 >;
 
+export interface EPSBankElementProps extends ElementProps {
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=epsBank).
+   */
+  options?: stripeJs.StripeEPSBankElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=epsBankElement).
+   */
+  onChange?: (event: stripeJs.StripeEPSBankElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeEPSBankElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+}
+
+export type EPSBankElementComponent = FunctionComponent<
+  EPSBankElementProps
+  >;
+
 export interface PaymentRequestButtonElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton).
@@ -394,6 +422,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: P24BankElementComponent
     ): stripeJs.StripeP24BankElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=epsBank) for the `EPSBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `EPSBankElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: EPSBankElementComponent
+    ): stripeJs.StripeEPSBankElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
