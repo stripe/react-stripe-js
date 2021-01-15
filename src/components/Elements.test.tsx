@@ -53,25 +53,6 @@ describe('Elements', () => {
     expect(mockStripe.elements).toHaveBeenCalledTimes(1);
   });
 
-  // TODO(christopher): support Strict Mode first
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('only creates elements once in Strict Mode', () => {
-    const TestComponent = () => {
-      const _ = useElements();
-      return <div />;
-    };
-
-    render(
-      <React.StrictMode>
-        <Elements stripe={mockStripe}>
-          <TestComponent />
-        </Elements>
-      </React.StrictMode>
-    );
-
-    expect(mockStripe.elements).toHaveBeenCalledTimes(1);
-  });
-
   test('injects stripe with the useStripe hook', () => {
     const wrapper = ({children}: any) => (
       <Elements stripe={mockStripe}>{children}</Elements>
@@ -96,27 +77,6 @@ describe('Elements', () => {
           }}
         </ElementsConsumer>
       </Elements>
-    );
-  });
-
-  // TODO(christopher): support Strict Mode first
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('provides elements and stripe with the ElementsConsumer component in Strict Mode', () => {
-    expect.assertions(2);
-
-    render(
-      <React.StrictMode>
-        <Elements stripe={mockStripe}>
-          <ElementsConsumer>
-            {(ctx) => {
-              expect(ctx.elements).toBe(mockElements);
-              expect(ctx.stripe).toBe(mockStripe);
-
-              return null;
-            }}
-          </ElementsConsumer>
-        </Elements>
-      </React.StrictMode>
     );
   });
 
@@ -215,34 +175,6 @@ describe('Elements', () => {
 
     rerender(
       <Elements stripe={mockStripePromise} options={{bar: 'bar'} as any} />
-    );
-
-    await act(() => mockStripePromise);
-
-    expect(consoleWarn).toHaveBeenCalledTimes(1);
-    expect(consoleWarn.mock.calls[0][0]).toContain(
-      'Unsupported prop change on Elements'
-    );
-    expect(mockStripe.elements).toHaveBeenCalledTimes(1);
-    expect(mockStripe.elements).toHaveBeenCalledWith({foo: 'foo'});
-  });
-
-  // TODO(christopher): support Strict Mode first
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('does not allow updates to options after the Stripe Promise is set in StrictMode', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {});
-
-    const {rerender} = render(
-      <React.StrictMode>
-        <Elements stripe={mockStripePromise} options={{foo: 'foo'} as any} />
-      </React.StrictMode>
-    );
-
-    rerender(
-      <React.StrictMode>
-        <Elements stripe={mockStripePromise} options={{bar: 'bar'} as any} />
-      </React.StrictMode>
     );
 
     await act(() => mockStripePromise);
