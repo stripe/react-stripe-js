@@ -115,11 +115,9 @@ const createElementComponent = (
     }, [options]);
 
     React.useEffect(() => {
-      const element = elementRef.current;
-
       return () => {
-        if (element) {
-          element.destroy();
+        if (elementRef.current) {
+          elementRef.current.destroy();
         }
       };
     }, []);
