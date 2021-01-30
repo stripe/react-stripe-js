@@ -114,7 +114,7 @@ const createElementComponent = (
       }
     }, [options]);
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
       return () => {
         if (elementRef.current) {
           elementRef.current.destroy();

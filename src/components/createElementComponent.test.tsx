@@ -121,6 +121,33 @@ describe('createElementComponent', () => {
       false
     );
 
+
+    it('Can remove and add CardElement at the same time', () => {
+      let cardMounted = false;
+      mockElement.mount.mockImplementation(()=> {
+        if(cardMounted){
+          throw new Error('Card already mounted');
+        }
+        cardMounted = true;
+      });
+      mockElement.destroy.mockImplementation(()=> {
+        cardMounted = false;
+      });
+
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement key={"1"} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement key={"2"} />
+        </Elements>
+      );
+
+      expect(mockElement.mount).toHaveBeenCalledTimes(2);
+    });
+
     it('gives the element component a proper displayName', () => {
       expect(CardElement.displayName).toBe('CardElement');
     });
