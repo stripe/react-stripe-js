@@ -263,6 +263,33 @@ export type PaymentRequestButtonElementComponent = FunctionComponent<
   PaymentRequestButtonElementProps
 >;
 
+export interface AfterpayClearpayMessageElementProps {
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  id?: string;
+
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  className?: string;
+
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
+   */
+  options?: stripeJs.StripeAfterpayClearpayMessageElementOptions;
+
+  /**
+   * Triggered when the Element has been fully loaded, after initial method calls have been fired.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeAfterpayClearpayMessageElement) => any;
+}
+
+export type AfterpayClearpayMessageElementComponent = FunctionComponent<
+  AfterpayClearpayMessageElementProps
+>;
+
 declare module '@stripe/stripe-js' {
   interface StripeElements {
     /**
@@ -339,5 +366,13 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentRequestButtonElementComponent
     ): stripeJs.StripePaymentRequestButtonElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: AfterpayClearpayMessageElementComponent
+    ): stripeJs.StripeAfterpayClearpayMessageElement | null;
   }
 }
