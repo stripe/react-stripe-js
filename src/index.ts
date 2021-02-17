@@ -9,7 +9,7 @@ import {
   IbanElementComponent,
   IdealBankElementComponent,
   P24BankElementComponent,
-  EPSBankElementComponent,
+  EpsBankElementComponent,
   PaymentRequestButtonElementComponent,
   AfterpayClearpayMessageElementComponent,
 } from './types';
@@ -103,7 +103,7 @@ export const P24BankElement: P24BankElementComponent = createElementComponent(
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
-export const EPSBankElement: EPSBankElementComponent = createElementComponent(
+export const EpsBankElement: EpsBankElementComponent = createElementComponent(
   'epsBank',
   isServer
 );

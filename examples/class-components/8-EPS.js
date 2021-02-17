@@ -4,7 +4,7 @@
 
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
-import {EPSBankElement, Elements, ElementsConsumer} from '../../src';
+import {EpsBankElement, Elements, ElementsConsumer} from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
 import '../styles/common.css';
@@ -48,7 +48,7 @@ class CheckoutForm extends React.Component {
       return;
     }
 
-    const epsBankElement = elements.getElement(EPSBankElement);
+    const epsBankElement = elements.getElement(EpsBankElement);
 
     const payload = await stripe.createPaymentMethod({
       type: 'eps',
@@ -89,7 +89,7 @@ class CheckoutForm extends React.Component {
           }}
         />
         <label htmlFor="eps">EPS Bank</label>
-        <EPSBankElement
+        <EpsBankElement
           id="eps"
           onBlur={logEvent('blur')}
           onChange={logEvent('change')}
