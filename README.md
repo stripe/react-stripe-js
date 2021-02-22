@@ -19,7 +19,7 @@ React components for
 - [Legacy `react-stripe-elements` docs](https://github.com/stripe/react-stripe-elements/#react-stripe-elements)
 - [Examples](examples)
 
-### Minimal example
+### Minimal example - Creating a Payment Method
 
 First, install React Stripe.js and
 [Stripe.js](https://github.com/stripe/stripe-js).
@@ -118,6 +118,63 @@ const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 const App = () => (
   <Elements stripe={stripePromise}>
     <InjectedCheckoutForm />
+  </Elements>
+);
+
+ReactDOM.render(<App />, document.body);
+```
+
+### Minimal example - Creating a Token Instead of a Payment Method
+###### Some developers may prefer sending tokens to their own backend before final Stripe processing
+
+First, install React Stripe.js and
+[Stripe.js](https://github.com/stripe/stripe-js).
+
+```sh
+npm install @stripe/react-stripe-js @stripe/stripe-js
+```
+
+#### Using hooks
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {loadStripe} from '@stripe/stripe-js';
+import {
+  CardElement,
+  Elements,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
+
+const CheckoutForm = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const cardToken = await stripe.createToken(elements.getElement(CardElement));
+    } catch (error) {
+      console.error(error)
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement />
+      <button type="submit" disabled={!stripe}>
+        Pay
+      </button>
+    </form>
+  );
+};
+
+const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+
+const App = () => (
+  <Elements stripe={stripePromise}>
+    <CheckoutForm />
   </Elements>
 );
 
