@@ -9,6 +9,7 @@ import {
   IbanElementComponent,
   IdealBankElementComponent,
   PaymentRequestButtonElementComponent,
+  AfterpayClearpayMessageElementComponent,
 } from './types';
 
 export * from './types'
@@ -94,5 +95,13 @@ export const IdealBankElement: IdealBankElementComponent = createElementComponen
  */
 export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
   'paymentRequestButton',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AfterpayClearpayMessageElement: AfterpayClearpayMessageElementComponent = createElementComponent(
+  'afterpayClearpayMessage',
   isServer
 );
