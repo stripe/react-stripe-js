@@ -8,6 +8,8 @@ import {
   FpxBankElementComponent,
   IbanElementComponent,
   IdealBankElementComponent,
+  P24BankElementComponent,
+  EpsBankElementComponent,
   PaymentRequestButtonElementComponent,
   AfterpayClearpayMessageElementComponent,
 } from './types';
@@ -87,6 +89,22 @@ export const IbanElement: IbanElementComponent = createElementComponent(
  */
 export const IdealBankElement: IdealBankElementComponent = createElementComponent(
   'idealBank',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const P24BankElement: P24BankElementComponent = createElementComponent(
+  'p24Bank',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const EpsBankElement: EpsBankElementComponent = createElementComponent(
+  'epsBank',
   isServer
 );
 
