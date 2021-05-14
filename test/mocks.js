@@ -26,5 +26,6 @@ export const mockStripe = () => ({
   confirmCardPayment: jest.fn(),
   confirmCardSetup: jest.fn(),
   paymentRequest: jest.fn(),
+  registerAppInfo: jest.fn(),
   _registerWrapper: jest.fn(),
 });
