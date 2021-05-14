@@ -163,11 +163,17 @@ export const Elements: FunctionComponent<ElementsProps> = ({
   React.useEffect(() => {
     const anyStripe: any = ctx.stripe;
 
-    if (!anyStripe || !anyStripe._registerWrapper) {
+    if (!anyStripe || !anyStripe._registerWrapper || !anyStripe.registerAppInfo) {
       return;
     }
 
     anyStripe._registerWrapper({name: 'react-stripe-js', version: _VERSION});
+
+    anyStripe.registerAppInfo({
+      name: 'react-stripe-js',
+      version: _VERSION,
+      url: 'https://stripe.com/docs/stripe-js/react',
+    })
   }, [ctx.stripe]);
 
   return (
