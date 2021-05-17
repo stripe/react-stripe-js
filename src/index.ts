@@ -10,6 +10,7 @@ import {
   IdealBankElementComponent,
   P24BankElementComponent,
   EpsBankElementComponent,
+  PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   AfterpayClearpayMessageElementComponent,
 } from './types';
@@ -105,6 +106,11 @@ export const P24BankElement: P24BankElementComponent = createElementComponent(
  */
 export const EpsBankElement: EpsBankElementComponent = createElementComponent(
   'epsBank',
+  isServer
+);
+
+export const PaymentElement: PaymentElementComponent = createElementComponent(
+  'payment',
   isServer
 );
 
