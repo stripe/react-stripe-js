@@ -293,7 +293,7 @@ describe('Elements', () => {
   test('throws when trying to call useElements outside of Elements context', () => {
     const {result} = renderHook(() => useElements());
 
-    expect(result.error!.message).toBe(
+    expect(result.error && result.error.message).toBe(
       'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
     );
   });
@@ -301,7 +301,7 @@ describe('Elements', () => {
   test('throws when trying to call useStripe outside of Elements context', () => {
     const {result} = renderHook(() => useStripe());
 
-    expect(result.error!.message).toBe(
+    expect(result.error && result.error.message).toBe(
       'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
   });
