@@ -295,6 +295,12 @@ export type EpsBankElementComponent = FunctionComponent<
   EpsBankElementProps
   >;
 
+export interface PaymentElementProps extends ElementProps {
+  options?: any;
+}
+
+export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
+
 export interface PaymentRequestButtonElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton).
@@ -430,6 +436,10 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: EpsBankElementComponent
     ): stripeJs.StripeEpsBankElement | null;
+
+    getElement(
+      component: PaymentElementComponent
+    ): stripeJs.StripeElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
