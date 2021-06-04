@@ -123,8 +123,14 @@ const CheckoutForm = () => {
       return;
     }
 
+    const card = elements.getElement(CardElement);
+
+    if (card == null) {
+      return;
+    }
+
     if (error) {
-      elements.getElement('card').focus();
+      card.focus();
       return;
     }
 
@@ -134,7 +140,7 @@ const CheckoutForm = () => {
 
     const payload = await stripe.createPaymentMethod({
       type: 'card',
-      card: elements.getElement(CardElement),
+      card,
       billing_details: billingDetails,
     });
 

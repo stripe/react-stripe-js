@@ -46,11 +46,15 @@ const CheckoutForm = () => {
       return;
     }
 
-    const epsBankElement = elements.getElement(EpsBankElement);
+    const eps = elements.getElement(EpsBankElement);
+
+    if (eps == null) {
+      return;
+    }
 
     const payload = await stripe.createPaymentMethod({
       type: 'eps',
-      eps: epsBankElement,
+      eps,
       billing_details: {
         name,
       },

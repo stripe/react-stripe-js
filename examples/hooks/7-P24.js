@@ -46,11 +46,15 @@ const CheckoutForm = () => {
       return;
     }
 
-    const p24BankElement = elements.getElement(P24BankElement);
+    const p24 = elements.getElement(P24BankElement);
+
+    if (p24 == null) {
+      return;
+    }
 
     const payload = await stripe.createPaymentMethod({
       type: 'p24',
-      p24: p24BankElement,
+      p24,
       billing_details: {
         name,
       },
