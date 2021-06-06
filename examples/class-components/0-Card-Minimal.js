@@ -25,7 +25,7 @@ class CheckoutForm extends React.Component {
     // each type of element.
     const card = elements.getElement(CardElement);
 
-    if (card != null) {
+    if (card == null) {
       return;
     }
 
