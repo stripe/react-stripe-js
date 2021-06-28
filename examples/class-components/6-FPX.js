@@ -49,11 +49,15 @@ class CheckoutForm extends React.Component {
       return;
     }
 
-    const fpxBankElement = elements.getElement(FpxBankElement);
+    const fpx = elements.getElement(FpxBankElement);
+
+    if (fpx == null) {
+      return;
+    }
 
     const payload = await stripe.createPaymentMethod({
       type: 'fpx',
-      fpx: fpxBankElement,
+      fpx,
       billing_details: {
         name,
       },

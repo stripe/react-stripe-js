@@ -47,6 +47,11 @@ const CheckoutForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (elements == null) {
+      return;
+    }
+
     const {error, paymentMethod} = await stripe.createPaymentMethod({
       type: 'card',
       card: elements.getElement(CardElement),
@@ -56,7 +61,7 @@ const CheckoutForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />
-      <button type="submit" disabled={!stripe}>
+      <button type="submit" disabled={!stripe || !elements}>
         Pay
       </button>
     </form>
@@ -86,6 +91,11 @@ class CheckoutForm extends React.Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     const {stripe, elements} = this.props;
+
+    if (elements == null) {
+      return;
+    }
+
     const {error, paymentMethod} = await stripe.createPaymentMethod({
       type: 'card',
       card: elements.getElement(CardElement),

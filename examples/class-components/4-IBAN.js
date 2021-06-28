@@ -46,6 +46,10 @@ class CheckoutForm extends React.Component {
 
     const ibanElement = elements.getElement(IbanElement);
 
+    if (ibanElement == null) {
+      return;
+    }
+
     const payload = await stripe.createPaymentMethod({
       type: 'sepa_debit',
       sepa_debit: ibanElement,

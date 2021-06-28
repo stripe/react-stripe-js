@@ -46,11 +46,15 @@ const CheckoutForm = () => {
       return;
     }
 
-    const idealBankElement = elements.getElement(IdealBankElement);
+    const ideal = elements.getElement(IdealBankElement);
+
+    if (ideal == null) {
+      return;
+    }
 
     const payload = await stripe.createPaymentMethod({
       type: 'ideal',
-      ideal: idealBankElement,
+      ideal,
       billing_details: {
         name,
       },

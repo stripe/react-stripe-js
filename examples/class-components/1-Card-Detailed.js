@@ -129,8 +129,14 @@ class CheckoutForm extends React.Component {
       return;
     }
 
+    const card = elements.getElement(CardElement);
+
+    if (card == null) {
+      return;
+    }
+
     if (error) {
-      elements.getElement('card').focus();
+      card.focus();
       return;
     }
 
@@ -140,7 +146,7 @@ class CheckoutForm extends React.Component {
 
     const payload = await stripe.createPaymentMethod({
       type: 'card',
-      card: elements.getElement(CardElement),
+      card,
       billing_details: {
         email,
         phone,
