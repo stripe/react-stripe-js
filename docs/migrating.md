@@ -250,7 +250,7 @@ const CheckoutForm = (props) => {
     // e.g. createToken - https://stripe.com/docs/js/tokens_sources/create_token?type=cardElement
     stripe.createToken(cardElement);
 
-    // or createPaymentMethod - https://stripe.com/docs/js/payment_intents/create_payment_method
+    // or createPaymentMethod - https://stripe.com/docs/js/payment_methods/create_payment_method
     stripe.createPaymentMethod({
       type: 'card',
       card: cardElement,
