@@ -2807,10 +2807,10 @@
     resolve-from "^5.0.0"
     store2 "^2.12.0"
 
-"@stripe/stripe-js@^1.13.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.13.0.tgz#7737a39d3d909c6d7164e604e0eb5828ab14cb0d"
-  integrity sha512-8H3yH+jqZ7pWe34WvOo0L0pYsjaveb3Kw9dfoHUMnUwHWZ7ku4SwWZD1D8wQSnTx5se4iVUuKRsLvEwkUaUjSw==
+"@stripe/stripe-js@^1.18.0":
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.18.0.tgz#687268d7cd68b44b92b86300d7c7f2a6e4df0b98"
+  integrity sha512-yBRHAMKHnF3kbzv0tpKB82kSow43wW5qXLK8ofg3V9NaaCyObSTO7wJfktWAtG/NBgkJOdUL+pV8dHBj0qvDkQ==
 
 "@testing-library/dom@^7.28.1":
   version "7.29.2"
