@@ -296,7 +296,26 @@ export type EpsBankElementComponent = FunctionComponent<
   >;
 
 export interface PaymentElementProps extends ElementProps {
-  options?: any;
+  /**
+   * An object containing Element configuration options.
+   */
+  options?: stripeJs.StripePaymentElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed.
+   */
+  onChange?: (event: stripeJs.StripePaymentElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripePaymentElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
