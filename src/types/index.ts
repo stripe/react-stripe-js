@@ -263,9 +263,7 @@ export interface P24BankElementProps extends ElementProps {
   onEscape?: () => any;
 }
 
-export type P24BankElementComponent = FunctionComponent<
-  P24BankElementProps
->;
+export type P24BankElementComponent = FunctionComponent<P24BankElementProps>;
 
 export interface EpsBankElementProps extends ElementProps {
   /**
@@ -291,9 +289,7 @@ export interface EpsBankElementProps extends ElementProps {
   onEscape?: () => any;
 }
 
-export type EpsBankElementComponent = FunctionComponent<
-  EpsBankElementProps
-  >;
+export type EpsBankElementComponent = FunctionComponent<EpsBankElementProps>;
 
 export interface PaymentElementProps extends ElementProps {
   /**

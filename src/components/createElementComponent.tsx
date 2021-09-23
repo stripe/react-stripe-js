@@ -8,12 +8,14 @@ import PropTypes from 'prop-types';
 
 import {useElementsContextWithUseCase} from './Elements';
 import {useCallbackReference} from '../utils/useCallbackReference';
-import {isEqual} from '../utils/isEqual';
 import {ElementProps} from '../types';
-import {isUnknownObject} from '../utils/guards';
+import {usePrevious} from '../utils/usePrevious';
+import {
+  extractAllowedOptionsUpdates,
+  UnknownOptions,
+} from '../utils/extractAllowedOptionsUpdates';
 
 type UnknownCallback = (...args: unknown[]) => any;
-type UnknownOptions = {[k: string]: unknown};
 
 interface PrivateElementProps {
   id?: string;
@@ -26,16 +28,6 @@ interface PrivateElementProps {
   onClick?: UnknownCallback;
   options?: UnknownOptions;
 }
-
-const extractUpdateableOptions = (options?: UnknownOptions): UnknownOptions => {
-  if (!isUnknownObject(options)) {
-    return {};
-  }
-
-  const {paymentRequest: _, ...rest} = options;
-
-  return rest;
-};
 
 const noop = () => {};
 
@@ -87,32 +79,20 @@ const createElementComponent = (
       }
     });
 
-    const prevOptions = React.useRef(options);
+    const prevOptions = usePrevious(options);
     React.useEffect(() => {
-      if (
-        prevOptions.current &&
-        prevOptions.current.paymentRequest !== options.paymentRequest
-      ) {
-        console.warn(
-          'Unsupported prop change: options.paymentRequest is not a customizable property.'
-        );
+      if (!elementRef.current) {
+        return;
       }
 
-      const updateableOptions = extractUpdateableOptions(options);
+      const updates = extractAllowedOptionsUpdates(options, prevOptions, [
+        'paymentRequest',
+      ]);
 
-      if (
-        Object.keys(updateableOptions).length !== 0 &&
-        !isEqual(
-          updateableOptions,
-          extractUpdateableOptions(prevOptions.current)
-        )
-      ) {
-        if (elementRef.current) {
-          elementRef.current.update(updateableOptions);
-          prevOptions.current = options;
-        }
+      if (updates) {
+        elementRef.current.update(updates);
       }
-    }, [options]);
+    }, [options, prevOptions]);
 
     React.useLayoutEffect(() => {
       return () => {

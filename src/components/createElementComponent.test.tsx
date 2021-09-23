@@ -121,27 +121,26 @@ describe('createElementComponent', () => {
       false
     );
 
-
     it('Can remove and add CardElement at the same time', () => {
       let cardMounted = false;
-      mockElement.mount.mockImplementation(()=> {
-        if(cardMounted){
+      mockElement.mount.mockImplementation(() => {
+        if (cardMounted) {
           throw new Error('Card already mounted');
         }
         cardMounted = true;
       });
-      mockElement.destroy.mockImplementation(()=> {
+      mockElement.destroy.mockImplementation(() => {
         cardMounted = false;
       });
 
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <CardElement key={"1"} />
+          <CardElement key={'1'} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <CardElement key={"2"} />
+          <CardElement key={'2'} />
         </Elements>
       );
 
@@ -407,7 +406,7 @@ describe('createElementComponent', () => {
       expect(mockElement.update).not.toHaveBeenCalled();
 
       expect(console.warn).toHaveBeenCalledWith(
-        'Unsupported prop change: options.paymentRequest is not a customizable property.'
+        'Unsupported prop change: options.paymentRequest is not a mutable property.'
       );
     });
 
@@ -446,6 +445,25 @@ describe('createElementComponent', () => {
 
       unmount();
       expect(mockElement.destroy).toHaveBeenCalled();
+    });
+
+    it('updates the Element when options change from null to non-null value', () => {
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          {/* @ts-expect-error */}
+          <CardElement options={null} />
+        </Elements>
+      );
+
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement options={{style: {base: {fontSize: '30px'}}}} />
+        </Elements>
+      );
+
+      expect(mockElement.update).toHaveBeenCalledWith({
+        style: {base: {fontSize: '30px'}},
+      });
     });
   });
 });
