@@ -8,13 +8,15 @@ export const extractAllowedOptionsUpdates = (
   prevOptions: unknown | void,
   immutableKeys: string[]
 ): UnknownOptions | null => {
-  if (!isUnknownObject(options) || !isUnknownObject(prevOptions)) {
+  if (!isUnknownObject(options)) {
     return null;
   }
 
   return Object.keys(options).reduce(
     (newOptions: null | UnknownOptions, key) => {
-      const isUpdated = !isEqual(options[key], prevOptions[key]);
+      const isUpdated =
+        !isUnknownObject(prevOptions) ||
+        !isEqual(options[key], prevOptions[key]);
 
       if (immutableKeys.includes(key)) {
         if (isUpdated) {

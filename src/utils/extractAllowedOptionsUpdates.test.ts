@@ -11,6 +11,12 @@ describe('extractAllowedOptionsUpdates', () => {
     ).toEqual({foo: 'foo2'});
   });
 
+  it('works with a null previous value', () => {
+    expect(extractAllowedOptionsUpdates({foo: 'foo2'}, null, [])).toEqual({
+      foo: 'foo2',
+    });
+  });
+
   it('warns about and drops updates to immutable keys', () => {
     const consoleSpy = jest.spyOn(window.console, 'warn');
 
