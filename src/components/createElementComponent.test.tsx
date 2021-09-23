@@ -121,27 +121,26 @@ describe('createElementComponent', () => {
       false
     );
 
-
     it('Can remove and add CardElement at the same time', () => {
       let cardMounted = false;
-      mockElement.mount.mockImplementation(()=> {
-        if(cardMounted){
+      mockElement.mount.mockImplementation(() => {
+        if (cardMounted) {
           throw new Error('Card already mounted');
         }
         cardMounted = true;
       });
-      mockElement.destroy.mockImplementation(()=> {
+      mockElement.destroy.mockImplementation(() => {
         cardMounted = false;
       });
 
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <CardElement key={"1"} />
+          <CardElement key={'1'} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <CardElement key={"2"} />
+          <CardElement key={'2'} />
         </Elements>
       );
 

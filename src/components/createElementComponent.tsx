@@ -10,7 +10,10 @@ import {useElementsContextWithUseCase} from './Elements';
 import {useCallbackReference} from '../utils/useCallbackReference';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
-import {extractAllowedOptionsUpdates, UnknownOptions} from '../utils/extractAllowedOptionsUpdates';
+import {
+  extractAllowedOptionsUpdates,
+  UnknownOptions,
+} from '../utils/extractAllowedOptionsUpdates';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -82,7 +85,9 @@ const createElementComponent = (
         return;
       }
 
-      const updates = extractAllowedOptionsUpdates(options, prevOptions, ['paymentRequest']);
+      const updates = extractAllowedOptionsUpdates(options, prevOptions, [
+        'paymentRequest',
+      ]);
 
       if (updates) {
         elementRef.current.update(updates);

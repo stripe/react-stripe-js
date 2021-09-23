@@ -6,7 +6,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {usePrevious} from '../utils/usePrevious';
-import {extractAllowedOptionsUpdates, UnknownOptions} from '../utils/extractAllowedOptionsUpdates';
+import {
+  extractAllowedOptionsUpdates,
+  UnknownOptions,
+} from '../utils/extractAllowedOptionsUpdates';
 import {isStripe, isPromise} from '../utils/guards';
 
 const INVALID_STRIPE_ERROR =
@@ -154,8 +157,11 @@ export const Elements: FunctionComponent<ElementsProps> = (({
       return;
     }
 
-    const updates = extractAllowedOptionsUpdates(options, prevOptions, ['clientSecret', 'fonts']);
-    
+    const updates = extractAllowedOptionsUpdates(options, prevOptions, [
+      'clientSecret',
+      'fonts',
+    ]);
+
     if (updates) {
       ctx.elements.update(updates);
     }
@@ -170,7 +176,11 @@ export const Elements: FunctionComponent<ElementsProps> = (({
   React.useEffect(() => {
     const anyStripe: any = ctx.stripe;
 
-    if (!anyStripe || !anyStripe._registerWrapper || !anyStripe.registerAppInfo) {
+    if (
+      !anyStripe ||
+      !anyStripe._registerWrapper ||
+      !anyStripe.registerAppInfo
+    ) {
       return;
     }
 
@@ -180,7 +190,7 @@ export const Elements: FunctionComponent<ElementsProps> = (({
       name: 'react-stripe-js',
       version: _VERSION,
       url: 'https://stripe.com/docs/stripe-js/react',
-    })
+    });
   }, [ctx.stripe]);
 
   return (
