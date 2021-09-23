@@ -5,8 +5,8 @@ import * as stripeJs from '@stripe/stripe-js';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {isEqual} from '../utils/isEqual';
 import {usePrevious} from '../utils/usePrevious';
+import {extractAllowedOptionsUpdates, UnknownOptions} from '../utils/extractAllowedOptionsUpdates';
 import {isStripe, isPromise} from '../utils/guards';
 
 const INVALID_STRIPE_ERROR =
@@ -85,7 +85,7 @@ interface ElementsProps {
 
 interface PrivateElementsProps {
   stripe: unknown;
-  options?: stripeJs.StripeElementsOptions;
+  options?: UnknownOptions;
   children?: ReactNode;
 }
 
@@ -99,7 +99,7 @@ interface PrivateElementsProps {
  *
  * @docs https://stripe.com/docs/stripe-js/react#elements-provider
  */
-export const Elements: FunctionComponent<ElementsProps> = ({
+export const Elements: FunctionComponent<ElementsProps> = (({
   stripe: rawStripeProp,
   options,
   children,
@@ -115,16 +115,10 @@ export const Elements: FunctionComponent<ElementsProps> = ({
   }));
 
   const prevStripe = usePrevious(rawStripeProp);
-  const prevOptions = usePrevious(options);
   if (prevStripe !== null) {
     if (prevStripe !== rawStripeProp) {
       console.warn(
         'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
-      );
-    }
-    if (!isEqual(options, prevOptions)) {
-      console.warn(
-        'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
       );
     }
   }
@@ -154,6 +148,19 @@ export const Elements: FunctionComponent<ElementsProps> = ({
     }
   }
 
+  const prevOptions = usePrevious(options);
+  React.useEffect(() => {
+    if (!ctx.elements) {
+      return;
+    }
+
+    const updates = extractAllowedOptionsUpdates(options, prevOptions, ['clientSecret', 'fonts']);
+    
+    if (updates) {
+      ctx.elements.update(updates);
+    }
+  }, [options, prevOptions, ctx.elements]);
+
   React.useEffect(() => {
     return (): void => {
       isMounted.current = false;
@@ -179,7 +186,7 @@ export const Elements: FunctionComponent<ElementsProps> = ({
   return (
     <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>
   );
-};
+}) as FunctionComponent<ElementsProps>;
 
 Elements.propTypes = {
   stripe: PropTypes.any,

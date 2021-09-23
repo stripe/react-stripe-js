@@ -15,6 +15,7 @@ export const mockElements = () => {
     getElement: jest.fn((type) => {
       return elements[type] || null;
     }),
+    update: jest.fn(),
   };
 };
 

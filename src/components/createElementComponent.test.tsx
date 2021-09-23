@@ -407,7 +407,7 @@ describe('createElementComponent', () => {
       expect(mockElement.update).not.toHaveBeenCalled();
 
       expect(console.warn).toHaveBeenCalledWith(
-        'Unsupported prop change: options.paymentRequest is not a customizable property.'
+        'Unsupported prop change: options.paymentRequest is not a mutable property.'
       );
     });
 

@@ -15,7 +15,7 @@ import {
   AfterpayClearpayMessageElementComponent,
 } from './types';
 
-export * from './types'
+export * from './types';
 
 export {
   useElements,

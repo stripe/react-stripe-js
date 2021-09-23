@@ -165,28 +165,6 @@ describe('Elements', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  test('does not allow updates to options after the Stripe Promise is set', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {});
-
-    const {rerender} = render(
-      <Elements stripe={mockStripePromise} options={{foo: 'foo'} as any} />
-    );
-
-    rerender(
-      <Elements stripe={mockStripePromise} options={{bar: 'bar'} as any} />
-    );
-
-    await act(() => mockStripePromise);
-
-    expect(consoleWarn).toHaveBeenCalledTimes(1);
-    expect(consoleWarn.mock.calls[0][0]).toContain(
-      'Unsupported prop change on Elements'
-    );
-    expect(mockStripe.elements).toHaveBeenCalledTimes(1);
-    expect(mockStripe.elements).toHaveBeenCalledWith({foo: 'foo'});
-  });
-
   test('works with a Promise resolving to null for SSR safety', async () => {
     const nullPromise = Promise.resolve(null);
     const TestComponent = () => {
@@ -258,10 +236,7 @@ describe('Elements', () => {
     );
   });
 
-  test('does not allow changes to options after setting the Stripe object', () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {});
-
+  test('allows changes to options via elements.update after setting the Stripe object', () => {
     const {rerender} = render(
       <Elements stripe={mockStripe} options={{foo: 'foo'} as any} />
     );
@@ -271,9 +246,8 @@ describe('Elements', () => {
     expect(mockStripe.elements).toHaveBeenCalledWith({foo: 'foo'});
     expect(mockStripe.elements).toHaveBeenCalledTimes(1);
 
-    expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on Elements: You cannot change the `options` prop after setting the `stripe` prop.'
-    );
+    expect(mockElements.update).toHaveBeenCalledWith({bar: 'bar'});
+    expect(mockStripe.elements).toHaveBeenCalledTimes(1);
   });
 
   test('allows options changes before setting the Stripe object', () => {
