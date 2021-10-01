@@ -10,6 +10,7 @@ import {
   IdealBankElementComponent,
   P24BankElementComponent,
   EpsBankElementComponent,
+  LinkAuthenticationElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   AfterpayClearpayMessageElementComponent,
@@ -119,6 +120,17 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
  */
 export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
   'paymentRequestButton',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const LinkAuthenticationElement: LinkAuthenticationElementComponent = createElementComponent(
+  'linkAuthentication',
   isServer
 );
 
