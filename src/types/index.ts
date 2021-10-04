@@ -369,7 +369,7 @@ export interface ShippingAddressElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
    */
-  options?: stripeJs.StripeShippingAddressOptions;
+  options?: stripeJs.StripeShippingAddressElementOptions;
 
   /**
    * Triggered when data exposed by this Element is changed (e.g., when there is an error).
