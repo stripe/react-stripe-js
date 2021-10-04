@@ -34,7 +34,7 @@ const noop = () => {};
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
-  type: stripeJs.StripeElementType | 'payment',
+  type: stripeJs.StripeElementType,
   isServer: boolean
 ): FunctionComponent<ElementProps> => {
   const displayName = `${capitalized(type)}Element`;

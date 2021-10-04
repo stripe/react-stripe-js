@@ -62,7 +62,7 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
     "@storybook/react": "^6.2.9",
-    "@stripe/stripe-js": "^1.18.0",
+    "@stripe/stripe-js": "^1.19.1",
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
     "@testing-library/react-hooks": "^4.0.0",
@@ -103,7 +103,7 @@
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": "^1.18.0",
+    "@stripe/stripe-js": "^1.19.1",
     "react": "^16.8.0 || ^17.0.0",
     "react-dom": "^16.8.0 || ^17.0.0"
   }

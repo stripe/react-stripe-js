@@ -263,6 +263,31 @@ export interface P24BankElementProps extends ElementProps {
   onEscape?: () => any;
 }
 
+export interface LinkAuthenticationElementProps extends ElementProps {
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=auBankAccountElement).
+   */
+  onChange?: (
+    event: stripeJs.StripeLinkAuthenticationElementChangeEvent
+  ) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeLinkAuthenticationElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+}
+
+export type LinkAuthenticationElementComponent = FunctionComponent<
+  LinkAuthenticationElementProps
+>;
+
 export type P24BankElementComponent = FunctionComponent<P24BankElementProps>;
 
 export interface EpsBankElementProps extends ElementProps {
@@ -338,6 +363,34 @@ export interface PaymentRequestButtonElementProps extends ElementProps {
 
 export type PaymentRequestButtonElementComponent = FunctionComponent<
   PaymentRequestButtonElementProps
+>;
+
+export interface ShippingAddressElementProps extends ElementProps {
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
+   */
+  options?: stripeJs.StripeShippingAddressElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=auBankAccountElement).
+   */
+  onChange?: (event: stripeJs.StripeShippingAddressElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeShippingAddressElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+}
+
+export type ShippingAddressElementComponent = FunctionComponent<
+  ShippingAddressElementProps
 >;
 
 export interface AfterpayClearpayMessageElementProps {
@@ -452,6 +505,14 @@ declare module '@stripe/stripe-js' {
       component: EpsBankElementComponent
     ): stripeJs.StripeEpsBankElement | null;
 
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `LinkAuthenticationElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `LinkAuthenticationElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: LinkAuthenticationElementComponent
+    ): stripeJs.StripeLinkAuthenticationElement | null;
+
     getElement(
       component: PaymentElementComponent
     ): stripeJs.StripeElement | null;
@@ -463,6 +524,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentRequestButtonElementComponent
     ): stripeJs.StripePaymentRequestButtonElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `ShippingAddressElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `ShippingAddressElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: ShippingAddressElementComponent
+    ): stripeJs.StripeShippingAddressElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
