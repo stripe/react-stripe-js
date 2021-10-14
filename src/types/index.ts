@@ -564,7 +564,7 @@ declare module '@stripe/stripe-js' {
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
      */
-     getElement(
+    getElement(
       component: AffirmMessageElementComponent
     ): stripeJs.StripeAffirmMessageElement | null;
 

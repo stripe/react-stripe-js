@@ -150,7 +150,7 @@ export const ShippingAddressElement: ShippingAddressElementComponent = createEle
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
- export const AffirmMessageElement: AffirmMessageElementComponent = createElementComponent(
+export const AffirmMessageElement: AffirmMessageElementComponent = createElementComponent(
   'affirmMessage',
   isServer
 );
