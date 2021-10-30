@@ -19,7 +19,9 @@ export const isEqual = (left: unknown, right: unknown): boolean => {
 
   if (leftPlainObject !== rightPlainObject) return false;
 
-  if (!leftPlainObject && !leftArray) return false;
+  // not sure what sort of special object this is (regexp is one option), so
+  // fallback to reference check.
+  if (!leftPlainObject && !leftArray) return left === right;
 
   const leftKeys = Object.keys(left);
   const rightKeys = Object.keys(right);
