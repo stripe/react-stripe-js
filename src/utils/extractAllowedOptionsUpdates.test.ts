@@ -47,7 +47,7 @@ describe('extractAllowedOptionsUpdates', () => {
     const obj = {
       num: 0,
       obj: {
-        num: 0
+        num: 0,
       },
       emptyObj: {},
       regex: /foo/,
@@ -55,9 +55,11 @@ describe('extractAllowedOptionsUpdates', () => {
       null: null,
       undefined: undefined,
       array: [1, 2, 3],
-    }
-    
-    expect(extractAllowedOptionsUpdates(obj, obj, Object.keys(obj))).toEqual(null); 
+    };
+
+    expect(extractAllowedOptionsUpdates(obj, obj, Object.keys(obj))).toEqual(
+      null
+    );
 
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
