@@ -393,6 +393,33 @@ export type ShippingAddressElementComponent = FunctionComponent<
   ShippingAddressElementProps
 >;
 
+export interface AffirmMessageElementProps {
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  id?: string;
+
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  className?: string;
+
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
+   */
+  options?: stripeJs.StripeAffirmMessageElementOptions;
+
+  /**
+   * Triggered when the Element has been fully loaded, after initial method calls have been fired.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeAffirmMessageElement) => any;
+}
+
+export type AffirmMessageElementComponent = FunctionComponent<
+  AffirmMessageElementProps
+>;
+
 export interface AfterpayClearpayMessageElementProps {
   /**
    * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
@@ -532,6 +559,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: ShippingAddressElementComponent
     ): stripeJs.StripeShippingAddressElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: AffirmMessageElementComponent
+    ): stripeJs.StripeAffirmMessageElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.

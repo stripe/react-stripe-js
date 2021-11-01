@@ -14,6 +14,7 @@ import {
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   ShippingAddressElementComponent,
+  AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
 } from './types';
 
@@ -143,6 +144,14 @@ export const LinkAuthenticationElement: LinkAuthenticationElementComponent = cre
  */
 export const ShippingAddressElement: ShippingAddressElementComponent = createElementComponent(
   'shippingAddress',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AffirmMessageElement: AffirmMessageElementComponent = createElementComponent(
+  'affirmMessage',
   isServer
 );
 
