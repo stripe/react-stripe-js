@@ -37,4 +37,31 @@ describe('extractAllowedOptionsUpdates', () => {
 
     consoleSpy.mockRestore();
   });
+
+  it('does not warn on properties that do not change', () => {
+    const consoleSpy = jest.spyOn(window.console, 'warn');
+
+    // Silence console output so test output is less noisy
+    consoleSpy.mockImplementation(() => {});
+
+    const obj = {
+      num: 0,
+      obj: {
+        num: 0,
+      },
+      emptyObj: {},
+      regex: /foo/,
+      func: () => {},
+      null: null,
+      undefined: undefined,
+      array: [1, 2, 3],
+    };
+
+    expect(extractAllowedOptionsUpdates(obj, obj, Object.keys(obj))).toEqual(
+      null
+    );
+
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
 });
