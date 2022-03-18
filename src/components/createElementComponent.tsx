@@ -72,7 +72,7 @@ const createElementComponent = (
         element.on('focus', callOnFocus);
         element.on('escape', callOnEscape);
 
-        // Users can pass an an onClick prop on any Element component
+        // Users can pass an onClick prop on any Element component
         // just as they could listen for the `click` event on any Element,
         // but only the PaymentRequestButton will actually trigger the event.
         (element as any).on('click', callOnClick);
