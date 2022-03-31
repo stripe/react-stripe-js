@@ -33,6 +33,47 @@ const noop = () => {};
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
+// The Element instances [adds and removes classes][0] from the container node
+// it is mounted to. We also want to be able to manage the class of the
+// container node via the `className` prop passed to the Element wrapper
+// component. If we naively apply the `className` prop, it will overwrite the
+// classes that the Element instance has set for itself ([#267][1]).
+//
+// So instead, we track the current and previous value of the `className` prop.
+// After each render, we _append_ every class in the current `className` prop
+// to the container `class`, then remove any class that was in the previous
+// `className` prop but is not in the current prop.
+//
+// [0]: https://stripe.com/docs/js/element/the_element_container
+// [1]: https://github.com/stripe/react-stripe-js/issues/267
+const useClassName = (domNode: HTMLDivElement | null, classNameProp = '') => {
+  const previousClassNamePropRef = React.useRef(classNameProp);
+
+  React.useLayoutEffect(() => {
+    const previousClassNameProp = previousClassNamePropRef.current;
+    previousClassNamePropRef.current = classNameProp;
+
+    if (!domNode) {
+      return;
+    }
+
+    const previousClassNames = previousClassNameProp
+      .split(/\s+/)
+      .filter((n) => n.length);
+    const classNames = classNameProp.split(/\s+/).filter((n) => n.length);
+    const removedClassNames = previousClassNames.filter(
+      (n) => !classNames.includes(n)
+    );
+
+    domNode.classList.add(...classNames);
+    domNode.classList.remove(...removedClassNames);
+  }, [domNode, classNameProp]);
+
+  // track previous classnames
+  // merge provided classnames and existing classnames on domNode
+  // remove the previous classnames not in the current classnames
+};
+
 const createElementComponent = (
   type: stripeJs.StripeElementType,
   isServer: boolean
@@ -52,7 +93,7 @@ const createElementComponent = (
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
-    const domNode = React.useRef<HTMLDivElement | null>(null);
+    const [domNode, setDomNode] = React.useState<HTMLDivElement | null>(null);
 
     const callOnReady = useCallbackReference(onReady);
     const callOnBlur = useCallbackReference(onBlur);
@@ -62,10 +103,10 @@ const createElementComponent = (
     const callOnEscape = useCallbackReference(onEscape);
 
     React.useLayoutEffect(() => {
-      if (elementRef.current == null && elements && domNode.current != null) {
+      if (elementRef.current == null && elements && domNode != null) {
         const element = elements.create(type as any, options);
         elementRef.current = element;
-        element.mount(domNode.current);
+        element.mount(domNode);
         element.on('ready', () => callOnReady(element));
         element.on('change', callOnChange);
         element.on('blur', callOnBlur);
@@ -102,7 +143,9 @@ const createElementComponent = (
       };
     }, []);
 
-    return <div id={id} className={className} ref={domNode} />;
+    useClassName(domNode, className);
+
+    return <div id={id} ref={setDomNode} />;
   };
 
   // Only render the Element wrapper in a server environment.

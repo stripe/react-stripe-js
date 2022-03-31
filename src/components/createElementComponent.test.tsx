@@ -465,5 +465,77 @@ describe('createElementComponent', () => {
         style: {base: {fontSize: '30px'}},
       });
     });
+
+    it('does not overwrite classnames set by the Element instance', () => {
+      const {container, rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement className="bar" />
+        </Elements>
+      );
+      const elementContainer = container.firstChild as Element;
+
+      expect(elementContainer.classList).toHaveLength(1);
+      expect(elementContainer).toHaveClass('bar');
+
+      elementContainer.classList.add('StripeElement', 'StripeElement--empty');
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement className="bar baz" />
+        </Elements>
+      );
+
+      expect(elementContainer.classList).toHaveLength(4);
+      expect(elementContainer).toHaveClass(
+        'bar',
+        'baz',
+        'StripeElement',
+        'StripeElement--empty'
+      );
+
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement className="baz" />
+        </Elements>
+      );
+
+      expect(elementContainer.classList).toHaveLength(3);
+      expect(elementContainer).toHaveClass(
+        'baz',
+        'StripeElement',
+        'StripeElement--empty'
+      );
+    });
+
+    // This should work, but does not
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip('does not remove classnames removed from the className prop that were also set by the Element instance', () => {
+      const {container, rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement className="foo StripeElement StripeElement--empty" />
+        </Elements>
+      );
+      const elementContainer = container.firstChild as Element;
+
+      expect(elementContainer.classList).toHaveLength(3);
+      expect(elementContainer).toHaveClass(
+        'foo',
+        'StripeElement',
+        'StripeElement--empty'
+      );
+
+      elementContainer.classList.add('StripeElement', 'StripeElement--empty');
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement className="foo" />
+        </Elements>
+      );
+
+      expect(elementContainer.classList).toHaveLength(3);
+      expect(elementContainer).toHaveClass(
+        'foo',
+        'StripeElement',
+        'StripeElement--empty'
+      );
+    });
   });
 });
