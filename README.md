@@ -6,6 +6,16 @@ React components for
 [![build status](https://img.shields.io/travis/stripe/react-stripe-js/master.svg?style=flat-square)](https://travis-ci.org/stripe/react-stripe-js)
 [![npm version](https://img.shields.io/npm/v/@stripe/react-stripe-js.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe-js)
 
+## Requirements
+
+We don't currently support React 18, but plan to
+([#273](https://github.com/stripe/react-stripe-js/issues/273)).
+
+The minimum supported version of React is v16.8. If you use an older version,
+upgrade React to use this library. If you prefer not to upgrade your React
+version, we recommend using legacy
+[`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
+
 ## Getting started
 
 - [Learn how to accept a payment](https://stripe.com/docs/payments/accept-a-payment#web)
@@ -133,13 +143,6 @@ const App = () => (
 
 ReactDOM.render(<App />, document.body);
 ```
-
-### Minimum requirements
-
-The minimum supported version of React is v16.8. If you use an older version,
-upgrade React to use this library. If you prefer not to upgrade your React
-version, we recommend using legacy
-[`react-stripe-elements`](https://github.com/stripe/react-stripe-elements).
 
 ### TypeScript support
 
