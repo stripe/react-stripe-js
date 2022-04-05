@@ -265,6 +265,11 @@ export interface P24BankElementProps extends ElementProps {
 
 export interface LinkAuthenticationElementProps extends ElementProps {
   /**
+   * An object containing this Element configuration options.
+   */
+  options?: stripeJs.StripeLinkAuthenticationElementOptions;
+  
+  /**
    * Triggered when data exposed by this Element is changed (e.g., when there is an error).
    * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=auBankAccountElement).
    */
