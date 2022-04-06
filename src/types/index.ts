@@ -265,7 +265,7 @@ export interface P24BankElementProps extends ElementProps {
 
 export interface LinkAuthenticationElementProps extends ElementProps {
   /**
-   * An object containing this Element configuration options.
+   * An object containing Element configuration options.
    */
   options?: stripeJs.StripeLinkAuthenticationElementOptions;
 
