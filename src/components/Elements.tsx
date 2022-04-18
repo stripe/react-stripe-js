@@ -1,5 +1,10 @@
 // Must use `import *` or named imports for React's types
-import {FunctionComponent, ReactElement, ReactNode} from 'react';
+import {
+  FunctionComponent,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
 import React from 'react';
@@ -102,7 +107,7 @@ interface PrivateElementsProps {
  *
  * @docs https://stripe.com/docs/stripe-js/react#elements-provider
  */
-export const Elements: FunctionComponent<ElementsProps> = (({
+export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   stripe: rawStripeProp,
   options,
   children,
@@ -196,7 +201,7 @@ export const Elements: FunctionComponent<ElementsProps> = (({
   return (
     <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>
   );
-}) as FunctionComponent<ElementsProps>;
+}) as FunctionComponent<PropsWithChildren<ElementsProps>>;
 
 Elements.propTypes = {
   stripe: PropTypes.any,
