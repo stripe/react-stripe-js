@@ -98,6 +98,7 @@ const createElementComponent = (
       return () => {
         if (elementRef.current) {
           elementRef.current.destroy();
+          elementRef.current = null;
         }
       };
     }, []);

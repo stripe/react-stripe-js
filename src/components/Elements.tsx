@@ -112,38 +112,23 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   options,
   children,
 }: PrivateElementsProps) => {
-  const final = React.useRef(false);
-  const isMounted = React.useRef(true);
   const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
     rawStripeProp,
   ]);
+
+  // For a sync stripe instance, initialize into context
   const [ctx, setContext] = React.useState<ElementsContextValue>(() => ({
-    stripe: null,
-    elements: null,
+    stripe: parsed.tag === 'sync' ? parsed.stripe : null,
+    elements: parsed.tag === 'sync' ? parsed.stripe.elements(options) : null,
   }));
 
-  const prevStripe = usePrevious(rawStripeProp);
-  if (prevStripe !== null) {
-    if (prevStripe !== rawStripeProp) {
-      console.warn(
-        'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
-      );
-    }
-  }
+  React.useEffect(() => {
+    let isMounted = true;
 
-  if (!final.current) {
-    if (parsed.tag === 'sync') {
-      final.current = true;
-      setContext({
-        stripe: parsed.stripe,
-        elements: parsed.stripe.elements(options),
-      });
-    }
-
-    if (parsed.tag === 'async') {
-      final.current = true;
+    // For an async stripePromise, store it in context once resolved
+    if (parsed.tag === 'async' && !ctx.stripe) {
       parsed.stripePromise.then((stripe) => {
-        if (stripe && isMounted.current) {
+        if (stripe && isMounted) {
           // Only update Elements context if the component is still mounted
           // and stripe is not null. We allow stripe to be null to make
           // handling SSR easier.
@@ -153,9 +138,30 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
           });
         }
       });
+    } else if (parsed.tag === 'sync' && !ctx.stripe) {
+      // Or, handle a sync stripe instance going from null -> populated
+      setContext({
+        stripe: parsed.stripe,
+        elements: parsed.stripe.elements(options),
+      });
     }
-  }
 
+    return () => {
+      isMounted = false;
+    };
+  }, [parsed, ctx, options]);
+
+  // Warn on changes to stripe prop
+  const prevStripe = usePrevious(rawStripeProp);
+  React.useEffect(() => {
+    if (prevStripe !== null && prevStripe !== rawStripeProp) {
+      console.warn(
+        'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
+      );
+    }
+  }, [prevStripe, rawStripeProp]);
+
+  // Apply updates to elements when options prop has relevant changes
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
     if (!ctx.elements) {
@@ -172,12 +178,7 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
     }
   }, [options, prevOptions, ctx.elements]);
 
-  React.useEffect(() => {
-    return (): void => {
-      isMounted.current = false;
-    };
-  }, []);
-
+  // Attach react-stripe-js version to stripe.js instance
   React.useEffect(() => {
     const anyStripe: any = ctx.stripe;
 
