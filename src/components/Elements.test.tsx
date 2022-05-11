@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {StrictMode} from 'react';
 import {render, act} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
@@ -36,6 +36,23 @@ describe('Elements', () => {
     const {result} = renderHook(() => useElements(), {wrapper});
 
     expect(result.current).toBe(mockElements);
+  });
+
+  test('creates elements twice in StrictMode', () => {
+    const TestComponent = () => {
+      const _ = useElements();
+      return <div />;
+    };
+
+    render(
+      <StrictMode>
+        <Elements stripe={mockStripe}>
+          <TestComponent />
+        </Elements>
+      </StrictMode>
+    );
+
+    expect(mockStripe.elements).toHaveBeenCalledTimes(2);
   });
 
   test('only creates elements once', () => {

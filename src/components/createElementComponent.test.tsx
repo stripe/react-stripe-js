@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {StrictMode} from 'react';
 import {render, act} from '@testing-library/react';
 
 import {Elements} from './Elements';
@@ -439,6 +439,23 @@ describe('createElementComponent', () => {
         <Elements stripe={stripePromise}>
           <CardElement />
         </Elements>
+      );
+
+      await act(() => stripePromise);
+
+      unmount();
+      expect(mockElement.destroy).toHaveBeenCalled();
+    });
+
+    it('destroys an existing Element when the component unmounts with an async stripe prop in StrictMode', async () => {
+      const stripePromise = Promise.resolve(mockStripe);
+
+      const {unmount} = render(
+        <StrictMode>
+          <Elements stripe={stripePromise}>
+            <CardElement />
+          </Elements>
+        </StrictMode>
       );
 
       await act(() => stripePromise);
