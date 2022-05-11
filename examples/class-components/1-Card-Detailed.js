@@ -5,6 +5,8 @@
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
+
+import '../styles/common.css';
 import '../styles/2-Card-Detailed.css';
 
 const CARD_OPTIONS = {

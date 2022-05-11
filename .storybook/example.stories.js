@@ -4,17 +4,11 @@ import {storiesOf, module} from '@storybook/react';
 import React, {useEffect, useState} from 'react';
 
 const ExampleComponent = ({file}) => {
-  // force iframe to reload on each example
-  if (window.reload) {
-    window.location.href = window.location.href;
-  }
-
   const [example, setExample] = useState(null);
 
   useEffect(() => {
     import(`../examples/${file}`).then(({default: Example}) => {
       setExample(<Example />);
-      window.reload = true;
     });
   }, []);
 

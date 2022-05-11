@@ -61,14 +61,14 @@
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
-    "@storybook/react": "^6.2.9",
+    "@storybook/react": "^6.5.0-alpha.64",
     "@stripe/stripe-js": "^1.26.0",
-    "@testing-library/jest-dom": "^5.11.8",
-    "@testing-library/react": "^11.2.3",
-    "@testing-library/react-hooks": "^4.0.0",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.1.1",
+    "@testing-library/react-hooks": "^8.0.0",
     "@types/jest": "^25.1.1",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@wessberg/rollup-plugin-ts": "^1.2.15",
@@ -87,10 +87,10 @@
     "fork-ts-checker-webpack-plugin": "^4.0.3",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
-    "react": "^17.0.1",
+    "react": "18.1.0",
     "react-docgen-typescript-loader": "^3.6.0",
-    "react-dom": "^17.0.1",
-    "react-test-renderer": "16.9",
+    "react-dom": "18.1.0",
+    "react-test-renderer": "^18.0.0",
     "rimraf": "^2.6.2",
     "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
@@ -102,9 +102,12 @@
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.5"
   },
+  "resolutions": {
+    "@types/react": "18.0.5"
+  },
   "peerDependencies": {
     "@stripe/stripe-js": "^1.26.0",
-    "react": "^16.8.0 || ^17.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
   }
 }
