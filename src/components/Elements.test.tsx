@@ -38,23 +38,6 @@ describe('Elements', () => {
     expect(result.current).toBe(mockElements);
   });
 
-  test('creates elements twice in StrictMode', () => {
-    const TestComponent = () => {
-      const _ = useElements();
-      return <div />;
-    };
-
-    render(
-      <StrictMode>
-        <Elements stripe={mockStripe}>
-          <TestComponent />
-        </Elements>
-      </StrictMode>
-    );
-
-    expect(mockStripe.elements).toHaveBeenCalledTimes(2);
-  });
-
   test('only creates elements once', () => {
     const TestComponent = () => {
       const _ = useElements();
@@ -308,5 +291,48 @@ describe('Elements', () => {
     expect(() => render(<TestComponent />)).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that mounts <ElementsConsumer> in an <Elements> provider.'
     );
+  });
+
+  describe('React.StrictMode', () => {
+    test('creates elements twice in StrictMode', () => {
+      const TestComponent = () => {
+        const _ = useElements();
+        return <div />;
+      };
+
+      render(
+        <StrictMode>
+          <Elements stripe={mockStripe}>
+            <TestComponent />
+          </Elements>
+        </StrictMode>
+      );
+
+      expect(mockStripe.elements).toHaveBeenCalledTimes(2);
+    });
+
+    test('allows changes to options via elements.update after setting the Stripe object in StrictMode', () => {
+      const TestComponent = () => {
+        const [options, setOptions] = React.useState({foo: 'foo'} as any);
+
+        React.useEffect(() => {
+          setOptions({bar: 'bar'} as any);
+        }, []);
+
+        return (
+          <StrictMode>
+            <Elements stripe={mockStripe} options={options as any} />
+          </StrictMode>
+        );
+      };
+
+      render(<TestComponent />);
+
+      expect(mockStripe.elements).toHaveBeenCalledWith({foo: 'foo'});
+      expect(mockStripe.elements).toHaveBeenCalledTimes(2);
+
+      expect(mockElements.update).toHaveBeenCalledWith({bar: 'bar'});
+      expect(mockStripe.elements).toHaveBeenCalledTimes(2);
+    });
   });
 });
