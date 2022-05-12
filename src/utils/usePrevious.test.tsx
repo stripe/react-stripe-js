@@ -4,9 +4,9 @@ import {usePrevious} from './usePrevious';
 
 describe('usePrevious', () => {
   it('returns the initial value if it has not yet been changed', () => {
-    const result = renderHook(() => usePrevious('foo'));
+    const {result} = renderHook(() => usePrevious('foo'));
 
-    expect(result.result.current).toEqual('foo');
+    expect(result.current).toEqual('foo');
   });
 
   it('returns the previous value after the it has been changed', () => {
