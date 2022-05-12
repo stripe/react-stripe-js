@@ -12,7 +12,7 @@ USAGE:
 
 ARGS:
     <release_type>
-            A Semantic Versioning release type used to bump the version number. Either "patch", "minor", or "major".
+            A Semantic Versioning release type used to bump the version number. Either "patch", "minor", "major", "prepatch", "preminor", "premajor", or "prerelease".
 EOF
 }
 
@@ -84,7 +84,7 @@ esac
 
 # Validate passed release type
 case $RELEASE_TYPE in
-  patch | minor | major)
+  patch | minor | major | prepatch | preminor | premajor | prerelease)
     ;;
 
   *)
