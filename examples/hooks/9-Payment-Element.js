@@ -60,48 +60,18 @@ const App = () => {
   const [pk, setPK] = React.useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [sk, setSK] = React.useState(
-    window.sessionStorage.getItem('react-stripe-js-sk') || ''
-  );
+  const [clientSecret, setClientSecret] = React.useState('');
+
   React.useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
-    window.sessionStorage.setItem('react-stripe-js-sk', sk || '');
-  }, [pk, sk]);
+  }, [pk]);
 
   const [stripePromise, setStripePromise] = React.useState();
-  const [clientSecret, setClientSecret] = React.useState();
   const [theme, setTheme] = React.useState('stripe');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Initialize Stripe.js
     setStripePromise(loadStripe(pk));
-
-    // NOTE: THIS IS FOR DEMO PURPOSES ONLY.
-    // YOUR SECRET KEY SHOULD ONLY BE USED IN A SECURE SERVER ENVIRONMENT.
-    // IT SHOULD NOT BE EXPOSED TO USERS.
-    fetch('https://api.stripe.com/v1/payment_intents', {
-      headers: {
-        accept: 'application/json',
-        authorization: 'Bearer ' + sk,
-        'content-type':
-          'application/x-www-form-urlencoded, application/x-www-form-urlencoded',
-      },
-      body:
-        'currency=usd&amount=2500&payment_method_types[0]=card&payment_method_types[1]=us_bank_account',
-      method: 'POST',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.client_secret) {
-          setClientSecret(res.client_secret);
-        } else {
-          console.error(res);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
   };
 
   const handleThemeChange = (e) => {
@@ -117,12 +87,10 @@ const App = () => {
     <>
       <form onSubmit={handleSubmit}>
         <label>
-          Secret key{' '}
+          Intent client_secret
           <input
-            autoComplete="off"
-            type="password"
-            value={sk}
-            onChange={(e) => setSK(e.target.value)}
+            value={clientSecret}
+            onChange={(e) => setClientSecret(e.target.value)}
           />
         </label>
         <label>
