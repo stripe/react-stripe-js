@@ -77,7 +77,9 @@ const App = () => {
     // Initialize Stripe.js
     setStripePromise(loadStripe(pk));
 
-    // Create PI using SK, resulting in clientSecret.
+    // NOTE: THIS IS FOR DEMO PURPOSES ONLY.
+    // YOUR SECRET KEY SHOULD ONLY BE USED IN A SECURE SERVER ENVIRONMENT.
+    // IT SHOULD NOT BE EXPOSED TO USERS.
     fetch('https://api.stripe.com/v1/payment_intents', {
       headers: {
         accept: 'application/json',
