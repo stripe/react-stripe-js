@@ -8,9 +8,6 @@ React components for
 
 ## Requirements
 
-We don't currently support React 18, but plan to
-([#273](https://github.com/stripe/react-stripe-js/issues/273)).
-
 The minimum supported version of React is v16.8. If you use an older version,
 upgrade React to use this library. If you prefer not to upgrade your React
 version, we recommend using legacy
