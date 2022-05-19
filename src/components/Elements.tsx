@@ -89,11 +89,18 @@ interface ElementsProps {
    * Once the stripe prop has been set, these options cannot be changed.
    */
   options?: stripeJs.StripeElementsOptions;
+
+  /**
+   * Optional
+   * `Elements` can raise an error on initialising (for example, if wrong format of `clientSecret` is provided)
+   */
+  raiseErrors?: boolean;
 }
 
 interface PrivateElementsProps {
   stripe: unknown;
   options?: UnknownOptions;
+  raiseErrors?: boolean;
   children?: ReactNode;
 }
 
@@ -110,6 +117,7 @@ interface PrivateElementsProps {
 export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   stripe: rawStripeProp,
   options,
+  raiseErrors = false,
   children,
 }: PrivateElementsProps) => {
   const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
@@ -122,22 +130,36 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
     elements: parsed.tag === 'sync' ? parsed.stripe.elements(options) : null,
   }));
 
+  // throw any stripePromise-related errors to the parent component
+  // in case `raiseErrors` is specified
+  const [error, setError] = React.useState<Error | undefined>();
+  React.useEffect(() => {
+    if (error && raiseErrors) {
+      throw error;
+    }
+  }, [error, raiseErrors]);
+
   React.useEffect(() => {
     let isMounted = true;
 
     // For an async stripePromise, store it in context once resolved
     if (parsed.tag === 'async' && !ctx.stripe) {
-      parsed.stripePromise.then((stripe) => {
-        if (stripe && isMounted) {
-          // Only update Elements context if the component is still mounted
-          // and stripe is not null. We allow stripe to be null to make
-          // handling SSR easier.
-          setContext({
-            stripe,
-            elements: stripe.elements(options),
-          });
-        }
-      });
+      parsed.stripePromise
+        .then((stripe) => {
+          if (stripe && isMounted) {
+            // Only update Elements context if the component is still mounted
+            // and stripe is not null. We allow stripe to be null to make
+            // handling SSR easier.
+            setContext({
+              stripe,
+              elements: stripe.elements(options),
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          setError(error);
+        });
     } else if (parsed.tag === 'sync' && !ctx.stripe) {
       // Or, handle a sync stripe instance going from null -> populated
       setContext({
@@ -148,6 +170,7 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
 
     return () => {
       isMounted = false;
+      setError(undefined);
     };
   }, [parsed, ctx, options]);
 
