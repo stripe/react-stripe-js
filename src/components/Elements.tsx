@@ -125,6 +125,17 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   React.useEffect(() => {
     let isMounted = true;
 
+    const safeSetContext = (stripe: stripeJs.Stripe) => {
+      setContext((ctx) => {
+        // no-op if we already have a stripe instance (https://github.com/stripe/react-stripe-js/issues/296)
+        if (ctx.stripe) return ctx;
+        return {
+          stripe,
+          elements: stripe.elements(options),
+        };
+      });
+    };
+
     // For an async stripePromise, store it in context once resolved
     if (parsed.tag === 'async' && !ctx.stripe) {
       parsed.stripePromise.then((stripe) => {
@@ -132,18 +143,12 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
           // Only update Elements context if the component is still mounted
           // and stripe is not null. We allow stripe to be null to make
           // handling SSR easier.
-          setContext({
-            stripe,
-            elements: stripe.elements(options),
-          });
+          safeSetContext(stripe);
         }
       });
     } else if (parsed.tag === 'sync' && !ctx.stripe) {
       // Or, handle a sync stripe instance going from null -> populated
-      setContext({
-        stripe: parsed.stripe,
-        elements: parsed.stripe.elements(options),
-      });
+      safeSetContext(parsed.stripe);
     }
 
     return () => {
