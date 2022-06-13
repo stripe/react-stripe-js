@@ -6,6 +6,7 @@ import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
 import {
   CardElementComponent,
+  PaymentElementComponent,
   PaymentRequestButtonElementComponent,
 } from '../types';
 
@@ -19,6 +20,7 @@ describe('createElementComponent', () => {
   let simulateEscape: any;
   let simulateReady: any;
   let simulateClick: any;
+  let simulateLoadError: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -46,6 +48,9 @@ describe('createElementComponent', () => {
           break;
         case 'click':
           simulateClick = fn;
+          break;
+        case 'loaderror':
+          simulateLoadError = fn;
           break;
         default:
           throw new Error('TestSetupError: Unexpected event registration.');
@@ -118,6 +123,10 @@ describe('createElementComponent', () => {
     );
     const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
       'card',
+      false
+    );
+    const PaymentElement: PaymentElementComponent = createElementComponent(
+      'payment',
       false
     );
 
@@ -342,6 +351,26 @@ describe('createElementComponent', () => {
       const clickEventMock = Symbol('click');
       simulateClick(clickEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(clickEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s loaderror event to the current onLoadError prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onLoadError={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onLoadError={mockHandler2} />
+        </Elements>
+      );
+
+      const loadErrorEventMock = Symbol('loaderror');
+      simulateLoadError(loadErrorEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(loadErrorEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 

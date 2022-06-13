@@ -26,6 +26,7 @@ interface PrivateElementProps {
   onEscape?: UnknownCallback;
   onReady?: UnknownCallback;
   onClick?: UnknownCallback;
+  onLoadError?: UnknownCallback;
   options?: UnknownOptions;
 }
 
@@ -49,6 +50,7 @@ const createElementComponent = (
     onChange = noop,
     onEscape = noop,
     onClick = noop,
+    onLoadError = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
@@ -60,6 +62,7 @@ const createElementComponent = (
     const callOnClick = useCallbackReference(onClick);
     const callOnChange = useCallbackReference(onChange);
     const callOnEscape = useCallbackReference(onEscape);
+    const callOnLoadError = useCallbackReference(onLoadError);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
@@ -71,6 +74,11 @@ const createElementComponent = (
         element.on('blur', callOnBlur);
         element.on('focus', callOnFocus);
         element.on('escape', callOnEscape);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `loaderror` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('loaderror', callOnLoadError);
 
         // Users can pass an onClick prop on any Element component
         // just as they could listen for the `click` event on any Element,
@@ -124,6 +132,7 @@ const createElementComponent = (
     onFocus: PropTypes.func,
     onReady: PropTypes.func,
     onClick: PropTypes.func,
+    onLoadError: PropTypes.func,
     options: PropTypes.object as any,
   };
 

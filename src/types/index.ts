@@ -1,5 +1,6 @@
 import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
+import {StripeError} from '@stripe/stripe-js';
 
 export interface ElementProps {
   /**
@@ -287,6 +288,14 @@ export interface LinkAuthenticationElementProps extends ElementProps {
    * Triggered when the escape key is pressed within the Element.
    */
   onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'linkAuthentication';
+    error: StripeError;
+  }) => any;
 }
 
 export type LinkAuthenticationElementComponent = FunctionComponent<
@@ -342,6 +351,11 @@ export interface PaymentElementProps extends ElementProps {
    * Triggered when the escape key is pressed within the Element.
    */
   onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'payment'; error: StripeError}) => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
@@ -392,6 +406,14 @@ export interface ShippingAddressElementProps extends ElementProps {
    * Triggered when the escape key is pressed within the Element.
    */
   onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'shippingAddress';
+    error: StripeError;
+  }) => any;
 }
 
 export type ShippingAddressElementComponent = FunctionComponent<
