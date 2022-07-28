@@ -21,6 +21,7 @@ describe('createElementComponent', () => {
   let simulateReady: any;
   let simulateClick: any;
   let simulateLoadError: any;
+  let simulateLoaderStart: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -51,6 +52,9 @@ describe('createElementComponent', () => {
           break;
         case 'loaderror':
           simulateLoadError = fn;
+          break;
+        case 'loaderstart':
+          simulateLoaderStart = fn;
           break;
         default:
           throw new Error('TestSetupError: Unexpected event registration.');
@@ -371,6 +375,25 @@ describe('createElementComponent', () => {
       const loadErrorEventMock = Symbol('loaderror');
       simulateLoadError(loadErrorEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(loadErrorEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s loaderstart event to the current onLoaderStart prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onLoaderStart={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onLoaderStart={mockHandler2} />
+        </Elements>
+      );
+
+      simulateLoaderStart();
+      expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
 

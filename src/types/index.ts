@@ -296,6 +296,11 @@ export interface LinkAuthenticationElementProps extends ElementProps {
     elementType: 'linkAuthentication';
     error: StripeError;
   }) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'linkAuthentication'}) => any;
 }
 
 export type LinkAuthenticationElementComponent = FunctionComponent<
@@ -356,6 +361,11 @@ export interface PaymentElementProps extends ElementProps {
    * Triggered when the Element fails to load.
    */
   onLoadError?: (event: {elementType: 'payment'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'payment'}) => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
@@ -414,6 +424,11 @@ export interface ShippingAddressElementProps extends ElementProps {
     elementType: 'shippingAddress';
     error: StripeError;
   }) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'shippingAddress'}) => any;
 }
 
 export type ShippingAddressElementComponent = FunctionComponent<
