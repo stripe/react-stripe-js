@@ -22,6 +22,7 @@ describe('createElementComponent', () => {
   let simulateClick: any;
   let simulateLoadError: any;
   let simulateLoaderStart: any;
+  let simulateNetworksChange: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -55,6 +56,9 @@ describe('createElementComponent', () => {
           break;
         case 'loaderstart':
           simulateLoaderStart = fn;
+          break;
+        case 'networkschange':
+          simulateNetworksChange = fn;
           break;
         default:
           throw new Error('TestSetupError: Unexpected event registration.');
@@ -393,6 +397,25 @@ describe('createElementComponent', () => {
       );
 
       simulateLoaderStart();
+      expect(mockHandler2).toHaveBeenCalledWith();
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s networkschange event to the current onNetworksChange prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement onNetworksChange={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement onNetworksChange={mockHandler2} />
+        </Elements>
+      );
+
+      simulateNetworksChange();
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
