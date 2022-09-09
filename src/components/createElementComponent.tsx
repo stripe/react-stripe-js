@@ -91,8 +91,8 @@ const createElementComponent = (
         // but only certain Elements will trigger the event.
         (element as any).on('loaderstart', callOnLoaderStart);
 
-        // Users can pass an onLoaderStart prop on any Element component
-        // just as they could listen for the `loaderstart` event on any Element,
+        // Users can pass an onNetworksChange prop on any Element component
+        // just as they could listen for the `networkschange` event on any Element,
         // but only the Card and CardNumber Elements will trigger the event.
         (element as any).on('networkschange', callOnNetworksChange);
 

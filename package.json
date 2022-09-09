@@ -106,7 +106,7 @@
     "@types/react": "18.0.5"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": "^1.35.0",
+    "@stripe/stripe-js": "^1.36.0",
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
     "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
   }
