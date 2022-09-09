@@ -74,6 +74,12 @@ export interface CardElementProps extends ElementProps {
    * Triggered when the escape key is pressed within the Element.
    */
   onEscape?: () => any;
+
+  /**
+   * Triggered when there is a change to the available networks the provided card can run on.
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_networkschange?type=cardElement).
+   */
+  onNetworksChange?: (event: {elementType: 'card'}) => any;
 }
 
 export type CardElementComponent = FunctionComponent<CardElementProps>;
@@ -100,6 +106,12 @@ export interface CardNumberElementProps extends ElementProps {
    * Triggered when the escape key is pressed within the Element.
    */
   onEscape?: () => any;
+
+  /**
+   * Triggered when there is a change to the available networks the provided card can run on.
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_networkschange?type=cardNumberElement).
+   */
+  onNetworksChange?: (event: {elementType: 'cardNumber'}) => any;
 }
 
 export type CardNumberElementComponent = FunctionComponent<
