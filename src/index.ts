@@ -143,7 +143,7 @@ export const LinkAuthenticationElement: LinkAuthenticationElementComponent = cre
  *
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
- export const AddressElement: AddressElementComponent = createElementComponent(
+export const AddressElement: AddressElementComponent = createElementComponent(
   'address',
   isServer
 );

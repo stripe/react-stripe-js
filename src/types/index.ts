@@ -432,10 +432,7 @@ export interface AddressElementProps extends ElementProps {
   /**
    * Triggered when the Element fails to load.
    */
-  onLoadError?: (event: {
-    elementType: 'address';
-    error: StripeError;
-  }) => any;
+  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
 
   /**
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
@@ -443,9 +440,7 @@ export interface AddressElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'address'}) => any;
 }
 
-export type AddressElementComponent = FunctionComponent<
-  AddressElementProps
->;
+export type AddressElementComponent = FunctionComponent<AddressElementProps>;
 
 export interface ShippingAddressElementProps extends ElementProps {
   /**
@@ -651,7 +646,7 @@ declare module '@stripe/stripe-js' {
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_address_element) for the `AddressElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `AddressElement` is rendered in the current `Elements` provider tree.
      */
-     getElement(
+    getElement(
       component: AddressElementComponent
     ): stripeJs.StripeAddressElement | null;
 
