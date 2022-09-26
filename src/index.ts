@@ -163,7 +163,7 @@ export const ShippingAddressElement: ShippingAddressElementComponent = createEle
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
- export const PaymentMethodMessagingElement: PaymentMethodMessagingElementComponent = createElementComponent(
+export const PaymentMethodMessagingElement: PaymentMethodMessagingElementComponent = createElementComponent(
   'paymentMethodMessaging',
   isServer
 );

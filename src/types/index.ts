@@ -689,7 +689,7 @@ declare module '@stripe/stripe-js' {
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=paymentMethodMessaging) for the `PaymentMethodMessagingElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `PaymentMethodMessagingElement` is rendered in the current `Elements` provider tree.
      */
-     getElement(
+    getElement(
       component: PaymentMethodMessagingElementComponent
     ): stripeJs.StripePaymentMethodMessagingElement | null;
 
