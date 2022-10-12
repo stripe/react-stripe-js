@@ -15,7 +15,6 @@ import {
   PaymentRequestButtonElementComponent,
   ShippingAddressElementComponent,
   AddressElementComponent,
-  CartElementComponent,
   AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
@@ -158,17 +157,6 @@ export const AddressElement: AddressElementComponent = createElementComponent(
  */
 export const ShippingAddressElement: ShippingAddressElementComponent = createElementComponent(
   'shippingAddress',
-  isServer
-);
-
-/**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- *
- * @docs https://stripe.com/docs/elements/cart-element
- */
-export const CartElement: CartElementComponent = createElementComponent(
-  'cart',
   isServer
 );
 
