@@ -2131,9 +2131,9 @@
     resolve-from "^5.0.0"
 
 "@stripe/stripe-js@^1.38.1":
-  version "1.38.1"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.38.1.tgz#67a27380f021931f6e44abeee2b011b8d7f524de"
-  integrity sha512-v0hF65jEs7tw33JE70E5puJ2fFhpiS2XYwmayupEdjKWavJivycYcZgZKYXAQhTiMgtDgN9YPzqUr86VzVc3Ew==
+  version "1.40.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.40.0.tgz#024a4e2beea1358d7e4d64e9ee39d3cf29a48473"
+  integrity sha512-PzkfSq47zCU1AzSWbE1wdWIvWpoF6YTOj8qTtRRwRiTDlSqi8A06ValSJDdoU5ZIMDPNYWRJFsSd2MlgrgZdMQ==
 
 "@testing-library/dom@^8.5.0":
   version "8.13.0"
