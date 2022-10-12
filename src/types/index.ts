@@ -172,6 +172,44 @@ export interface CardCvcElementProps extends ElementProps {
 
 export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
 
+export interface CartElementProps extends ElementProps {
+  /**
+   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_cart_element#cart_element_create-options).
+   */
+  options?: stripeJs.StripeCartElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=cartElement).
+   */
+  onChange?: (event: stripeJs.StripeCartElementPayloadEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (event: stripeJs.StripeCartElementPayloadEvent) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'cart'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the "Checkout" button is clicked within the Element.
+   */
+  onCheckout?: (event: stripeJs.StripeCartElementPayloadEvent) => any;
+
+  /**
+   * Triggered when a line item's link is clicked within the Element.
+   */
+  onLineItemClick?: (
+    event: stripeJs.StripeCartElementLineItemClickEvent
+  ) => any;
+}
+
+export type CartElementComponent = FunctionComponent<CartElementProps>;
+
 export interface FpxBankElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank).
@@ -608,6 +646,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: CardExpiryElementComponent
     ): stripeJs.StripeCardExpiryElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=cart) for the `CartElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `CartElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: CartElementComponent
+    ): stripeJs.StripeCartElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
