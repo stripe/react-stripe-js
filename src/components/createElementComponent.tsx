@@ -6,7 +6,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import {useElementsContextWithUseCase} from './Elements';
+import {useElementsContextWithUseCase, CartElementContext} from './Elements';
 import {useCallbackReference} from '../utils/useCallbackReference';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
@@ -29,6 +29,8 @@ interface PrivateElementProps {
   onLoadError?: UnknownCallback;
   onLoaderStart?: UnknownCallback;
   onNetworksChange?: UnknownCallback;
+  onCheckout?: UnknownCallback;
+  onLineItemClick?: UnknownCallback;
   options?: UnknownOptions;
 }
 
@@ -55,10 +57,14 @@ const createElementComponent = (
     onLoadError = noop,
     onLoaderStart = noop,
     onNetworksChange = noop,
+    onCheckout = noop,
+    onLineItemClick = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
+
+    const {setCart, setCartState} = React.useContext(CartElementContext) || {};
 
     const callOnReady = useCallbackReference(onReady);
     const callOnBlur = useCallbackReference(onBlur);
@@ -69,17 +75,55 @@ const createElementComponent = (
     const callOnLoadError = useCallbackReference(onLoadError);
     const callOnLoaderStart = useCallbackReference(onLoaderStart);
     const callOnNetworksChange = useCallbackReference(onNetworksChange);
+    const callOnCheckout = useCallbackReference(onCheckout);
+    const callOnLineItemClick = useCallbackReference(onLineItemClick);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
         const element = elements.create(type as any, options);
+        if (type === 'cart' && setCart) {
+          // we know that elements.create return value must be of type StripeCartElement if type is 'cart',
+          // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+          setCart((element as unknown) as stripeJs.StripeCartElement);
+        }
         elementRef.current = element;
         element.mount(domNode.current);
-        element.on('ready', () => callOnReady(element));
-        element.on('change', callOnChange);
-        element.on('blur', callOnBlur);
-        element.on('focus', callOnFocus);
-        element.on('escape', callOnEscape);
+        element.on('ready', (event) => {
+          if (type === 'cart' && setCartState) {
+            // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+            // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+            setCartState(
+              (event as unknown) as stripeJs.StripeCartElementPayloadEvent
+            );
+          }
+          callOnReady(element);
+        });
+
+        element.on('change', (event) => {
+          if (type === 'cart' && setCartState) {
+            // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+            // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+            setCartState(
+              (event as unknown) as stripeJs.StripeCartElementPayloadEvent
+            );
+          }
+          callOnChange(event);
+        });
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `blur` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('blur', callOnBlur);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `focus` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('focus', callOnFocus);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `escape` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('escape', callOnEscape);
 
         // Users can pass an onLoadError prop on any Element component
         // just as they could listen for the `loaderror` event on any Element,
@@ -100,6 +144,16 @@ const createElementComponent = (
         // just as they could listen for the `click` event on any Element,
         // but only the PaymentRequestButton will actually trigger the event.
         (element as any).on('click', callOnClick);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `checkout` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('checkout', callOnCheckout);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `lineitemclick` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('lineitemclick', callOnLineItemClick);
       }
     });
 
@@ -147,10 +201,13 @@ const createElementComponent = (
     onBlur: PropTypes.func,
     onFocus: PropTypes.func,
     onReady: PropTypes.func,
+    onEscape: PropTypes.func,
     onClick: PropTypes.func,
     onLoadError: PropTypes.func,
     onLoaderStart: PropTypes.func,
     onNetworksChange: PropTypes.func,
+    onCheckout: PropTypes.func,
+    onLineItemClick: PropTypes.func,
     options: PropTypes.object as any,
   };
 

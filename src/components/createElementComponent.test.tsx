@@ -8,6 +8,7 @@ import {
   CardElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
+  CartElementComponent,
 } from '../types';
 
 describe('createElementComponent', () => {
@@ -23,6 +24,8 @@ describe('createElementComponent', () => {
   let simulateLoadError: any;
   let simulateLoaderStart: any;
   let simulateNetworksChange: any;
+  let simulateCheckout: any;
+  let simulateLineItemClick: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -59,6 +62,12 @@ describe('createElementComponent', () => {
           break;
         case 'networkschange':
           simulateNetworksChange = fn;
+          break;
+        case 'checkout':
+          simulateCheckout = fn;
+          break;
+        case 'lineitemclick':
+          simulateLineItemClick = fn;
           break;
         default:
           throw new Error('TestSetupError: Unexpected event registration.');
@@ -135,6 +144,11 @@ describe('createElementComponent', () => {
     );
     const PaymentElement: PaymentElementComponent = createElementComponent(
       'payment',
+      false
+    );
+
+    const CartElement: CartElementComponent = createElementComponent(
+      'cart',
       false
     );
 
@@ -417,6 +431,46 @@ describe('createElementComponent', () => {
 
       simulateNetworksChange();
       expect(mockHandler2).toHaveBeenCalledWith();
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s checkout event to the current onCheckout prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CartElement onCheckout={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CartElement onCheckout={mockHandler2} />
+        </Elements>
+      );
+
+      const checkoutEventMock = Symbol('checkout');
+      simulateCheckout(checkoutEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(checkoutEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s lineitemclick event to the current onLineItemClick prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CartElement onLineItemClick={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CartElement onLineItemClick={mockHandler2} />
+        </Elements>
+      );
+
+      const lineItemClickEventMock = Symbol('lineitemclick');
+      simulateLineItemClick(lineItemClickEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(lineItemClickEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 

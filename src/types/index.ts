@@ -172,7 +172,18 @@ export interface CardCvcElementProps extends ElementProps {
 
 export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
 
-export interface CartElementProps extends ElementProps {
+// CartElementProps does not extend ElementsProps because Cart Element does not have onBlur and onFocus events
+export interface CartElementProps {
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  id?: string;
+
+  /**
+   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
+   */
+  className?: string;
+
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_cart_element#cart_element_create-options).
    */

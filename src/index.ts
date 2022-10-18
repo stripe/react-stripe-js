@@ -26,6 +26,8 @@ export * from './types';
 export {
   useElements,
   useStripe,
+  useCartElement,
+  useCartElementState,
   Elements,
   ElementsConsumer,
 } from './components/Elements';
