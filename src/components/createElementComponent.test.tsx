@@ -286,7 +286,7 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
-    it('useCartElement', () => {
+    it('sets cart in the CartElementContext', () => {
       expect(mockCartElementContext.cart).toBe(null);
 
       render(
@@ -298,7 +298,7 @@ describe('createElementComponent', () => {
       expect(mockCartElementContext.cart).toBe(mockElement);
     });
 
-    it('useCartElementState', () => {
+    it('sets cartState in the CartElementContext', () => {
       render(
         <Elements stripe={mockStripe}>
           <CartElement />
