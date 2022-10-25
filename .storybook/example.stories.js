@@ -27,7 +27,7 @@ const addDemo = (directory, file, stories) => {
 
 const hooksStories = storiesOf('react-stripe-js/Hooks', module);
 require
-  .context('../examples/hooks/', false, /\/\d-(.*).js$/)
+  .context('../examples/hooks/', false, /\/\d+-(.*).js$/)
   .keys()
   .forEach((key) => {
     addDemo('hooks', key.slice(2), hooksStories);
@@ -35,7 +35,7 @@ require
 
 const classStories = storiesOf('react-stripe-js/Class Components', module);
 require
-  .context('../examples/class-components/', false, /\/\d-(.*).js$/)
+  .context('../examples/class-components/', false, /\/\d+-(.*).js$/)
   .keys()
   .forEach((key) => {
     addDemo('class-components', key.slice(2), classStories);

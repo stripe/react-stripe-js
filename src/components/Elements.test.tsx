@@ -2,7 +2,14 @@ import React, {StrictMode} from 'react';
 import {render, act} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
-import {Elements, useElements, useStripe, ElementsConsumer} from './Elements';
+import {
+  Elements,
+  useElements,
+  useStripe,
+  ElementsConsumer,
+  useCartElement,
+  useCartElementState,
+} from './Elements';
 import * as mocks from '../../test/mocks';
 
 describe('Elements', () => {
@@ -290,6 +297,22 @@ describe('Elements', () => {
 
     expect(() => render(<TestComponent />)).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that mounts <ElementsConsumer> in an <Elements> provider.'
+    );
+  });
+
+  test('throws when trying to call useCartElement outside of Elements context', () => {
+    const {result} = renderHook(() => useCartElement());
+
+    expect(result.error && result.error.message).toBe(
+      'Could not find Elements context; You need to wrap the part of your app that calls useCartElement() in an <Elements> provider.'
+    );
+  });
+
+  test('throws when trying to call useCartElementState outside of Elements context', () => {
+    const {result} = renderHook(() => useCartElementState());
+
+    expect(result.error && result.error.message).toBe(
+      'Could not find Elements context; You need to wrap the part of your app that calls useCartElementState() in an <Elements> provider.'
     );
   });
 
