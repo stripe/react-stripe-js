@@ -6,7 +6,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import {useElementsContextWithUseCase, CartElementContext} from './Elements';
+import {
+  useElementsContextWithUseCase,
+  useCartElementContextWithUseCase,
+} from './Elements';
 import {useCallbackReference} from '../utils/useCallbackReference';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
@@ -64,7 +67,9 @@ const createElementComponent = (
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
 
-    const {setCart, setCartState} = React.useContext(CartElementContext) || {};
+    const {setCart, setCartState} = useCartElementContextWithUseCase(
+      `mounts <${displayName}>`
+    );
 
     const callOnReady = useCallbackReference(onReady);
     const callOnBlur = useCallbackReference(onBlur);
@@ -110,17 +115,17 @@ const createElementComponent = (
           callOnChange(event);
         });
 
-        // Users can pass an onLoadError prop on any Element component
+        // Users can pass an onBlur prop on any Element component
         // just as they could listen for the `blur` event on any Element,
         // but only certain Elements will trigger the event.
         (element as any).on('blur', callOnBlur);
 
-        // Users can pass an onLoadError prop on any Element component
+        // Users can pass an onFocus prop on any Element component
         // just as they could listen for the `focus` event on any Element,
         // but only certain Elements will trigger the event.
         (element as any).on('focus', callOnFocus);
 
-        // Users can pass an onLoadError prop on any Element component
+        // Users can pass an onEscape prop on any Element component
         // just as they could listen for the `escape` event on any Element,
         // but only certain Elements will trigger the event.
         (element as any).on('escape', callOnEscape);
@@ -145,12 +150,22 @@ const createElementComponent = (
         // but only the PaymentRequestButton will actually trigger the event.
         (element as any).on('click', callOnClick);
 
-        // Users can pass an onLoadError prop on any Element component
+        // Users can pass an onCheckout prop on any Element component
         // just as they could listen for the `checkout` event on any Element,
         // but only certain Elements will trigger the event.
-        (element as any).on('checkout', callOnCheckout);
+        (element as any).on(
+          'checkout',
+          (event: stripeJs.StripeCartElementPayloadEvent) => {
+            if (type === 'cart' && setCartState) {
+              // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+              // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+              setCartState(event);
+            }
+            callOnCheckout(event);
+          }
+        );
 
-        // Users can pass an onLoadError prop on any Element component
+        // Users can pass an onLineItemClick prop on any Element component
         // just as they could listen for the `lineitemclick` event on any Element,
         // but only certain Elements will trigger the event.
         (element as any).on('lineitemclick', callOnLineItemClick);
@@ -188,6 +203,7 @@ const createElementComponent = (
   const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
     // Validate that we are in the right context by calling useElementsContextWithUseCase.
     useElementsContextWithUseCase(`mounts <${displayName}>`);
+    useCartElementContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
     return <div id={id} className={className} />;
   };

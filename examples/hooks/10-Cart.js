@@ -13,29 +13,31 @@ import {
 
 import '../styles/common.css';
 
-const ProductPage = ({options}) => {
+const ProductPage = ({options, productId}) => {
   const cartElement = useCartElement();
   const cartElementState = useCartElementState();
-  console.log('inside product page');
 
-  const handleCheckout = async (event) => {
-    console.log(event);
+  const handleCheckout = async () => {
+    if (!cartElement) return;
     // Redirect to Checkout page
     cartElement.cancelCheckout('Error message here');
   };
 
   const handleLineItemClick = async (event) => {
+    if (!cartElement) return;
     // Block native link redirect
     event.preventDefault();
     console.log(event.url);
   };
 
   const handleShow = () => {
+    if (!cartElement) return;
     cartElement.show();
   };
 
   const handleAddLineItem = () => {
-    cartElement.addLineItem({});
+    if (!cartElement) return;
+    cartElement.addLineItem({product: productId});
   };
 
   return (
@@ -61,19 +63,37 @@ const App = () => {
   const [pk, setPK] = React.useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [clientSecret, setClientSecret] = React.useState('');
-  console.log('inside app');
+  const [clientSecret, setClientSecret] = React.useState(
+    window.sessionStorage.getItem('react-stripe-js-client-secret') || ''
+  );
+  const [productId, setProductId] = React.useState(
+    window.sessionStorage.getItem('react-stripe-js-product-id') || ''
+  );
 
   React.useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
+
+  React.useEffect(() => {
+    window.sessionStorage.setItem(
+      'react-stripe-js-client-secret',
+      clientSecret || ''
+    );
+  }, [clientSecret]);
+
+  React.useEffect(() => {
+    window.sessionStorage.setItem(
+      'react-stripe-js-product-id',
+      productId || ''
+    );
+  }, [productId]);
 
   const [stripePromise, setStripePromise] = React.useState();
   const [theme, setTheme] = React.useState('stripe');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setStripePromise(loadStripe(pk));
+    setStripePromise(loadStripe(pk, {betas: ['cart_beta_1']}));
   };
 
   const handleThemeChange = (e) => {
@@ -89,6 +109,10 @@ const App = () => {
     <>
       <form onSubmit={handleSubmit}>
         <label>
+          Publishable key{' '}
+          <input value={pk} onChange={(e) => setPK(e.target.value)} />
+        </label>
+        <label>
           Cart Session client_secret
           <input
             value={clientSecret}
@@ -96,8 +120,11 @@ const App = () => {
           />
         </label>
         <label>
-          Publishable key{' '}
-          <input value={pk} onChange={(e) => setPK(e.target.value)} />
+          Product ID{' '}
+          <input
+            value={productId}
+            onChange={(e) => setProductId(e.target.value)}
+          />
         </label>
         <button style={{marginRight: 10}} type="submit">
           Load
@@ -118,7 +145,7 @@ const App = () => {
       </form>
       {stripePromise && clientSecret && (
         <Elements stripe={stripePromise} options={{appearance: {theme}}}>
-          <ProductPage options={{clientSecret}} />
+          <ProductPage options={{clientSecret}} productId={productId} />
         </Elements>
       )}
     </>

@@ -83,7 +83,7 @@ interface CartElementContextValue {
   ) => void;
 }
 
-export const CartElementContext = React.createContext<CartElementContextValue | null>(
+const CartElementContext = React.createContext<CartElementContextValue | null>(
   null
 );
 CartElementContext.displayName = 'CartElementContext';

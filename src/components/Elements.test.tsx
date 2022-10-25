@@ -10,15 +10,12 @@ import {
   useCartElement,
   useCartElementState,
 } from './Elements';
-import createElementComponent from './createElementComponent';
-import {CartElementComponent} from '../types';
 import * as mocks from '../../test/mocks';
 
 describe('Elements', () => {
   let mockStripe: any;
   let mockStripePromise: any;
   let mockElements: any;
-  let mockCartElement: any;
   let consoleError: any;
   let consoleWarn: any;
 
@@ -27,8 +24,6 @@ describe('Elements', () => {
     mockStripePromise = Promise.resolve(mockStripe);
     mockElements = mocks.mockElements();
     mockStripe.elements.mockReturnValue(mockElements);
-
-    mockCartElement = mocks.mockElement();
 
     jest.spyOn(console, 'error');
     jest.spyOn(console, 'warn');
@@ -73,42 +68,6 @@ describe('Elements', () => {
     const {result} = renderHook(() => useStripe(), {wrapper});
 
     expect(result.current).toBe(mockStripe);
-  });
-
-  test('injects cartElement with the useCartElement hook', () => {
-    const CartElement: CartElementComponent = createElementComponent(
-      'cart',
-      false
-    );
-
-    const wrapper = ({children}: any) => (
-      <Elements stripe={mockStripe}>
-        <CartElement options={{clientSecret: ''}} />
-        {children}
-      </Elements>
-    );
-
-    const {result} = renderHook(() => useCartElement(), {wrapper});
-
-    expect(result.current).toBe(mockCartElement);
-  });
-
-  test('returns cartElement state with the useCartElement hook', () => {
-    const CartElement: CartElementComponent = createElementComponent(
-      'cart',
-      false
-    );
-
-    const wrapper = ({children}: any) => (
-      <Elements stripe={mockStripe}>
-        <CartElement options={{clientSecret: ''}} />
-        {children}
-      </Elements>
-    );
-
-    const {result} = renderHook(() => useCartElementState(), {wrapper});
-
-    expect(result.current).toHaveProperty('lineItems.count');
   });
 
   test('provides elements and stripe with the ElementsConsumer component', () => {

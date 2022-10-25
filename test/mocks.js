@@ -30,3 +30,17 @@ export const mockStripe = () => ({
   registerAppInfo: jest.fn(),
   _registerWrapper: jest.fn(),
 });
+
+export const mockCartElementContext = () => {
+  const cartElementContext = {
+    cart: null,
+    cartState: null,
+  };
+  cartElementContext.setCart = (val) => {
+    cartElementContext.cart = val;
+  };
+  cartElementContext.setCartState = (val) => {
+    cartElementContext.cartState = val;
+  };
+  return cartElementContext;
+};

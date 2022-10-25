@@ -1,7 +1,7 @@
 import React, {StrictMode} from 'react';
 import {render, act} from '@testing-library/react';
 
-import {Elements} from './Elements';
+import * as ElementsModule from './Elements';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
 import {
@@ -11,10 +11,13 @@ import {
   CartElementComponent,
 } from '../types';
 
+const {Elements} = ElementsModule;
+
 describe('createElementComponent', () => {
   let mockStripe: any;
   let mockElements: any;
   let mockElement: any;
+  let mockCartElementContext: any;
   let simulateChange: any;
   let simulateBlur: any;
   let simulateFocus: any;
@@ -73,6 +76,10 @@ describe('createElementComponent', () => {
           throw new Error('TestSetupError: Unexpected event registration.');
       }
     });
+    mockCartElementContext = mocks.mockCartElementContext();
+    jest
+      .spyOn(ElementsModule, 'useCartElementContextWithUseCase')
+      .mockReturnValue(mockCartElementContext);
   });
 
   afterEach(() => {
@@ -277,6 +284,59 @@ describe('createElementComponent', () => {
       simulateReady();
       expect(mockHandler2).toHaveBeenCalledWith(mockElement);
       expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('useCartElement', () => {
+      expect(mockCartElementContext.cart).toBe(null);
+
+      render(
+        <Elements stripe={mockStripe}>
+          <CartElement />
+        </Elements>
+      );
+
+      expect(mockCartElementContext.cart).toBe(mockElement);
+    });
+
+    it('useCartElementState', () => {
+      render(
+        <Elements stripe={mockStripe}>
+          <CartElement />
+        </Elements>
+      );
+
+      expect(mockCartElementContext.cartState).toBe(null);
+
+      const readyEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_ready',
+        lineItems: {
+          count: 0,
+        },
+      };
+
+      simulateReady(readyEvent);
+      expect(mockCartElementContext.cartState).toBe(readyEvent);
+
+      const changeEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_change',
+        lineItems: {
+          count: 1,
+        },
+      };
+      simulateChange(changeEvent);
+      expect(mockCartElementContext.cartState).toBe(changeEvent);
+
+      const checkoutEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_checkout',
+        lineItems: {
+          count: 2,
+        },
+      };
+      simulateCheckout(checkoutEvent);
+      expect(mockCartElementContext.cartState).toBe(checkoutEvent);
     });
 
     it('propagates the Element`s change event to the current onChange prop', () => {
