@@ -17,6 +17,11 @@ const ProductPage = ({options, productId}) => {
   const cartElement = useCartElement();
   const cartElementState = useCartElementState();
 
+  const handleReady = async (event) => {
+    if (!cartElement) return;
+    console.log(event?.lineItems?.count);
+  };
+
   const handleCheckout = async () => {
     if (!cartElement) return;
     // Redirect to Checkout page
@@ -50,6 +55,7 @@ const ProductPage = ({options, productId}) => {
       </button>
       <CartElement
         options={options}
+        onReady={handleReady}
         onCheckout={handleCheckout}
         onLineItemClick={handleLineItemClick}
       />

@@ -94,14 +94,19 @@ const createElementComponent = (
         elementRef.current = element;
         element.mount(domNode.current);
         element.on('ready', (event) => {
-          if (type === 'cart' && setCartState) {
+          if (type === 'cart') {
             // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
             // we need to cast because typescript is not able to infer which overloaded method is used based off param type
-            setCartState(
-              (event as unknown) as stripeJs.StripeCartElementPayloadEvent
-            );
+            if (setCartState) {
+              setCartState(
+                (event as unknown) as stripeJs.StripeCartElementPayloadEvent
+              );
+            }
+            // the cart ready event returns a CartStatePayload instead of the CartElement
+            callOnReady(event);
+          } else {
+            callOnReady(element);
           }
-          callOnReady(element);
         });
 
         element.on('change', (event) => {
