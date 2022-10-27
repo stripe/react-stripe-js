@@ -17,20 +17,23 @@ const ProductPage = ({options, productId}) => {
   const cartElement = useCartElement();
   const cartElementState = useCartElementState();
 
-  const handleReady = async (event) => {
-    if (!cartElement) return;
+  const handleReady = (event) => {
     console.log(event?.lineItems?.count);
   };
 
-  const handleCheckout = async () => {
+  const handleChange = (event) => {
+    console.log(event?.lineItems?.count);
+  };
+
+  const handleCheckout = (event) => {
+    console.log(event);
     if (!cartElement) return;
-    // Redirect to Checkout page
+    // redirect to Checkout page would go here
     cartElement.cancelCheckout('Error message here');
   };
 
-  const handleLineItemClick = async (event) => {
-    if (!cartElement) return;
-    // Block native link redirect
+  const handleLineItemClick = (event) => {
+    // calling preventDefault blocks native link redirect
     event.preventDefault();
     console.log(event.url);
   };
@@ -56,6 +59,7 @@ const ProductPage = ({options, productId}) => {
       <CartElement
         options={options}
         onReady={handleReady}
+        onChange={handleChange}
         onCheckout={handleCheckout}
         onLineItemClick={handleLineItemClick}
       />
