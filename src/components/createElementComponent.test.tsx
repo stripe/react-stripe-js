@@ -10,6 +10,7 @@ import {
   PaymentRequestButtonElementComponent,
   CartElementComponent,
 } from '../types';
+import {PayButtonElement} from '..';
 
 const {Elements} = ElementsModule;
 
@@ -29,6 +30,10 @@ describe('createElementComponent', () => {
   let simulateNetworksChange: any;
   let simulateCheckout: any;
   let simulateLineItemClick: any;
+  let simulateConfirm: any;
+  let simulateCancel: any;
+  let simulateShippingAddressChange: any;
+  let simulateShippingRateChange: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -71,6 +76,18 @@ describe('createElementComponent', () => {
           break;
         case 'lineitemclick':
           simulateLineItemClick = fn;
+          break;
+        case 'confirm':
+          simulateConfirm = fn;
+          break;
+        case 'cancel':
+          simulateCancel = fn;
+          break;
+        case 'shippingaddresschange':
+          simulateShippingAddressChange = fn;
+          break;
+        case 'shippingratechange':
+          simulateShippingRateChange = fn;
           break;
         default:
           throw new Error('TestSetupError: Unexpected event registration.');
@@ -531,6 +548,98 @@ describe('createElementComponent', () => {
       const lineItemClickEventMock = Symbol('lineitemclick');
       simulateLineItemClick(lineItemClickEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(lineItemClickEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s lineitemclick event to the current onConfirm prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onConfirm={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onConfirm={mockHandler2} />
+        </Elements>
+      );
+
+      const confirmEventMock = Symbol('lineitemclick');
+      simulateConfirm(confirmEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s cancel event to the current onCancel prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onConfirm={() => {}} onCancel={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onConfirm={() => {}} onCancel={mockHandler2} />
+        </Elements>
+      );
+
+      const cancelEventMock = Symbol('lineitemclick');
+      simulateCancel(cancelEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(cancelEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s shippingaddresschange event to the current onShippingAddressChange prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement
+            onConfirm={() => {}}
+            onShippingAddressChange={mockHandler}
+          />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement
+            onConfirm={() => {}}
+            onShippingAddressChange={mockHandler2}
+          />
+        </Elements>
+      );
+
+      const shippingAddressChangeEventMock = Symbol('shippingaddresschange');
+      simulateShippingAddressChange(shippingAddressChangeEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(shippingAddressChangeEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s shippingratechange event to the current onShippingRateChange prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement
+            onConfirm={() => {}}
+            onShippingRateChange={mockHandler}
+          />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement
+            onConfirm={() => {}}
+            onShippingRateChange={mockHandler2}
+          />
+        </Elements>
+      );
+
+      const shippingRateChangeEventMock = Symbol('shippingratechange');
+      simulateShippingRateChange(shippingRateChangeEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(shippingRateChangeEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 

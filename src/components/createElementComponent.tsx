@@ -34,6 +34,10 @@ interface PrivateElementProps {
   onNetworksChange?: UnknownCallback;
   onCheckout?: UnknownCallback;
   onLineItemClick?: UnknownCallback;
+  onConfirm?: UnknownCallback;
+  onCancel?: UnknownCallback;
+  onShippingAddressChange?: UnknownCallback;
+  onShippingRateChange?: UnknownCallback;
   options?: UnknownOptions;
 }
 
@@ -62,6 +66,10 @@ const createElementComponent = (
     onNetworksChange = noop,
     onCheckout = noop,
     onLineItemClick = noop,
+    onConfirm = noop,
+    onCancel = noop,
+    onShippingAddressChange = noop,
+    onShippingRateChange = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
@@ -82,6 +90,12 @@ const createElementComponent = (
     const callOnNetworksChange = useCallbackReference(onNetworksChange);
     const callOnCheckout = useCallbackReference(onCheckout);
     const callOnLineItemClick = useCallbackReference(onLineItemClick);
+    const callOnConfirm = useCallbackReference(onConfirm);
+    const callOnCancel = useCallbackReference(onCancel);
+    const callOnShippingAddressChange = useCallbackReference(
+      onShippingAddressChange
+    );
+    const callOnShippingRateChange = useCallbackReference(onShippingRateChange);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
@@ -174,6 +188,29 @@ const createElementComponent = (
         // just as they could listen for the `lineitemclick` event on any Element,
         // but only certain Elements will trigger the event.
         (element as any).on('lineitemclick', callOnLineItemClick);
+
+        // Users can pass an onConfirm prop on any Element component
+        // just as they could listen for the `confirm` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('confirm', callOnConfirm);
+
+        // Users can pass an onCancel prop on any Element component
+        // just as they could listen for the `cancel` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('cancel', callOnCancel);
+
+        // Users can pass an onShippingAddressChange prop on any Element component
+        // just as they could listen for the `shippingaddresschange` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on(
+          'shippingaddresschange',
+          callOnShippingAddressChange
+        );
+
+        // Users can pass an onShippingRateChange prop on any Element component
+        // just as they could listen for the `shippingratechange` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('shippingratechange', callOnShippingRateChange);
       }
     });
 
@@ -229,6 +266,10 @@ const createElementComponent = (
     onNetworksChange: PropTypes.func,
     onCheckout: PropTypes.func,
     onLineItemClick: PropTypes.func,
+    onConfirm: PropTypes.func,
+    onCancel: PropTypes.func,
+    onShippingAddressChange: PropTypes.func,
+    onShippingRateChange: PropTypes.func,
     options: PropTypes.object as any,
   };
 

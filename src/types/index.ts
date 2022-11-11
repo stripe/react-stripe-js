@@ -431,6 +431,62 @@ export interface PaymentElementProps extends ElementProps {
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
+export interface PayButtonElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options?: stripeJs.StripePayButtonElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripePayButtonElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'payButton'; error: StripeError}) => any;
+
+  /**
+   * Triggered when a button on the Element is clicked.
+   */
+  onClick?: (event: stripeJs.StripePayButtonElementClickEvent) => any;
+
+  /**
+   * Triggered when a buyer authorizes a payment within a supported payment method.
+   */
+  onConfirm: (event: stripeJs.StripePayButtonElementConfirmEvent) => any;
+
+  /**
+   * Triggered when a payment interface is dismissed (e.g., a buyer closes the payment interface)
+   */
+  onCancel?: (event: {elementType: 'payButton'}) => any;
+
+  /**
+   * Triggered when a buyer selects a different shipping address.
+   */
+  onShippingAddressChange?: (
+    event: stripeJs.StripePayButtonElementShippingAddressChangeEvent
+  ) => any;
+
+  /**
+   * Triggered when a buyer selects a different shipping rate.
+   */
+  onShippingRateChange?: (
+    event: stripeJs.StripePayButtonElementShippingRateChangeEvent
+  ) => any;
+}
+
+export type PayButtonElementComponent = FunctionComponent<
+  PayButtonElementProps
+>;
+
 export interface PaymentRequestButtonElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton).
@@ -707,15 +763,27 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeEpsBankElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `LinkAuthenticationElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_link_authentication_element) for the `LinkAuthenticationElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `LinkAuthenticationElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
       component: LinkAuthenticationElementComponent
     ): stripeJs.StripeLinkAuthenticationElement | null;
 
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `PaymentElement` is rendered in the current `Elements` provider tree.
+     */
     getElement(
       component: PaymentElementComponent
+    ): stripeJs.StripeElement | null;
+
+    /**
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_pay_button_element) for the `PayButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `PayButtonElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: PayButtonElementComponent
     ): stripeJs.StripeElement | null;
 
     /**
