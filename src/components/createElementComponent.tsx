@@ -118,6 +118,8 @@ const createElementComponent = (
             }
             // the cart ready event returns a CartStatePayload instead of the CartElement
             callOnReady(event);
+          } else if (type === 'payButton') {
+            callOnReady(event);
           } else {
             callOnReady(element);
           }

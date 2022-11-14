@@ -439,9 +439,9 @@ export interface PayButtonElementProps extends ElementProps {
 
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   * The list of payment methods that could possibly show in the element, or undefined if no payment methods can show.
    */
-  onReady?: (element: stripeJs.StripePayButtonElement) => any;
+  onReady?: (event: stripeJs.StripePayButtonElementReadyEvent) => any;
 
   /**
    * Triggered when the escape key is pressed within the Element.
