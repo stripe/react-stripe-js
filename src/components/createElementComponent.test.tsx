@@ -9,8 +9,8 @@ import {
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   CartElementComponent,
+  PayButtonElementComponent,
 } from '../types';
-import {PayButtonElement} from '..';
 
 const {Elements} = ElementsModule;
 
@@ -173,6 +173,11 @@ describe('createElementComponent', () => {
 
     const CartElement: CartElementComponent = createElementComponent(
       'cart',
+      false
+    );
+
+    const PayButtonElement: PayButtonElementComponent = createElementComponent(
+      'payButton',
       false
     );
 
@@ -551,7 +556,7 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
-    it('propagates the Element`s lineitemclick event to the current onConfirm prop', () => {
+    it('propagates the Element`s confirm event to the current onConfirm prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
       const {rerender} = render(
@@ -565,7 +570,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      const confirmEventMock = Symbol('lineitemclick');
+      const confirmEventMock = Symbol('confirm');
       simulateConfirm(confirmEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
@@ -585,7 +590,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      const cancelEventMock = Symbol('lineitemclick');
+      const cancelEventMock = Symbol('cancel');
       simulateCancel(cancelEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(cancelEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
