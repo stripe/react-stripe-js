@@ -19,6 +19,7 @@ import {
   AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
+  PayButtonElementComponent,
 } from './types';
 
 export * from './types';
@@ -119,6 +120,17 @@ export const EpsBankElement: EpsBankElementComponent = createElementComponent(
 
 export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const PayButtonElement: PayButtonElementComponent = createElementComponent(
+  'payButton',
   isServer
 );
 
