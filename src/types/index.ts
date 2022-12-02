@@ -16,12 +16,12 @@ export interface ElementProps {
   /**
    * Triggered when the Element loses focus.
    */
-  onBlur?: () => any;
+  onBlur?: (event: {elementType: stripeJs.StripeElementType}) => any;
 
   /**
    * Triggered when the Element receives focus.
    */
-  onFocus?: () => any;
+  onFocus?: (event: {elementType: stripeJs.StripeElementType}) => any;
 }
 
 export interface AuBankAccountElementProps extends ElementProps {
