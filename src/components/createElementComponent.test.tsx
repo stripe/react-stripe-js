@@ -19,21 +19,13 @@ describe('createElementComponent', () => {
   let mockElements: any;
   let mockElement: any;
   let mockCartElementContext: any;
-  let simulateChange: any;
-  let simulateBlur: any;
-  let simulateFocus: any;
-  let simulateEscape: any;
-  let simulateReady: any;
-  let simulateClick: any;
-  let simulateLoadError: any;
-  let simulateLoaderStart: any;
-  let simulateNetworksChange: any;
-  let simulateCheckout: any;
-  let simulateLineItemClick: any;
-  let simulateConfirm: any;
-  let simulateCancel: any;
-  let simulateShippingAddressChange: any;
-  let simulateShippingRateChange: any;
+
+  let simulateElementsEvents: Record<string, any[]>;
+  let simulateOn: any;
+  let simulateOff: any;
+  const simulateEvent = (event: string, ...args: any[]) => {
+    simulateElementsEvents[event].forEach((fn) => fn(...args));
+  };
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -42,57 +34,23 @@ describe('createElementComponent', () => {
     mockStripe.elements.mockReturnValue(mockElements);
     mockElements.create.mockReturnValue(mockElement);
     jest.spyOn(React, 'useLayoutEffect');
-    mockElement.on = jest.fn((event, fn) => {
-      switch (event) {
-        case 'change':
-          simulateChange = fn;
-          break;
-        case 'blur':
-          simulateBlur = fn;
-          break;
-        case 'focus':
-          simulateFocus = fn;
-          break;
-        case 'escape':
-          simulateEscape = fn;
-          break;
-        case 'ready':
-          simulateReady = fn;
-          break;
-        case 'click':
-          simulateClick = fn;
-          break;
-        case 'loaderror':
-          simulateLoadError = fn;
-          break;
-        case 'loaderstart':
-          simulateLoaderStart = fn;
-          break;
-        case 'networkschange':
-          simulateNetworksChange = fn;
-          break;
-        case 'checkout':
-          simulateCheckout = fn;
-          break;
-        case 'lineitemclick':
-          simulateLineItemClick = fn;
-          break;
-        case 'confirm':
-          simulateConfirm = fn;
-          break;
-        case 'cancel':
-          simulateCancel = fn;
-          break;
-        case 'shippingaddresschange':
-          simulateShippingAddressChange = fn;
-          break;
-        case 'shippingratechange':
-          simulateShippingRateChange = fn;
-          break;
-        default:
-          throw new Error('TestSetupError: Unexpected event registration.');
-      }
+
+    simulateElementsEvents = {};
+    simulateOn = jest.fn((event, fn) => {
+      simulateElementsEvents[event] = [
+        ...(simulateElementsEvents[event] || []),
+        fn,
+      ];
     });
+    simulateOff = jest.fn((event, fn) => {
+      simulateElementsEvents[event] = simulateElementsEvents[event].filter(
+        (previouslyAddedFn) => previouslyAddedFn !== fn
+      );
+    });
+
+    mockElement.on = simulateOn;
+    mockElement.off = simulateOff;
+
     mockCartElementContext = mocks.mockCartElementContext();
     jest
       .spyOn(ElementsModule, 'useCartElementContextWithUseCase')
@@ -246,6 +204,9 @@ describe('createElementComponent', () => {
       );
 
       expect(mockElements.create).toHaveBeenCalledWith('card', options);
+
+      expect(simulateOn).not.toBeCalled();
+      expect(simulateOff).not.toBeCalled();
     });
 
     it('mounts the element', () => {
@@ -257,6 +218,9 @@ describe('createElementComponent', () => {
 
       expect(mockElement.mount).toHaveBeenCalledWith(container.firstChild);
       expect(React.useLayoutEffect).toHaveBeenCalled();
+
+      expect(simulateOn).not.toBeCalled();
+      expect(simulateOff).not.toBeCalled();
     });
 
     it('does not create and mount until Elements has been instantiated', () => {
@@ -289,6 +253,28 @@ describe('createElementComponent', () => {
       );
     });
 
+    it('removes old event handlers when an event handler changes', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+
+      expect(simulateOn).toBeCalledWith('change', mockHandler);
+      expect(simulateOff).not.toBeCalled();
+
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler2} />
+        </Elements>
+      );
+
+      expect(simulateOff).toBeCalledWith('change', mockHandler);
+      expect(simulateOn).toHaveBeenLastCalledWith('change', mockHandler2);
+    });
+
     it('propagates the Element`s ready event to the current onReady prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
@@ -303,8 +289,29 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateReady();
+      const mockEvent = Symbol('ready');
+      simulateEvent('ready', mockEvent);
       expect(mockHandler2).toHaveBeenCalledWith(mockElement);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Pay Button Element`s ready event to the current onReady prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onReady={mockHandler} onConfirm={() => {}} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PayButtonElement onReady={mockHandler2} onConfirm={() => {}} />
+        </Elements>
+      );
+
+      const mockEvent = Symbol('ready');
+      simulateEvent('ready', mockEvent);
+      expect(mockHandler2).toHaveBeenCalledWith(mockEvent);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
@@ -337,7 +344,7 @@ describe('createElementComponent', () => {
         },
       };
 
-      simulateReady(readyEvent);
+      simulateEvent('ready', readyEvent);
       expect(mockCartElementContext.cartState).toBe(readyEvent);
 
       const changeEvent = {
@@ -347,7 +354,7 @@ describe('createElementComponent', () => {
           count: 1,
         },
       };
-      simulateChange(changeEvent);
+      simulateEvent('change', changeEvent);
       expect(mockCartElementContext.cartState).toBe(changeEvent);
 
       const checkoutEvent = {
@@ -357,8 +364,60 @@ describe('createElementComponent', () => {
           count: 2,
         },
       };
-      simulateCheckout(checkoutEvent);
+      simulateEvent('checkout', checkoutEvent);
       expect(mockCartElementContext.cartState).toBe(checkoutEvent);
+    });
+
+    it('sets cartState in the CartElementContext when passing in callbacks', () => {
+      const onReady = jest.fn();
+      const onChange = jest.fn();
+      const onCheckout = jest.fn();
+
+      render(
+        <Elements stripe={mockStripe}>
+          <CartElement
+            onReady={onReady}
+            onChange={onChange}
+            onCheckout={onCheckout}
+          />
+        </Elements>
+      );
+
+      expect(mockCartElementContext.cartState).toBe(null);
+
+      const readyEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_ready',
+        lineItems: {
+          count: 0,
+        },
+      };
+
+      simulateEvent('ready', readyEvent);
+      expect(mockCartElementContext.cartState).toBe(readyEvent);
+      expect(onReady).toBeCalledWith(readyEvent);
+
+      const changeEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_change',
+        lineItems: {
+          count: 1,
+        },
+      };
+      simulateEvent('change', changeEvent);
+      expect(mockCartElementContext.cartState).toBe(changeEvent);
+      expect(onChange).toBeCalledWith(changeEvent);
+
+      const checkoutEvent = {
+        elementType: 'cart',
+        id: 'cart_session_id_checkout',
+        lineItems: {
+          count: 2,
+        },
+      };
+      simulateEvent('checkout', checkoutEvent);
+      expect(mockCartElementContext.cartState).toBe(checkoutEvent);
+      expect(onCheckout).toBeCalledWith(checkoutEvent);
     });
 
     it('propagates the Element`s change event to the current onChange prop', () => {
@@ -376,7 +435,7 @@ describe('createElementComponent', () => {
       );
 
       const changeEventMock = Symbol('change');
-      simulateChange(changeEventMock);
+      simulateEvent('change', changeEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(changeEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -395,7 +454,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateBlur();
+      simulateEvent('blur');
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -414,7 +473,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateFocus();
+      simulateEvent('focus');
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -433,7 +492,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateEscape();
+      simulateEvent('escape');
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -453,7 +512,7 @@ describe('createElementComponent', () => {
       );
 
       const clickEventMock = Symbol('click');
-      simulateClick(clickEventMock);
+      simulateEvent('click', clickEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(clickEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -473,7 +532,7 @@ describe('createElementComponent', () => {
       );
 
       const loadErrorEventMock = Symbol('loaderror');
-      simulateLoadError(loadErrorEventMock);
+      simulateEvent('loaderror', loadErrorEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(loadErrorEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -492,7 +551,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateLoaderStart();
+      simulateEvent('loaderstart');
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -511,7 +570,7 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      simulateNetworksChange();
+      simulateEvent('networkschange');
       expect(mockHandler2).toHaveBeenCalledWith();
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -531,7 +590,7 @@ describe('createElementComponent', () => {
       );
 
       const checkoutEventMock = Symbol('checkout');
-      simulateCheckout(checkoutEventMock);
+      simulateEvent('checkout', checkoutEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(checkoutEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -551,7 +610,7 @@ describe('createElementComponent', () => {
       );
 
       const lineItemClickEventMock = Symbol('lineitemclick');
-      simulateLineItemClick(lineItemClickEventMock);
+      simulateEvent('lineitemclick', lineItemClickEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(lineItemClickEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -571,7 +630,7 @@ describe('createElementComponent', () => {
       );
 
       const confirmEventMock = Symbol('confirm');
-      simulateConfirm(confirmEventMock);
+      simulateEvent('confirm', confirmEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -591,7 +650,7 @@ describe('createElementComponent', () => {
       );
 
       const cancelEventMock = Symbol('cancel');
-      simulateCancel(cancelEventMock);
+      simulateEvent('cancel', cancelEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(cancelEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -617,7 +676,7 @@ describe('createElementComponent', () => {
       );
 
       const shippingAddressChangeEventMock = Symbol('shippingaddresschange');
-      simulateShippingAddressChange(shippingAddressChangeEventMock);
+      simulateEvent('shippingaddresschange', shippingAddressChangeEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(shippingAddressChangeEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -643,7 +702,7 @@ describe('createElementComponent', () => {
       );
 
       const shippingRateChangeEventMock = Symbol('shippingratechange');
-      simulateShippingRateChange(shippingRateChangeEventMock);
+      simulateEvent('shippingratechange', shippingRateChangeEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(shippingRateChangeEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
