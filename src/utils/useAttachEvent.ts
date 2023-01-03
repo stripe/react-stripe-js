@@ -6,15 +6,28 @@ export const useAttachEvent = <A extends unknown[]>(
   event: string,
   cb?: (...args: A) => any
 ) => {
-  React.useEffect(() => {
-    if (!cb || !elementRef.current) {
-      return () => {};
+  const removePreviousEvent = React.useRef(() => {});
+
+  const addEventCallback = React.useCallback(() => {
+    removePreviousEvent.current();
+
+    if (!elementRef.current || !cb) {
+      removePreviousEvent.current = () => {};
+      return;
     }
 
     const element = elementRef.current;
 
     (element as any).on(event, cb);
 
-    return () => (element as any).off(event, cb);
+    removePreviousEvent.current = () => {
+      if (element === elementRef.current) {
+        (element as any).off(event, cb);
+      }
+    };
   }, [cb, event, elementRef]);
+
+  React.useEffect(() => addEventCallback(), [addEventCallback]);
+
+  return addEventCallback;
 };

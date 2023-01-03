@@ -80,22 +80,42 @@ const createElementComponent = (
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
     // the old callback with element.off and then call element.on with the new one.
-    useAttachEvent(elementRef, 'blur', onBlur);
-    useAttachEvent(elementRef, 'focus', onFocus);
-    useAttachEvent(elementRef, 'escape', onEscape);
-    useAttachEvent(elementRef, 'click', onClick);
-    useAttachEvent(elementRef, 'loaderror', onLoadError);
-    useAttachEvent(elementRef, 'loaderstart', onLoaderStart);
-    useAttachEvent(elementRef, 'networkschange', onNetworksChange);
-    useAttachEvent(elementRef, 'lineitemclick', onLineItemClick);
-    useAttachEvent(elementRef, 'confirm', onConfirm);
-    useAttachEvent(elementRef, 'cancel', onCancel);
-    useAttachEvent(
+    const attachBlurEvent = useAttachEvent(elementRef, 'blur', onBlur);
+    const attachFocusEvent = useAttachEvent(elementRef, 'focus', onFocus);
+    const attachEscapeEvent = useAttachEvent(elementRef, 'escape', onEscape);
+    const attachClickEvent = useAttachEvent(elementRef, 'click', onClick);
+    const attachLoadErrorEvent = useAttachEvent(
+      elementRef,
+      'loaderror',
+      onLoadError
+    );
+    const attachLoaderStartEvent = useAttachEvent(
+      elementRef,
+      'loaderstart',
+      onLoaderStart
+    );
+    const attachNetworksChangeEvent = useAttachEvent(
+      elementRef,
+      'networkschange',
+      onNetworksChange
+    );
+    const attachLineItemClickEvent = useAttachEvent(
+      elementRef,
+      'lineitemclick',
+      onLineItemClick
+    );
+    const attachConfirmEvent = useAttachEvent(elementRef, 'confirm', onConfirm);
+    const attachCancelEvent = useAttachEvent(elementRef, 'cancel', onCancel);
+    const attachShippingAddressChangeEvent = useAttachEvent(
       elementRef,
       'shippingaddresschange',
       onShippingAddressChange
     );
-    useAttachEvent(elementRef, 'shippingratechange', onShippingRateChange);
+    const attachShippingRateChangeEvent = useAttachEvent(
+      elementRef,
+      'shippingratechange',
+      onShippingRateChange
+    );
 
     let readyCallback: UnknownCallback | undefined;
     if (type === 'cart') {
@@ -117,7 +137,7 @@ const createElementComponent = (
       }
     }
 
-    useAttachEvent(elementRef, 'ready', readyCallback);
+    const attachReadyEvent = useAttachEvent(elementRef, 'ready', readyCallback);
 
     const changeCallback =
       type === 'cart'
@@ -127,7 +147,11 @@ const createElementComponent = (
           }
         : onChange;
 
-    useAttachEvent(elementRef, 'change', changeCallback);
+    const attachChangeEvent = useAttachEvent(
+      elementRef,
+      'change',
+      changeCallback
+    );
 
     const checkoutCallback =
       type === 'cart'
@@ -137,7 +161,11 @@ const createElementComponent = (
           }
         : onCheckout;
 
-    useAttachEvent(elementRef, 'checkout', checkoutCallback);
+    const attachCheckoutEvent = useAttachEvent(
+      elementRef,
+      'checkout',
+      checkoutCallback
+    );
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
@@ -149,6 +177,22 @@ const createElementComponent = (
         }
         elementRef.current = element;
         element.mount(domNode.current);
+
+        attachBlurEvent();
+        attachFocusEvent();
+        attachEscapeEvent();
+        attachClickEvent();
+        attachLoadErrorEvent();
+        attachLoaderStartEvent();
+        attachNetworksChangeEvent();
+        attachLineItemClickEvent();
+        attachConfirmEvent();
+        attachCancelEvent();
+        attachShippingAddressChangeEvent();
+        attachShippingRateChangeEvent();
+        attachReadyEvent();
+        attachChangeEvent();
+        attachCheckoutEvent();
       }
     });
 
