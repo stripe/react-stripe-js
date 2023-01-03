@@ -27,7 +27,7 @@ export const useAttachEvent = <A extends unknown[]>(
     };
   }, [cb, event, elementRef]);
 
-  React.useEffect(() => addEventCallback(), [addEventCallback]);
+  React.useLayoutEffect(() => addEventCallback(), [addEventCallback]);
 
   return addEventCallback;
 };

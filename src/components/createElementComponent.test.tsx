@@ -253,6 +253,22 @@ describe('createElementComponent', () => {
       );
     });
 
+    it('adds an event handler', () => {
+      const mockHandler = jest.fn();
+      render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+
+      expect(simulateOn).toBeCalledTimes(1);
+      expect(simulateOn).toBeCalledWith('change', mockHandler);
+
+      const changeEventMock = Symbol('change');
+      simulateEvent('change', changeEventMock);
+      expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
+    });
+
     it('removes old event handlers when an event handler changes', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
@@ -263,6 +279,8 @@ describe('createElementComponent', () => {
       );
 
       expect(simulateOn).toBeCalledWith('change', mockHandler);
+
+      expect(simulateOn).toBeCalledTimes(1);
       expect(simulateOff).not.toBeCalled();
 
       rerender(
