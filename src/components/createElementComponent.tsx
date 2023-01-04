@@ -10,7 +10,7 @@ import {
   useElementsContextWithUseCase,
   useCartElementContextWithUseCase,
 } from './Elements';
-import {useAttachEvent} from '../utils/useAttachEvent';
+import {useCallbackReference} from '../utils/useCallbackReference';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
 import {
@@ -41,6 +41,8 @@ interface PrivateElementProps {
   options?: UnknownOptions;
 }
 
+const noop = () => {};
+
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
@@ -53,21 +55,21 @@ const createElementComponent = (
     id,
     className,
     options = {},
-    onBlur,
-    onFocus,
-    onReady,
-    onChange,
-    onEscape,
-    onClick,
-    onLoadError,
-    onLoaderStart,
-    onNetworksChange,
-    onCheckout,
-    onLineItemClick,
-    onConfirm,
-    onCancel,
-    onShippingAddressChange,
-    onShippingRateChange,
+    onBlur = noop,
+    onFocus = noop,
+    onReady = noop,
+    onChange = noop,
+    onEscape = noop,
+    onClick = noop,
+    onLoadError = noop,
+    onLoaderStart = noop,
+    onNetworksChange = noop,
+    onCheckout = noop,
+    onLineItemClick = noop,
+    onConfirm = noop,
+    onCancel = noop,
+    onShippingAddressChange = noop,
+    onShippingRateChange = noop,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
@@ -77,67 +79,23 @@ const createElementComponent = (
       `mounts <${displayName}>`
     );
 
-    // For every event where the merchant provides a callback, call element.on
-    // with that callback. If the merchant ever changes the callback, removes
-    // the old callback with element.off and then call element.on with the new one.
-    useAttachEvent(elementRef, 'blur', onBlur);
-    useAttachEvent(elementRef, 'focus', onFocus);
-    useAttachEvent(elementRef, 'escape', onEscape);
-    useAttachEvent(elementRef, 'click', onClick);
-    useAttachEvent(elementRef, 'loaderror', onLoadError);
-    useAttachEvent(elementRef, 'loaderstart', onLoaderStart);
-    useAttachEvent(elementRef, 'networkschange', onNetworksChange);
-    useAttachEvent(elementRef, 'lineitemclick', onLineItemClick);
-    useAttachEvent(elementRef, 'confirm', onConfirm);
-    useAttachEvent(elementRef, 'cancel', onCancel);
-    useAttachEvent(
-      elementRef,
-      'shippingaddresschange',
+    const callOnReady = useCallbackReference(onReady);
+    const callOnBlur = useCallbackReference(onBlur);
+    const callOnFocus = useCallbackReference(onFocus);
+    const callOnClick = useCallbackReference(onClick);
+    const callOnChange = useCallbackReference(onChange);
+    const callOnEscape = useCallbackReference(onEscape);
+    const callOnLoadError = useCallbackReference(onLoadError);
+    const callOnLoaderStart = useCallbackReference(onLoaderStart);
+    const callOnNetworksChange = useCallbackReference(onNetworksChange);
+    const callOnCheckout = useCallbackReference(onCheckout);
+    const callOnLineItemClick = useCallbackReference(onLineItemClick);
+    const callOnConfirm = useCallbackReference(onConfirm);
+    const callOnCancel = useCallbackReference(onCancel);
+    const callOnShippingAddressChange = useCallbackReference(
       onShippingAddressChange
     );
-    useAttachEvent(elementRef, 'shippingratechange', onShippingRateChange);
-
-    let readyCallback: UnknownCallback | undefined;
-    if (type === 'cart') {
-      readyCallback = (event) => {
-        setCartState(
-          (event as unknown) as stripeJs.StripeCartElementPayloadEvent
-        );
-        onReady && onReady(event);
-      };
-    } else if (onReady) {
-      if (type === 'payButton') {
-        // Passes through the event, which includes visible PM types
-        readyCallback = onReady;
-      } else {
-        // For other Elements, pass through the Element itself.
-        readyCallback = () => {
-          onReady(elementRef.current);
-        };
-      }
-    }
-
-    useAttachEvent(elementRef, 'ready', readyCallback);
-
-    const changeCallback =
-      type === 'cart'
-        ? (event: stripeJs.StripeCartElementPayloadEvent) => {
-            setCartState(event);
-            onChange && onChange(event);
-          }
-        : onChange;
-
-    useAttachEvent(elementRef, 'change', changeCallback);
-
-    const checkoutCallback =
-      type === 'cart'
-        ? (event: stripeJs.StripeCartElementPayloadEvent) => {
-            setCartState(event);
-            onCheckout && onCheckout(event);
-          }
-        : onCheckout;
-
-    useAttachEvent(elementRef, 'checkout', checkoutCallback);
+    const callOnShippingRateChange = useCallbackReference(onShippingRateChange);
 
     React.useLayoutEffect(() => {
       if (elementRef.current == null && elements && domNode.current != null) {
@@ -149,6 +107,112 @@ const createElementComponent = (
         }
         elementRef.current = element;
         element.mount(domNode.current);
+        element.on('ready', (event) => {
+          if (type === 'cart') {
+            // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+            // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+            if (setCartState) {
+              setCartState(
+                (event as unknown) as stripeJs.StripeCartElementPayloadEvent
+              );
+            }
+            // the cart ready event returns a CartStatePayload instead of the CartElement
+            callOnReady(event);
+          } else if (type === 'payButton') {
+            callOnReady(event);
+          } else {
+            callOnReady(element);
+          }
+        });
+
+        element.on('change', (event) => {
+          if (type === 'cart' && setCartState) {
+            // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+            // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+            setCartState(
+              (event as unknown) as stripeJs.StripeCartElementPayloadEvent
+            );
+          }
+          callOnChange(event);
+        });
+
+        // Users can pass an onBlur prop on any Element component
+        // just as they could listen for the `blur` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('blur', callOnBlur);
+
+        // Users can pass an onFocus prop on any Element component
+        // just as they could listen for the `focus` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('focus', callOnFocus);
+
+        // Users can pass an onEscape prop on any Element component
+        // just as they could listen for the `escape` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('escape', callOnEscape);
+
+        // Users can pass an onLoadError prop on any Element component
+        // just as they could listen for the `loaderror` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('loaderror', callOnLoadError);
+
+        // Users can pass an onLoaderStart prop on any Element component
+        // just as they could listen for the `loaderstart` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('loaderstart', callOnLoaderStart);
+
+        // Users can pass an onNetworksChange prop on any Element component
+        // just as they could listen for the `networkschange` event on any Element,
+        // but only the Card and CardNumber Elements will trigger the event.
+        (element as any).on('networkschange', callOnNetworksChange);
+
+        // Users can pass an onClick prop on any Element component
+        // just as they could listen for the `click` event on any Element,
+        // but only the PaymentRequestButton will actually trigger the event.
+        (element as any).on('click', callOnClick);
+
+        // Users can pass an onCheckout prop on any Element component
+        // just as they could listen for the `checkout` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on(
+          'checkout',
+          (event: stripeJs.StripeCartElementPayloadEvent) => {
+            if (type === 'cart' && setCartState) {
+              // we know that elements.on event must be of type StripeCartPayloadEvent if type is 'cart'
+              // we need to cast because typescript is not able to infer which overloaded method is used based off param type
+              setCartState(event);
+            }
+            callOnCheckout(event);
+          }
+        );
+
+        // Users can pass an onLineItemClick prop on any Element component
+        // just as they could listen for the `lineitemclick` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('lineitemclick', callOnLineItemClick);
+
+        // Users can pass an onConfirm prop on any Element component
+        // just as they could listen for the `confirm` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('confirm', callOnConfirm);
+
+        // Users can pass an onCancel prop on any Element component
+        // just as they could listen for the `cancel` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('cancel', callOnCancel);
+
+        // Users can pass an onShippingAddressChange prop on any Element component
+        // just as they could listen for the `shippingaddresschange` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on(
+          'shippingaddresschange',
+          callOnShippingAddressChange
+        );
+
+        // Users can pass an onShippingRateChange prop on any Element component
+        // just as they could listen for the `shippingratechange` event on any Element,
+        // but only certain Elements will trigger the event.
+        (element as any).on('shippingratechange', callOnShippingRateChange);
       }
     });
 
