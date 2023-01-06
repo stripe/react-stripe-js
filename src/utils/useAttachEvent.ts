@@ -6,15 +6,28 @@ export const useAttachEvent = <A extends unknown[]>(
   event: string,
   cb?: (...args: A) => any
 ) => {
+  const cbDefined = !!cb;
+  const cbRef = React.useRef(cb);
+
   React.useEffect(() => {
-    if (!cb || !element) {
+    cbRef.current = cb;
+  }, [cb]);
+
+  React.useEffect(() => {
+    if (!cbDefined || !element) {
       return () => {};
     }
 
-    (element as any).on(event, cb);
+    const decoratedCb = (...args: A): void => {
+      if (cbRef.current) {
+        cbRef.current(...args);
+      }
+    };
+
+    (element as any).on(event, decoratedCb);
 
     return () => {
-      (element as any).off(event, cb);
+      (element as any).off(event, decoratedCb);
     };
-  }, [cb, event, element]);
+  }, [cbDefined, event, element, cbRef]);
 };

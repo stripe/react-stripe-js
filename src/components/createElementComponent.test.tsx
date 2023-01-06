@@ -253,17 +253,70 @@ describe('createElementComponent', () => {
       );
     });
 
-    it('removes old event handlers when an event handler changes', () => {
+    it('adds an event handlers to an Element', () => {
       const mockHandler = jest.fn();
-      const mockHandler2 = jest.fn();
+      render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+
+      const changeEventMock = Symbol('change');
+      simulateEvent('change', changeEventMock);
+      expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
+    });
+
+    it('adds event handler on re-render', () => {
+      const mockHandler = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
           <CardElement onChange={mockHandler} />
         </Elements>
       );
 
-      expect(simulateOn).toBeCalledWith('change', mockHandler);
+      expect(simulateOn).toBeCalledWith('change', expect.any(Function));
       expect(simulateOff).not.toBeCalled();
+
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement />
+        </Elements>
+      );
+
+      expect(simulateOff).toBeCalledWith('change', expect.any(Function));
+    });
+
+    it('removes event handler when removed on re-render', () => {
+      const mockHandler = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+
+      expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+      expect(simulateOff).not.toBeCalled();
+
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement />
+        </Elements>
+      );
+
+      expect(simulateOff).toBeCalledWith('change', expect.any(Function));
+    });
+
+    it('does not call on/off when an event handler changes', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+
+      expect(simulateOn).toBeCalledWith('change', expect.any(Function));
 
       rerender(
         <Elements stripe={mockStripe}>
@@ -271,8 +324,8 @@ describe('createElementComponent', () => {
         </Elements>
       );
 
-      expect(simulateOff).toBeCalledWith('change', mockHandler);
-      expect(simulateOn).toHaveBeenLastCalledWith('change', mockHandler2);
+      expect(simulateOn).toBeCalledTimes(1);
+      expect(simulateOff).not.toBeCalled();
     });
 
     it('propagates the Element`s ready event to the current onReady prop', () => {
