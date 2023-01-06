@@ -70,7 +70,9 @@ const createElementComponent = (
     onShippingRateChange,
   }) => {
     const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
-    const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
+    const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
+      null
+    );
     const domNode = React.useRef<HTMLDivElement | null>(null);
 
     const {setCart, setCartState} = useCartElementContextWithUseCase(
@@ -80,22 +82,18 @@ const createElementComponent = (
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
     // the old callback with element.off and then call element.on with the new one.
-    useAttachEvent(elementRef, 'blur', onBlur);
-    useAttachEvent(elementRef, 'focus', onFocus);
-    useAttachEvent(elementRef, 'escape', onEscape);
-    useAttachEvent(elementRef, 'click', onClick);
-    useAttachEvent(elementRef, 'loaderror', onLoadError);
-    useAttachEvent(elementRef, 'loaderstart', onLoaderStart);
-    useAttachEvent(elementRef, 'networkschange', onNetworksChange);
-    useAttachEvent(elementRef, 'lineitemclick', onLineItemClick);
-    useAttachEvent(elementRef, 'confirm', onConfirm);
-    useAttachEvent(elementRef, 'cancel', onCancel);
-    useAttachEvent(
-      elementRef,
-      'shippingaddresschange',
-      onShippingAddressChange
-    );
-    useAttachEvent(elementRef, 'shippingratechange', onShippingRateChange);
+    useAttachEvent(element, 'blur', onBlur);
+    useAttachEvent(element, 'focus', onFocus);
+    useAttachEvent(element, 'escape', onEscape);
+    useAttachEvent(element, 'click', onClick);
+    useAttachEvent(element, 'loaderror', onLoadError);
+    useAttachEvent(element, 'loaderstart', onLoaderStart);
+    useAttachEvent(element, 'networkschange', onNetworksChange);
+    useAttachEvent(element, 'lineitemclick', onLineItemClick);
+    useAttachEvent(element, 'confirm', onConfirm);
+    useAttachEvent(element, 'cancel', onCancel);
+    useAttachEvent(element, 'shippingaddresschange', onShippingAddressChange);
+    useAttachEvent(element, 'shippingratechange', onShippingRateChange);
 
     let readyCallback: UnknownCallback | undefined;
     if (type === 'cart') {
@@ -112,12 +110,12 @@ const createElementComponent = (
       } else {
         // For other Elements, pass through the Element itself.
         readyCallback = () => {
-          onReady(elementRef.current);
+          onReady(element);
         };
       }
     }
 
-    useAttachEvent(elementRef, 'ready', readyCallback);
+    useAttachEvent(element, 'ready', readyCallback);
 
     const changeCallback =
       type === 'cart'
@@ -127,7 +125,7 @@ const createElementComponent = (
           }
         : onChange;
 
-    useAttachEvent(elementRef, 'change', changeCallback);
+    useAttachEvent(element, 'change', changeCallback);
 
     const checkoutCallback =
       type === 'cart'
@@ -137,24 +135,24 @@ const createElementComponent = (
           }
         : onCheckout;
 
-    useAttachEvent(elementRef, 'checkout', checkoutCallback);
+    useAttachEvent(element, 'checkout', checkoutCallback);
 
     React.useLayoutEffect(() => {
-      if (elementRef.current == null && elements && domNode.current != null) {
-        const element = elements.create(type as any, options);
+      if (element === null && elements && domNode.current !== null) {
+        const newElement = elements.create(type as any, options);
         if (type === 'cart' && setCart) {
           // we know that elements.create return value must be of type StripeCartElement if type is 'cart',
           // we need to cast because typescript is not able to infer which overloaded method is used based off param type
-          setCart((element as unknown) as stripeJs.StripeCartElement);
+          setCart((newElement as unknown) as stripeJs.StripeCartElement);
         }
-        elementRef.current = element;
-        element.mount(domNode.current);
+        setElement(newElement);
+        newElement.mount(domNode.current);
       }
-    });
+    }, [element, elements, options, setCart]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
-      if (!elementRef.current) {
+      if (!element) {
         return;
       }
 
@@ -163,18 +161,18 @@ const createElementComponent = (
       ]);
 
       if (updates) {
-        elementRef.current.update(updates);
+        element.update(updates);
       }
-    }, [options, prevOptions]);
+    }, [options, prevOptions, element]);
 
     React.useLayoutEffect(() => {
       return () => {
-        if (elementRef.current) {
-          elementRef.current.destroy();
-          elementRef.current = null;
+        if (element) {
+          element.destroy();
+          setElement(null);
         }
       };
-    }, []);
+    }, [element]);
 
     return <div id={id} className={className} ref={domNode} />;
   };
