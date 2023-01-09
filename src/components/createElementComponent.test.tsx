@@ -266,6 +266,40 @@ describe('createElementComponent', () => {
       expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
     });
 
+    it('attaches event listeners once the element is created', () => {
+      jest
+        .spyOn(ElementsModule, 'useElementsContextWithUseCase')
+        .mockReturnValueOnce({elements: null, stripe: null})
+        .mockReturnValue({elements: mockElements, stripe: mockStripe});
+
+      const mockHandler = jest.fn();
+
+      // This won't create the element, since elements is undefined on this render
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+      expect(mockElements.create).not.toBeCalled();
+
+      expect(simulateOn).not.toBeCalled();
+
+      // This creates the element now that elements is defined
+      rerender(
+        <Elements stripe={mockStripe}>
+          <CardElement onChange={mockHandler} />
+        </Elements>
+      );
+      expect(mockElements.create).toBeCalled();
+
+      expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+      expect(simulateOff).not.toBeCalled();
+
+      const changeEventMock = Symbol('change');
+      simulateEvent('change', changeEventMock);
+      expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
+    });
+
     it('adds event handler on re-render', () => {
       const mockHandler = jest.fn();
       const {rerender} = render(
