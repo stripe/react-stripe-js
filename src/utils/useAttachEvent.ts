@@ -9,6 +9,8 @@ export const useAttachEvent = <A extends unknown[]>(
   const cbDefined = !!cb;
   const cbRef = React.useRef(cb);
 
+  // In many integrations the callback prop changes on each render.
+  // Using a ref saves us from calling element.on/.off every render.
   React.useEffect(() => {
     cbRef.current = cb;
   }, [cb]);
