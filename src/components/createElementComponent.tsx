@@ -169,7 +169,6 @@ const createElementComponent = (
       return () => {
         if (element) {
           element.destroy();
-          setElement(null);
         }
       };
     }, [element]);
