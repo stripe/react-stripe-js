@@ -73,6 +73,7 @@ const createElementComponent = (
     const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
       null
     );
+    const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
 
     const {setCart, setCartState} = useCartElementContextWithUseCase(
@@ -138,21 +139,26 @@ const createElementComponent = (
     useAttachEvent(element, 'checkout', checkoutCallback);
 
     React.useLayoutEffect(() => {
-      if (element === null && elements && domNode.current !== null) {
+      if (elementRef.current === null && elements && domNode.current !== null) {
         const newElement = elements.create(type as any, options);
         if (type === 'cart' && setCart) {
           // we know that elements.create return value must be of type StripeCartElement if type is 'cart',
           // we need to cast because typescript is not able to infer which overloaded method is used based off param type
           setCart((newElement as unknown) as stripeJs.StripeCartElement);
         }
+
+        // Store element in a ref to ensure it's _immediately_ available in cleanup hooks in StrictMode
+        elementRef.current = newElement;
+        // Store element in state to facilitate event listener attachment
         setElement(newElement);
+
         newElement.mount(domNode.current);
       }
-    }, [element, elements, options, setCart]);
+    }, [elements, options, setCart]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
-      if (!element) {
+      if (!elementRef.current) {
         return;
       }
 
@@ -161,17 +167,18 @@ const createElementComponent = (
       ]);
 
       if (updates) {
-        element.update(updates);
+        elementRef.current.update(updates);
       }
-    }, [options, prevOptions, element]);
+    }, [options, prevOptions]);
 
     React.useLayoutEffect(() => {
       return () => {
-        if (element) {
-          element.destroy();
+        if (elementRef.current) {
+          elementRef.current.destroy();
+          elementRef.current = null;
         }
       };
-    }, [element]);
+    }, []);
 
     return <div id={id} className={className} ref={domNode} />;
   };
