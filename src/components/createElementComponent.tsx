@@ -149,7 +149,7 @@ const createElementComponent = (
 
         // Store element in a ref to ensure it's _immediately_ available in cleanup hooks in StrictMode
         elementRef.current = newElement;
-        // Store element in state to to facilitate event listener attachment
+        // Store element in state to facilitate event listener attachment
         setElement(newElement);
 
         newElement.mount(domNode.current);
