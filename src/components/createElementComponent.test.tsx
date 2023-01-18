@@ -209,6 +209,34 @@ describe('createElementComponent', () => {
       expect(simulateOff).not.toBeCalled();
     });
 
+    it('creates, destroys, then re-creates element in strict mode', () => {
+      expect.assertions(4);
+
+      let elementCreated = false;
+
+      mockElements.create.mockImplementation(() => {
+        expect(elementCreated).toBe(false);
+        elementCreated = true;
+
+        return mockElement;
+      });
+
+      mockElement.destroy.mockImplementation(() => {
+        elementCreated = false;
+      });
+
+      render(
+        <StrictMode>
+          <Elements stripe={mockStripe}>
+            <CardElement />
+          </Elements>
+        </StrictMode>
+      );
+
+      expect(mockElements.create).toHaveBeenCalledTimes(2);
+      expect(mockElement.destroy).toHaveBeenCalledTimes(1);
+    });
+
     it('mounts the element', () => {
       const {container} = render(
         <Elements stripe={mockStripe}>
