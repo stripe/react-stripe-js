@@ -431,17 +431,17 @@ export interface PaymentElementProps extends ElementProps {
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
-export interface PayButtonElementProps extends ElementProps {
+export interface ExpressCheckoutElementProps extends ElementProps {
   /**
    * An object containing Element configuration options.
    */
-  options?: stripeJs.StripePayButtonElementOptions;
+  options?: stripeJs.StripeExpressCheckoutElementOptions;
 
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
    * The list of payment methods that could possibly show in the element, or undefined if no payment methods can show.
    */
-  onReady?: (event: stripeJs.StripePayButtonElementReadyEvent) => any;
+  onReady?: (event: stripeJs.StripeExpressCheckoutElementReadyEvent) => any;
 
   /**
    * Triggered when the escape key is pressed within the Element.
@@ -451,40 +451,43 @@ export interface PayButtonElementProps extends ElementProps {
   /**
    * Triggered when the Element fails to load.
    */
-  onLoadError?: (event: {elementType: 'payButton'; error: StripeError}) => any;
+  onLoadError?: (event: {
+    elementType: 'expressCheckout';
+    error: StripeError;
+  }) => any;
 
   /**
    * Triggered when a button on the Element is clicked.
    */
-  onClick?: (event: stripeJs.StripePayButtonElementClickEvent) => any;
+  onClick?: (event: stripeJs.StripeExpressCheckoutElementClickEvent) => any;
 
   /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
-  onConfirm: (event: stripeJs.StripePayButtonElementConfirmEvent) => any;
+  onConfirm: (event: stripeJs.StripeExpressCheckoutElementConfirmEvent) => any;
 
   /**
    * Triggered when a payment interface is dismissed (e.g., a buyer closes the payment interface)
    */
-  onCancel?: (event: {elementType: 'payButton'}) => any;
+  onCancel?: (event: {elementType: 'expressCheckout'}) => any;
 
   /**
    * Triggered when a buyer selects a different shipping address.
    */
   onShippingAddressChange?: (
-    event: stripeJs.StripePayButtonElementShippingAddressChangeEvent
+    event: stripeJs.StripeExpressCheckoutElementShippingAddressChangeEvent
   ) => any;
 
   /**
    * Triggered when a buyer selects a different shipping rate.
    */
   onShippingRateChange?: (
-    event: stripeJs.StripePayButtonElementShippingRateChangeEvent
+    event: stripeJs.StripeExpressCheckoutElementShippingRateChangeEvent
   ) => any;
 }
 
-export type PayButtonElementComponent = FunctionComponent<
-  PayButtonElementProps
+export type ExpressCheckoutElementComponent = FunctionComponent<
+  ExpressCheckoutElementProps
 >;
 
 export interface PaymentRequestButtonElementProps extends ElementProps {
@@ -779,11 +782,11 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_pay_button_element) for the `PayButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `PayButtonElement` is rendered in the current `Elements` provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_express_checkout_element) for the `ExpressCheckoutElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `ExpressCheckoutElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
-      component: PayButtonElementComponent
+      component: ExpressCheckoutElementComponent
     ): stripeJs.StripeElement | null;
 
     /**
