@@ -5,6 +5,7 @@ import {
   CardNumberElementComponent,
   CardExpiryElementComponent,
   CardCvcElementComponent,
+  ExpressCheckoutElementComponent,
   FpxBankElementComponent,
   IbanElementComponent,
   IdealBankElementComponent,
@@ -19,7 +20,6 @@ import {
   AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
-  PayButtonElementComponent,
 } from './types';
 
 export * from './types';
@@ -129,8 +129,8 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
  *
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
-export const PayButtonElement: PayButtonElementComponent = createElementComponent(
-  'payButton',
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
+  'expressCheckout',
   isServer
 );
 

@@ -9,7 +9,7 @@ import {
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   CartElementComponent,
-  PayButtonElementComponent,
+  ExpressCheckoutElementComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -134,8 +134,8 @@ describe('createElementComponent', () => {
       false
     );
 
-    const PayButtonElement: PayButtonElementComponent = createElementComponent(
-      'payButton',
+    const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
+      'expressCheckout',
       false
     );
 
@@ -410,17 +410,17 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
-    it('propagates the Pay Button Element`s ready event to the current onReady prop', () => {
+    it('propagates the Express Checkout Element`s ready event to the current onReady prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onReady={mockHandler} onConfirm={() => {}} />
+          <ExpressCheckoutElement onReady={mockHandler} onConfirm={() => {}} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onReady={mockHandler2} onConfirm={() => {}} />
+          <ExpressCheckoutElement onReady={mockHandler2} onConfirm={() => {}} />
         </Elements>
       );
 
@@ -735,12 +735,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onConfirm={mockHandler} />
+          <ExpressCheckoutElement onConfirm={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onConfirm={mockHandler2} />
+          <ExpressCheckoutElement onConfirm={mockHandler2} />
         </Elements>
       );
 
@@ -755,12 +755,15 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onConfirm={() => {}} onCancel={mockHandler} />
+          <ExpressCheckoutElement onConfirm={() => {}} onCancel={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PayButtonElement onConfirm={() => {}} onCancel={mockHandler2} />
+          <ExpressCheckoutElement
+            onConfirm={() => {}}
+            onCancel={mockHandler2}
+          />
         </Elements>
       );
 
@@ -775,7 +778,7 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PayButtonElement
+          <ExpressCheckoutElement
             onConfirm={() => {}}
             onShippingAddressChange={mockHandler}
           />
@@ -783,7 +786,7 @@ describe('createElementComponent', () => {
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PayButtonElement
+          <ExpressCheckoutElement
             onConfirm={() => {}}
             onShippingAddressChange={mockHandler2}
           />
@@ -801,7 +804,7 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PayButtonElement
+          <ExpressCheckoutElement
             onConfirm={() => {}}
             onShippingRateChange={mockHandler}
           />
@@ -809,7 +812,7 @@ describe('createElementComponent', () => {
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PayButtonElement
+          <ExpressCheckoutElement
             onConfirm={() => {}}
             onShippingRateChange={mockHandler2}
           />

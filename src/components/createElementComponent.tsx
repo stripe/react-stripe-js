@@ -105,7 +105,7 @@ const createElementComponent = (
         onReady && onReady(event);
       };
     } else if (onReady) {
-      if (type === 'payButton') {
+      if (type === 'expressCheckout') {
         // Passes through the event, which includes visible PM types
         readyCallback = onReady;
       } else {
