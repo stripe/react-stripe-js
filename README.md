@@ -38,7 +38,7 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 #### Using hooks
 
 ```jsx
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import {loadStripe} from '@stripe/stripe-js';
 import {
