@@ -173,16 +173,16 @@ const createElementComponent = (
 
     React.useLayoutEffect(() => {
       return () => {
-        try {
-          if (
-            elementRef.current &&
-            typeof elementRef.current.destroy === 'function'
-          ) {
+        if (
+          elementRef.current &&
+          typeof elementRef.current.destroy === 'function'
+        ) {
+          try {
             elementRef.current.destroy();
             elementRef.current = null;
+          } catch (error) {
+            // Do nothing
           }
-        } catch (error) {
-          // Do nothing
         }
       };
     }, []);
