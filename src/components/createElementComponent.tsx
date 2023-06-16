@@ -182,7 +182,7 @@ const createElementComponent = (
             elementRef.current = null;
           }
         } catch (error) {
-          console.warn('threw an error while destroying', error);
+          // Do nothing
         }
       };
     }, []);
