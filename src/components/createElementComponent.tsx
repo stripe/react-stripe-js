@@ -138,6 +138,14 @@ const createElementComponent = (
 
     useAttachEvent(element, 'checkout', checkoutCallback);
 
+    const destroyCallback = () => {
+      if (elementRef.current) {
+        elementRef.current = null;
+      }
+    };
+
+    useAttachEvent(element, 'destroy', destroyCallback);
+
     React.useLayoutEffect(() => {
       if (elementRef.current === null && elements && domNode.current !== null) {
         const newElement = elements.create(type as any, options);
