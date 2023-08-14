@@ -66,6 +66,16 @@ Remember to create a release on GitHub with a changelog notes:
 EOF
 }
 
+verify_commit_is_signed() {
+  local commit_hash=$(git log -1 --format="%H")
+
+  if ! git verify-commit "$commit_hash" &> /dev/null; then
+    echo "Error! Commit $commit_hash is not signed"
+    echo "Please follow https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account and sign your commit"
+    exit 1
+  fi
+}
+
 # Show help if no arguments passed
 if [ $# -eq 0 ]; then
   echo "Error! Missing release type argument"
@@ -127,16 +137,17 @@ yarn -s run test
 echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
 yarn -s version --$RELEASE_TYPE
 
+create_github_release
+verify_commit_is_signed
+
+echo "Pushing git commit and tag"
+git push --follow-tags
+
 echo "Building"
 yarn -s run build
 
 echo "Publishing release"
 yarn --ignore-scripts publish --non-interactive --access=public
 
-echo "Pushing git commit and tag"
-git push --follow-tags
-
 echo "Publish successful!"
 echo ""
-
-create_github_release
