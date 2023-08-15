@@ -4,15 +4,18 @@ set -euo pipefail
 IFS=$'\n\t'
 
 RELEASE_TYPE=${1:-}
+PREID=${2:-}
 
 echo_help() {
   cat << EOF
 USAGE:
-    ./scripts/publish <release_type>
+    ./scripts/publish <release_type> <pre_id>
 
 ARGS:
     <release_type>
             A Semantic Versioning release type used to bump the version number. Either "patch", "minor", "major", "prepatch", "preminor", "premajor", or "prerelease".
+    <pre_id>
+            Adds an identifier to be used to prefix premajor, preminor, prepatch or prerelease version increments. Either "alpha" or "beta".
 EOF
 }
 
@@ -105,6 +108,24 @@ case $RELEASE_TYPE in
     ;;
 esac
 
+# validate preid if passed
+ALLOWED_PRERELEASE_TYPES=(prepatch preminor premajor prerelease)
+if [ -n "$PREID" ]; then
+    if [ "$PREID" != "alpha" ] && [ "$PREID" != "beta" ]; then
+        echo "Invalid pre_id. It should be either 'alpha' or 'beta'"
+        echo ""
+        echo_help
+        exit 1
+    fi
+    if [ -n "$RELEASE_TYPE" ] && [[ ! " ${ALLOWED_PRERELEASE_TYPES[*]} " =~ "${RELEASE_TYPE}" ]]; then
+        ALLOWED_PRERELEASE_TYPES_STRING=$(printf "'%s', " "${ALLOWED_PRERELEASE_TYPES[@]}")
+        echo "Invalid release_type. It should be one of: $ALLOWED_PRERELEASE_TYPES_STRING when pre_id is set"
+        echo ""
+        echo_help
+        exit 1
+    fi
+fi
+
 # Make sure our working dir is the repo root directory
 cd "$(git rev-parse --show-toplevel)"
 
@@ -134,8 +155,14 @@ yarn -s install --frozen-lockfile
 echo "Running tests"
 yarn -s run test
 
-echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
-yarn -s version --$RELEASE_TYPE
+if [ -n "$PREID" ]; then
+  echo "Bumping package.json $RELEASE_TYPE, $PREID version and tagging commit"
+  yarn -s version --$RELEASE_TYPE --preid $PREID
+else
+  echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
+  yarn -s version --$RELEASE_TYPE
+fi
+
 
 create_github_release
 verify_commit_is_signed
