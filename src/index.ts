@@ -124,9 +124,6 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
 );
 
 /**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- *
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
@@ -143,9 +140,6 @@ export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
 );
 
 /**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- *
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
 export const LinkAuthenticationElement: LinkAuthenticationElementComponent = createElementComponent(
