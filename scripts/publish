@@ -111,19 +111,31 @@ esac
 # validate preid if passed
 ALLOWED_PRERELEASE_TYPES=(prepatch preminor premajor prerelease)
 if [ -n "$PREID" ]; then
-    if [ "$PREID" != "alpha" ] && [ "$PREID" != "beta" ]; then
-        echo "Invalid pre_id. It should be either 'alpha' or 'beta'"
-        echo ""
-        echo_help
-        exit 1
+  if [ "$PREID" != "alpha" ] && [ "$PREID" != "beta" ]; then
+    echo "Invalid pre_id. It should be either 'alpha' or 'beta'"
+    echo ""
+    echo_help
+    exit 1
+  fi
+
+  if [ -n "$RELEASE_TYPE" ]; then
+    valid=false
+
+    for type in "${ALLOWED_PRERELEASE_TYPES[@]}"; do
+      if [ "$type" = "$RELEASE_TYPE" ]; then
+        valid=true
+        break
+      fi
+    done
+
+    if [ "$valid" = false ]; then
+      ALLOWED_PRERELEASE_TYPES_STRING=$(printf "'%s', " "${ALLOWED_PRERELEASE_TYPES[@]}")
+      echo "Invalid release_type. It should be one of: $ALLOWED_PRERELEASE_TYPES_STRING when pre_id is set"
+      echo ""
+      echo_help
+      exit 1
     fi
-    if [ -n "$RELEASE_TYPE" ] && [[ ! " ${ALLOWED_PRERELEASE_TYPES[*]} " =~ "${RELEASE_TYPE}" ]]; then
-        ALLOWED_PRERELEASE_TYPES_STRING=$(printf "'%s', " "${ALLOWED_PRERELEASE_TYPES[@]}")
-        echo "Invalid release_type. It should be one of: $ALLOWED_PRERELEASE_TYPES_STRING when pre_id is set"
-        echo ""
-        echo_help
-        exit 1
-    fi
+  fi
 fi
 
 # Make sure our working dir is the repo root directory
