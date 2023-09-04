@@ -18,12 +18,14 @@ import {
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 
-interface ElementsContextValue {
+export interface ElementsContextValue {
   elements: stripeJs.StripeElements | null;
   stripe: stripeJs.Stripe | null;
 }
 
-const ElementsContext = React.createContext<ElementsContextValue | null>(null);
+export const ElementsContext = React.createContext<ElementsContextValue | null>(
+  null
+);
 ElementsContext.displayName = 'ElementsContext';
 
 export const parseElementsContext = (
@@ -211,10 +213,21 @@ export const useElementsContextWithUseCase = (
   return parseElementsContext(ctx, useCaseMessage);
 };
 
+const DUMMY_CART_ELEMENT_CONTEXT: CartElementContextValue = {
+  cart: null,
+  cartState: null,
+  setCart: () => {},
+  setCartState: () => {},
+};
+
 export const useCartElementContextWithUseCase = (
-  useCaseMessage: string
+  useCaseMessage: string,
+  isInCustomCheckout = false
 ): CartElementContextValue => {
   const ctx = React.useContext(CartElementContext);
+  if (isInCustomCheckout) {
+    return DUMMY_CART_ELEMENT_CONTEXT;
+  }
   return parseCartElementContext(ctx, useCaseMessage);
 };
 
@@ -224,14 +237,6 @@ export const useCartElementContextWithUseCase = (
 export const useElements = (): stripeJs.StripeElements | null => {
   const {elements} = useElementsContextWithUseCase('calls useElements()');
   return elements;
-};
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook
- */
-export const useStripe = (): stripeJs.Stripe | null => {
-  const {stripe} = useElementsContextWithUseCase('calls useStripe()');
-  return stripe;
 };
 
 /**

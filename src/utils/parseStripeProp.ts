@@ -7,12 +7,15 @@ const INVALID_STRIPE_ERROR =
 // We are using types to enforce the `stripe` prop in this lib, but in a real
 // integration `stripe` could be anything, so we need to do some sanity
 // validation to prevent type errors.
-const validateStripe = (maybeStripe: unknown): null | stripeJs.Stripe => {
+const validateStripe = (
+  maybeStripe: unknown,
+  errorMsg = INVALID_STRIPE_ERROR
+): null | stripeJs.Stripe => {
   if (maybeStripe === null || isStripe(maybeStripe)) {
     return maybeStripe;
   }
 
-  throw new Error(INVALID_STRIPE_ERROR);
+  throw new Error(errorMsg);
 };
 
 type ParsedStripeProp =
@@ -20,15 +23,20 @@ type ParsedStripeProp =
   | {tag: 'sync'; stripe: stripeJs.Stripe}
   | {tag: 'async'; stripePromise: Promise<stripeJs.Stripe | null>};
 
-export const parseStripeProp = (raw: unknown): ParsedStripeProp => {
+export const parseStripeProp = (
+  raw: unknown,
+  errorMsg = INVALID_STRIPE_ERROR
+): ParsedStripeProp => {
   if (isPromise(raw)) {
     return {
       tag: 'async',
-      stripePromise: Promise.resolve(raw).then(validateStripe),
+      stripePromise: Promise.resolve(raw).then((result) =>
+        validateStripe(result, errorMsg)
+      ),
     };
   }
 
-  const stripe = validateStripe(raw);
+  const stripe = validateStripe(raw, errorMsg);
 
   if (stripe === null) {
     return {tag: 'empty'};

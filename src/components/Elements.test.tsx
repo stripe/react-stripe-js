@@ -5,11 +5,11 @@ import {renderHook} from '@testing-library/react-hooks';
 import {
   Elements,
   useElements,
-  useStripe,
   ElementsConsumer,
   useCartElement,
   useCartElementState,
 } from './Elements';
+import {useStripe} from './CustomCheckout';
 import * as mocks from '../../test/mocks';
 
 describe('Elements', () => {
@@ -283,7 +283,7 @@ describe('Elements', () => {
     const {result} = renderHook(() => useStripe());
 
     expect(result.error && result.error.message).toBe(
-      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
+      'Cannot find either Elements or CustomCheckout context; You need to wrap the part of your app that calls useStripe() in either <Elements> or <CustomCheckoutProvider> provider.'
     );
   });
 
