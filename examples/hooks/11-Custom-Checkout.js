@@ -91,10 +91,6 @@ const CheckoutForm = () => {
   const buttonDisabled =
     !stripe || !customCheckout || !customCheckout.canConfirm || loading;
 
-  if (!customCheckout) {
-    return null;
-  }
-
   return (
     <form onSubmit={handleSubmit}>
       <CustomerDetails />
