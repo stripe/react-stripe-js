@@ -42,7 +42,7 @@ interface EmbeddedCheckoutSessionProviderProps {
    * You can also pass in `null` or a `Promise` resolving to `null` if you are
    * performing an initial server-side render or when generating a static site.
    */
-  stripe: any;
+  stripe: PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null;
   /**
    * [Embedded Checkout configuration options](https://stripe.com/docs/js/TODO).
    * Once the stripe prop has been set, these options cannot be changed.
@@ -70,9 +70,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
     return parseStripeProp(rawStripeProp);
   }, [rawStripeProp]);
 
-  const embeddedCheckoutPromise = React.useRef<Promise<
-    EmbeddedCheckoutPublicInterface
-  > | null>(null);
+  const embeddedCheckoutPromise = React.useRef<Promise<void> | null>(null);
   const loadedStripe = React.useRef<stripeJs.Stripe | null>(null);
 
   const [ctx, setContext] = React.useState<EmbeddedCheckoutContextValue>({
@@ -90,10 +88,8 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
 
       loadedStripe.current = stripe;
       embeddedCheckoutPromise.current = loadedStripe.current
-        // @ts-expect-error initEmbeddedCheckout is not defined on the Stripe
-        // interface yet.
-        .initEmbeddedCheckout(options)
-        .then((embeddedCheckout: EmbeddedCheckoutPublicInterface) => {
+        .initEmbeddedCheckout(options as any)
+        .then((embeddedCheckout) => {
           setContext({embeddedCheckout});
         });
     };
