@@ -37,6 +37,8 @@ export {
   useCustomCheckout,
   CustomCheckoutProvider,
 } from './components/CustomCheckout';
+export {EmbeddedCheckout} from './components/EmbeddedCheckout';
+export {EmbeddedCheckoutSessionProvider} from './components/EmbeddedCheckoutSessionProvider';
 
 const isServer = typeof window === 'undefined';
 
