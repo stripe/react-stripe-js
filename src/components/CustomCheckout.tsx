@@ -240,7 +240,7 @@ export const useElementsOrCustomCheckoutSdkContextWithUseCase = (
 
   if (customCheckoutSdkContext && elementsContext) {
     throw new Error(
-      `You cannot wrap your app in both <CustomCheckoutProvider> and <Elements> providers.`
+      `You cannot wrap the part of your app that ${useCaseString} in both <CustomCheckoutProvider> and <Elements> providers.`
     );
   }
 
@@ -251,22 +251,7 @@ export const useElementsOrCustomCheckoutSdkContextWithUseCase = (
     );
   }
 
-  if (elementsContext) {
-    return parseElementsContext(elementsContext, useCaseString);
-  }
-
-  throw new Error(
-    `Cannot find either Elements or CustomCheckout context; You need to wrap the part of your app that ${useCaseString} in either <Elements> or <CustomCheckoutProvider> provider.`
-  );
-};
-/**
- * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook
- */
-export const useStripe = (): stripeJs.Stripe | null => {
-  const {stripe} = useElementsOrCustomCheckoutSdkContextWithUseCase(
-    'calls useStripe()'
-  );
-  return stripe;
+  return parseElementsContext(elementsContext, useCaseString);
 };
 
 export const useCustomCheckout = (): CustomCheckoutContextValue | null => {

@@ -132,7 +132,7 @@ describe('createElementComponent', () => {
         (console.error as any).mockImplementation(() => {});
 
         expect(() => render(<CardElement />)).toThrow(
-          'Cannot find either Elements or CustomCheckout context; You need to wrap the part of your app that mounts <CardElement> in either <Elements> or <CustomCheckoutProvider> provider.'
+          'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
         );
       });
 
@@ -310,7 +310,7 @@ describe('createElementComponent', () => {
       (console.error as any).mockImplementation(() => {});
 
       expect(() => render(<CardElement />)).toThrow(
-        'Cannot find either Elements or CustomCheckout context; You need to wrap the part of your app that mounts <CardElement> in either <Elements> or <CustomCheckoutProvider> provider.'
+        'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
       );
     });
 

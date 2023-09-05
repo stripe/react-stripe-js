@@ -25,6 +25,7 @@ import {
 export * from './types';
 
 export {
+  useStripe,
   useElements,
   useCartElement,
   useCartElementState,
@@ -33,7 +34,6 @@ export {
 } from './components/Elements';
 
 export {
-  useStripe,
   useCustomCheckout,
   CustomCheckoutProvider,
 } from './components/CustomCheckout';

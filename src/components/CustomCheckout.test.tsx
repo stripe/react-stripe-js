@@ -3,7 +3,7 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CustomCheckoutProvider, useCustomCheckout} from './CustomCheckout';
-import {useStripe} from './CustomCheckout';
+import {useStripe} from './Elements';
 import * as mocks from '../../test/mocks';
 
 describe('CustomCheckoutProvider', () => {
@@ -350,7 +350,7 @@ describe('CustomCheckoutProvider', () => {
     const {result} = renderHook(() => useStripe());
 
     expect(result.error && result.error.message).toBe(
-      'Cannot find either Elements or CustomCheckout context; You need to wrap the part of your app that calls useStripe() in either <Elements> or <CustomCheckoutProvider> provider.'
+      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
   });
 
