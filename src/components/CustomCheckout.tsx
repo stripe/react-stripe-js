@@ -47,12 +47,8 @@ const CustomCheckoutContext = React.createContext<CustomCheckoutContextValue | n
 CustomCheckoutContext.displayName = 'CustomCheckoutContext';
 
 export const extractCustomCheckoutContextValue = (
-  customCheckoutSdk: stripeJs.StripeCustomCheckout | null
-): CustomCheckoutContextValue | null => {
-  if (!customCheckoutSdk) {
-    return null;
-  }
-
+  customCheckoutSdk: stripeJs.StripeCustomCheckout
+): CustomCheckoutContextValue => {
   const {on: _on, session: _session, ...actions} = customCheckoutSdk;
   return {...actions, ...customCheckoutSdk.session()};
 };
@@ -204,9 +200,14 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     registerWithStripeJs(ctx.stripe);
   }, [ctx.stripe]);
 
+  if (!ctx.customCheckoutSdk) {
+    return null;
+  }
+
   const customCheckoutContextValue = extractCustomCheckoutContextValue(
     ctx.customCheckoutSdk
   );
+
   return (
     <CustomCheckoutSdkContext.Provider value={ctx}>
       <CustomCheckoutContext.Provider value={customCheckoutContextValue}>

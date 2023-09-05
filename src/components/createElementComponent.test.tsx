@@ -67,6 +67,45 @@ describe('createElementComponent', () => {
     jest.restoreAllMocks();
   });
 
+  describe('on the server - only for Elements', () => {
+    const CardElement = createElementComponent('card', true);
+    it('passes id to the wrapping DOM element', () => {
+      const {container} = render(
+        <Elements stripe={null}>
+          <CardElement id="foo" />
+        </Elements>
+      );
+
+      const elementContainer = container.firstChild as Element;
+
+      expect(elementContainer.id).toBe('foo');
+    });
+
+    it('passes className to the wrapping DOM element', () => {
+      const {container} = render(
+        <Elements stripe={null}>
+          <CardElement className="bar" />
+        </Elements>
+      );
+      const elementContainer = container.firstChild as Element;
+      expect(elementContainer).toHaveClass('bar');
+    });
+  });
+
+  describe('on the server - only for CustomCheckoutProvider', () => {
+    const CardElement = createElementComponent('card', true);
+
+    it('does not render anything', () => {
+      const {container} = render(
+        <CustomCheckoutProvider stripe={null} options={{clientSecret: ''}}>
+          <CardElement />
+        </CustomCheckoutProvider>
+      );
+
+      expect(container.firstChild).toBe(null);
+    });
+  });
+
   describe.each([
     ['Elements', Elements, {clientSecret: 'pi_123'}],
     [
@@ -85,28 +124,6 @@ describe('createElementComponent', () => {
 
       it('stores the element component`s type as a static property', () => {
         expect((CardElement as any).__elementType).toBe('card');
-      });
-
-      it('passes id to the wrapping DOM element', () => {
-        const {container} = render(
-          <Provider stripe={null} options={providerOptions}>
-            <CardElement id="foo" />
-          </Provider>
-        );
-
-        const elementContainer = container.firstChild as Element;
-
-        expect(elementContainer.id).toBe('foo');
-      });
-
-      it('passes className to the wrapping DOM element', () => {
-        const {container} = render(
-          <Provider stripe={null} options={providerOptions}>
-            <CardElement className="bar" />
-          </Provider>
-        );
-        const elementContainer = container.firstChild as Element;
-        expect(elementContainer).toHaveClass('bar');
       });
 
       it('throws when the Element is mounted outside of Elements context', () => {
@@ -991,7 +1008,7 @@ describe('createElementComponent', () => {
 
         mockElement.mount.mockImplementation(() => {
           if (peMounted) {
-            throw new Error('Card already mounted');
+            throw new Error('Element already mounted');
           }
           peMounted = true;
         });
@@ -999,7 +1016,7 @@ describe('createElementComponent', () => {
           peMounted = false;
         });
       });
-      it('Can remove and add CardElement at the same time', async () => {
+      it('Can remove and add PaymentElement at the same time', async () => {
         act(() => {
           result = render(
             <CustomCheckoutProvider
@@ -1086,8 +1103,9 @@ describe('createElementComponent', () => {
         expect(simulateOff).not.toBeCalled();
       });
 
-      it('creates, no destory in strict mode', async () => {
+      it('creates, destroys, then re-creates element in strict mode', async () => {
         let elementCreated = false;
+        let elementMounted = false;
 
         mockCustomCheckoutSdk.createElement.mockImplementation(() => {
           expect(elementCreated).toBe(false);
@@ -1095,9 +1113,14 @@ describe('createElementComponent', () => {
 
           return mockElement;
         });
+        mockElement.mount.mockImplementation(() => {
+          expect(elementMounted).toBe(false);
+          elementMounted = true;
+        });
 
         mockElement.destroy.mockImplementation(() => {
           elementCreated = false;
+          elementMounted = false;
         });
 
         act(() => {
@@ -1112,10 +1135,11 @@ describe('createElementComponent', () => {
             </StrictMode>
           );
         });
-        await waitFor(() => expect(peMounted).toBeTruthy());
+        await waitFor(() => expect(elementMounted).toBeTruthy());
 
-        expect(mockCustomCheckoutSdk.createElement).toHaveBeenCalledTimes(1);
-        expect(mockElement.destroy).toHaveBeenCalledTimes(0);
+        expect(mockCustomCheckoutSdk.createElement).toHaveBeenCalledTimes(2);
+        expect(mockElement.mount).toHaveBeenCalledTimes(2);
+        expect(mockElement.destroy).toHaveBeenCalledTimes(1);
       });
 
       it('mounts the element', async () => {
@@ -1194,41 +1218,26 @@ describe('createElementComponent', () => {
       });
 
       it('attaches event listeners once the element is created', async () => {
-        jest
-          .spyOn(
-            CustomCheckoutModule,
-            'useElementsOrCustomCheckoutSdkContextWithUseCase'
-          )
-          .mockReturnValueOnce({
-            customCheckoutSdk: null,
-            stripe: null,
-          })
-          .mockReturnValue({
-            customCheckoutSdk: mockCustomCheckoutSdk,
-            stripe: mockStripe,
-          });
-
         const mockHandler = jest.fn();
 
-        // This won't create the element, since elements is undefined on this render
+        // This won't create the element, since customCheckoutSdk is undefined on this render
         act(() => {
           result = render(
             <CustomCheckoutProvider
-              stripe={mockStripe}
+              stripe={null}
               options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CustomCheckoutProvider>
           );
         });
-        expect(mockElements.create).not.toBeCalled();
+        expect(mockCustomCheckoutSdk.createElement).not.toBeCalled();
 
         expect(simulateOn).not.toBeCalled();
 
-        // This creates the element now that elements is defined
-        const {rerender} = result;
+        // This creates the element now that customCheckoutSdk is defined
         act(() => {
-          rerender(
+          result.rerender(
             <CustomCheckoutProvider
               stripe={mockStripe}
               options={{clientSecret: 'cs_123'}}
@@ -1237,6 +1246,7 @@ describe('createElementComponent', () => {
             </CustomCheckoutProvider>
           );
         });
+
         await waitFor(() => expect(peMounted).toBeTruthy());
         expect(mockCustomCheckoutSdk.createElement).toBeCalled();
 

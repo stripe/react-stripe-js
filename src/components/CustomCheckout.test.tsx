@@ -91,7 +91,7 @@ describe('CustomCheckoutProvider', () => {
     );
 
     const {result, rerender} = renderHook(() => useCustomCheckout(), {wrapper});
-    expect(result.current).toBe(null);
+    expect(result.current).toBe(undefined);
 
     stripeProp = mockStripe;
     act(() => rerender());
@@ -112,7 +112,7 @@ describe('CustomCheckoutProvider', () => {
       wrapper,
     });
 
-    expect(result.current).toBe(null);
+    expect(result.current).toBe(undefined);
 
     await waitForNextUpdate();
 
@@ -134,12 +134,12 @@ describe('CustomCheckoutProvider', () => {
       () => useCustomCheckout(),
       {wrapper}
     );
-    expect(result.current).toBe(null);
+    expect(result.current).toBe(undefined);
 
     stripeProp = mockStripePromise;
     act(() => rerender());
 
-    expect(result.current).toBe(null);
+    expect(result.current).toBe(undefined);
 
     await waitForNextUpdate();
 
