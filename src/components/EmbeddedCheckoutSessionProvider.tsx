@@ -60,6 +60,8 @@ interface PrivateEmbeddedCheckoutSessionProviderProps {
   options: UnknownOptions;
   children?: ReactNode;
 }
+const INVALID_STRIPE_ERROR =
+  'Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
 export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildren<
   EmbeddedCheckoutSessionProviderProps
@@ -69,7 +71,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
   children,
 }: PrivateEmbeddedCheckoutSessionProviderProps) => {
   const parsed = React.useMemo(() => {
-    return parseStripeProp(rawStripeProp);
+    return parseStripeProp(rawStripeProp, INVALID_STRIPE_ERROR);
   }, [rawStripeProp]);
 
   const embeddedCheckoutPromise = React.useRef<Promise<void> | null>(null);
@@ -183,7 +185,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
       options.onComplete !== prevOptions.onComplete
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot remove the onComplete option after setting it.'
+        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the onComplete option after setting it.'
       );
     }
   }, [prevOptions, options]);
