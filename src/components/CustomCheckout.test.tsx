@@ -3,7 +3,7 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CustomCheckoutProvider, useCustomCheckout} from './CustomCheckout';
-import {useStripe} from './Elements';
+import {Elements, useStripe} from './Elements';
 import * as mocks from '../../test/mocks';
 
 describe('CustomCheckoutProvider', () => {
@@ -351,6 +351,50 @@ describe('CustomCheckoutProvider', () => {
 
     expect(result.error && result.error.message).toBe(
       'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
+    );
+  });
+
+  test('throws when trying to call useStripe in Elements -> CustomCheckoutProvider nested context', async () => {
+    const wrapper = ({children}: any) => (
+      <Elements stripe={mockStripe}>
+        <CustomCheckoutProvider
+          stripe={mockStripe}
+          options={{clientSecret: 'cs_123'}}
+        >
+          {children}
+        </CustomCheckoutProvider>
+      </Elements>
+    );
+
+    const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
+      wrapper,
+    });
+
+    await waitForNextUpdate();
+
+    expect(result.error && result.error.message).toBe(
+      'You cannot wrap the part of your app that calls useStripe() in both <CustomCheckoutProvider> and <Elements> providers.'
+    );
+  });
+
+  test('throws when trying to call useStripe in CustomCheckoutProvider -> Elements nested context', async () => {
+    const wrapper = ({children}: any) => (
+      <CustomCheckoutProvider
+        stripe={mockStripe}
+        options={{clientSecret: 'cs_123'}}
+      >
+        <Elements stripe={mockStripe}>{children}</Elements>
+      </CustomCheckoutProvider>
+    );
+
+    const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
+      wrapper,
+    });
+
+    await waitForNextUpdate();
+
+    expect(result.error && result.error.message).toBe(
+      'You cannot wrap the part of your app that calls useStripe() in both <CustomCheckoutProvider> and <Elements> providers.'
     );
   });
 
