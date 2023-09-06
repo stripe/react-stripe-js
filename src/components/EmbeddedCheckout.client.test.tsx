@@ -9,6 +9,7 @@ const {EmbeddedCheckoutSessionProvider} = EmbeddedCheckoutSessionProviderModule;
 
 describe('EmbeddedCheckout on the client', () => {
   let mockStripe: any;
+  let mockStripePromise: any;
   let mockEmbeddedCheckout: any;
   let mockEmbeddedCheckoutPromise: any;
   const fakeClientSecret = 'cs_123_secret_abc';
@@ -16,6 +17,7 @@ describe('EmbeddedCheckout on the client', () => {
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
+    mockStripePromise = Promise.resolve(mockStripe);
     mockEmbeddedCheckout = mocks.mockEmbeddedCheckout();
     mockEmbeddedCheckoutPromise = Promise.resolve(mockEmbeddedCheckout);
     mockStripe.initEmbeddedCheckout.mockReturnValue(
@@ -29,31 +31,33 @@ describe('EmbeddedCheckout on the client', () => {
     jest.restoreAllMocks();
   });
 
-  it('passes id to the wrapping DOM element', () => {
+  it('passes id to the wrapping DOM element', async () => {
     const {container} = render(
       <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
+        stripe={mockStripePromise}
         options={fakeOptions}
       >
         <EmbeddedCheckout id="foo" />
       </EmbeddedCheckoutSessionProvider>
     );
-    const embeddedCheckoutDiv = container.firstChild as Element;
+    await act(async () => await mockStripePromise);
 
+    const embeddedCheckoutDiv = container.firstChild as Element;
     expect(embeddedCheckoutDiv.id).toBe('foo');
   });
 
-  it('passes className to the wrapping DOM element', () => {
+  it('passes className to the wrapping DOM element', async () => {
     const {container} = render(
       <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
+        stripe={mockStripePromise}
         options={fakeOptions}
       >
         <EmbeddedCheckout className="bar" />
       </EmbeddedCheckoutSessionProvider>
     );
-    const embeddedCheckoutDiv = container.firstChild as Element;
+    await act(async () => await mockStripePromise);
 
+    const embeddedCheckoutDiv = container.firstChild as Element;
     expect(embeddedCheckoutDiv).toHaveClass('bar');
   });
 
