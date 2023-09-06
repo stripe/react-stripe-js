@@ -63,6 +63,12 @@ export const mockCustomCheckoutSdk = () => {
   };
 };
 
+export const mockEmbeddedCheckout = () => ({
+  mount: jest.fn(),
+  unmount: jest.fn(),
+  destroy: jest.fn(),
+});
+
 export const mockStripe = () => {
   const customCheckoutSdk = mockCustomCheckoutSdk();
   return {
@@ -76,6 +82,9 @@ export const mockStripe = () => {
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
     initCustomCheckout: jest.fn().mockResolvedValue(customCheckoutSdk),
+    initEmbeddedCheckout: jest.fn(() =>
+      Promise.resolve(mockEmbeddedCheckout())
+    ),
   };
 };
 

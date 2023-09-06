@@ -1,7 +1,23 @@
 import * as React from 'react';
 import {useEmbeddedCheckoutContext} from './EmbeddedCheckoutSessionProvider';
+import {isServer} from '../utils/isServer';
 
-export const EmbeddedCheckout = () => {
+interface EmbeddedCheckoutProps {
+  /**
+   * Passes through to the Embedded Checkout container.
+   */
+  id?: string;
+
+  /**
+   * Passes through to the Embedded Checkout container.
+   */
+  className?: string;
+}
+
+const EmbeddedCheckoutClientElement = ({
+  id,
+  className,
+}: EmbeddedCheckoutProps) => {
   const {embeddedCheckout} = useEmbeddedCheckoutContext();
 
   const isMounted = React.useRef<boolean>(false);
@@ -22,5 +38,19 @@ export const EmbeddedCheckout = () => {
     };
   }, [embeddedCheckout]);
 
-  return <div ref={domNode} />;
+  return <div ref={domNode} id={id} className={className} />;
 };
+
+// Only render the wrapper in a server environment.
+const EmbeddedCheckoutServerElement = ({
+  id,
+  className,
+}: EmbeddedCheckoutProps) => {
+  // Validate that we are in the right context by calling useEmbeddedCheckoutContext.
+  useEmbeddedCheckoutContext();
+  return <div id={id} className={className} />;
+};
+
+export const EmbeddedCheckout = isServer
+  ? EmbeddedCheckoutServerElement
+  : EmbeddedCheckoutClientElement;

@@ -21,6 +21,7 @@ import {
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
 } from './types';
+import {isServer} from './utils/isServer';
 
 export * from './types';
 
@@ -39,8 +40,6 @@ export {
 } from './components/CustomCheckout';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutSessionProvider} from './components/EmbeddedCheckoutSessionProvider';
-
-const isServer = typeof window === 'undefined';
 
 /**
  * Requires beta access:

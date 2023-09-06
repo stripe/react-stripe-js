@@ -17,9 +17,10 @@ export type EmbeddedCheckoutContextValue = {
   embeddedCheckout: EmbeddedCheckoutPublicInterface | null;
 };
 
-const EmbeddedCheckoutContext = React.createContext<
-  EmbeddedCheckoutContextValue
->({embeddedCheckout: null});
+const EmbeddedCheckoutContext = React.createContext<EmbeddedCheckoutContextValue | null>(
+  null
+);
+EmbeddedCheckoutContext.displayName = 'EmbeddedCheckoutSessionProviderContext';
 
 export const useEmbeddedCheckoutContext = (): EmbeddedCheckoutContextValue => {
   const ctx = React.useContext(EmbeddedCheckoutContext);
@@ -44,18 +45,19 @@ interface EmbeddedCheckoutSessionProviderProps {
    */
   stripe: PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null;
   /**
-   * [Embedded Checkout configuration options](https://stripe.com/docs/js/TODO).
-   * Once the stripe prop has been set, these options cannot be changed.
+   * Embedded Checkout configuration options.
+   * You can initially pass in `null` as `options.clientSecret` if you are
+   * performing an initial server-side render or when generating a static site.
    */
   options: {
-    clientSecret: string;
+    clientSecret: string | null;
     onComplete?: () => void;
   };
 }
 
 interface PrivateEmbeddedCheckoutSessionProviderProps {
   stripe: unknown;
-  options?: UnknownOptions;
+  options: UnknownOptions;
   children?: ReactNode;
 }
 
@@ -95,13 +97,21 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
     };
 
     // For an async stripePromise, store it once resolved
-    if (parsed.tag === 'async' && !loadedStripe.current) {
+    if (
+      parsed.tag === 'async' &&
+      !loadedStripe.current &&
+      options.clientSecret
+    ) {
       parsed.stripePromise.then((stripe) => {
         if (stripe) {
           setStripeAndInitEmbeddedCheckout(stripe);
         }
       });
-    } else if (parsed.tag === 'sync' && !loadedStripe.current) {
+    } else if (
+      parsed.tag === 'sync' &&
+      !loadedStripe.current &&
+      options.clientSecret
+    ) {
       // Or, handle a sync stripe instance going from null -> populated
       setStripeAndInitEmbeddedCheckout(parsed.stripe);
     }
@@ -133,7 +143,9 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
     registerWithStripeJs(loadedStripe);
   }, [loadedStripe]);
 
-  // Warn on changes to stripe prop
+  // Warn on changes to stripe prop.
+  // The stripe prop value can only go from null to non-null once and
+  // can't be changed after that.
   const prevStripe = usePrevious(rawStripeProp);
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
@@ -143,16 +155,35 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
     }
   }, [prevStripe, rawStripeProp]);
 
-  // Warn on changes to options prop
+  // Warn on changes to options.
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
+    if (prevOptions == null) {
+      return;
+    }
+
+    if (options == null) {
+      console.warn(
+        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot unset options after setting them.'
+      );
+      return;
+    }
+
     if (
-      options != null &&
-      prevOptions != null &&
-      prevOptions.clientSecret !== options.clientSecret
+      prevOptions.clientSecret != null &&
+      options.clientSecret !== prevOptions.clientSecret
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the `clientSecret` option after setting it.'
+        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutSessionProvider instead.'
+      );
+    }
+
+    if (
+      prevOptions.onComplete != null &&
+      options.onComplete !== prevOptions.onComplete
+    ) {
+      console.warn(
+        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot remove the onComplete option after setting it.'
       );
     }
   }, [prevOptions, options]);
