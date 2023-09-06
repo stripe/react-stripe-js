@@ -47,10 +47,19 @@ const CustomCheckoutContext = React.createContext<CustomCheckoutContextValue | n
 CustomCheckoutContext.displayName = 'CustomCheckoutContext';
 
 export const extractCustomCheckoutContextValue = (
-  customCheckoutSdk: stripeJs.StripeCustomCheckout
-): CustomCheckoutContextValue => {
+  customCheckoutSdk: stripeJs.StripeCustomCheckout | null,
+  sessionState: stripeJs.StripeCustomCheckoutSession | null
+): CustomCheckoutContextValue | null => {
+  if (!customCheckoutSdk) {
+    return null;
+  }
+
   const {on: _on, session: _session, ...actions} = customCheckoutSdk;
-  return {...actions, ...customCheckoutSdk.session()};
+  if (!sessionState) {
+    return {...actions, ...customCheckoutSdk.session()};
+  }
+
+  return {...actions, ...sessionState};
 };
 
 interface CustomCheckoutProviderProps {
@@ -87,7 +96,7 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
 
   // State used to trigger a re-render when sdk.session is updated
   const [
-    _,
+    session,
     setSession,
   ] = React.useState<stripeJs.StripeCustomCheckoutSession | null>(null);
 
@@ -200,13 +209,14 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     registerWithStripeJs(ctx.stripe);
   }, [ctx.stripe]);
 
+  const customCheckoutContextValue = React.useMemo(
+    () => extractCustomCheckoutContextValue(ctx.customCheckoutSdk, session),
+    [ctx.customCheckoutSdk, session]
+  );
+
   if (!ctx.customCheckoutSdk) {
     return null;
   }
-
-  const customCheckoutContextValue = extractCustomCheckoutContextValue(
-    ctx.customCheckoutSdk
-  );
 
   return (
     <CustomCheckoutSdkContext.Provider value={ctx}>
