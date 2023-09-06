@@ -212,11 +212,10 @@ const createElementComponent = (
     const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(
       `mounts <${displayName}>`
     );
-    const customCheckoutSdk =
-      'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null;
+
     useCartElementContextWithUseCase(
       `mounts <${displayName}>`,
-      !!customCheckoutSdk
+      'customCheckoutSdk' in ctx
     );
     const {id, className} = props;
     return <div id={id} className={className} />;
