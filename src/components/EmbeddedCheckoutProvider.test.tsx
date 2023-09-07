@@ -3,12 +3,12 @@ import {render, act} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {
-  EmbeddedCheckoutSessionProvider,
+  EmbeddedCheckoutProvider,
   useEmbeddedCheckoutContext,
-} from './EmbeddedCheckoutSessionProvider';
+} from './EmbeddedCheckoutProvider';
 import * as mocks from '../../test/mocks';
 
-describe('EmbeddedCheckoutSessionProvider', () => {
+describe('EmbeddedCheckoutProvider', () => {
   let mockStripe: any;
   let mockStripePromise: any;
   let mockEmbeddedCheckout: any;
@@ -39,12 +39,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
   it('provides the Embedded Checkout instance via context', async () => {
     const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
         {children}
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     const {result} = renderHook(() => useEmbeddedCheckoutContext(), {wrapper});
@@ -61,12 +58,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     };
 
     render(
-      <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
         <TestConsumerComponent />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     await act(() => mockEmbeddedCheckoutPromise);
@@ -77,12 +71,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
   it('allows a transition from null to a valid Stripe object', async () => {
     let stripeProp: any = null;
     const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutSessionProvider
-        stripe={stripeProp}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={stripeProp} options={fakeOptions}>
         {children}
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     const {result, rerender} = renderHook(() => useEmbeddedCheckoutContext(), {
@@ -99,12 +90,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
   it('allows a transition from null to a valid client secret', async () => {
     let optionsProp: any = {clientSecret: null};
     const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
-        options={optionsProp}
-      >
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={optionsProp}>
         {children}
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     const {result, rerender} = renderHook(() => useEmbeddedCheckoutContext(), {
@@ -121,12 +109,12 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
   it('works with a Promise resolving to a valid Stripe object', async () => {
     const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripePromise}
         options={fakeOptions}
       >
         {children}
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     const {result} = renderHook(() => useEmbeddedCheckoutContext(), {wrapper});
@@ -143,12 +131,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     let stripeProp: any = null;
 
     const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutSessionProvider
-        stripe={stripeProp}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={stripeProp} options={fakeOptions}>
         {children}
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     const {result, rerender} = renderHook(() => useEmbeddedCheckoutContext(), {
@@ -174,12 +159,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     };
 
     const {container} = render(
-      <EmbeddedCheckoutSessionProvider
-        stripe={nullPromise}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={nullPromise} options={fakeOptions}>
         <TestConsumerComponent />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     expect(container).toBeEmptyDOMElement();
@@ -194,14 +176,12 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
     expect(() =>
       render(
-        <EmbeddedCheckoutSessionProvider
+        <EmbeddedCheckoutProvider
           stripe={undefined as any}
           options={fakeOptions}
         />
       )
-    ).toThrow(
-      'Invalid prop `stripe` supplied to `EmbeddedCheckoutSessionProvider`.'
-    );
+    ).toThrow('Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`.');
   });
 
   it('errors when props.stripe is `false`', () => {
@@ -210,14 +190,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
     expect(() =>
       render(
-        <EmbeddedCheckoutSessionProvider
-          stripe={false as any}
-          options={fakeOptions}
-        />
+        <EmbeddedCheckoutProvider stripe={false as any} options={fakeOptions} />
       )
-    ).toThrow(
-      'Invalid prop `stripe` supplied to `EmbeddedCheckoutSessionProvider`.'
-    );
+    ).toThrow('Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`.');
   });
 
   it('errors when props.stripe is a string', () => {
@@ -226,14 +201,9 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
     expect(() =>
       render(
-        <EmbeddedCheckoutSessionProvider
-          stripe={'foo' as any}
-          options={fakeOptions}
-        />
+        <EmbeddedCheckoutProvider stripe={'foo' as any} options={fakeOptions} />
       )
-    ).toThrow(
-      'Invalid prop `stripe` supplied to `EmbeddedCheckoutSessionProvider`.'
-    );
+    ).toThrow('Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`.');
   });
 
   it('errors when props.stripe is a some other object', () => {
@@ -242,14 +212,12 @@ describe('EmbeddedCheckoutSessionProvider', () => {
 
     expect(() =>
       render(
-        <EmbeddedCheckoutSessionProvider
+        <EmbeddedCheckoutProvider
           stripe={{wat: 2} as any}
           options={fakeOptions}
         />
       )
-    ).toThrow(
-      'Invalid prop `stripe` supplied to `EmbeddedCheckoutSessionProvider`.'
-    );
+    ).toThrow('Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`.');
   });
 
   it('does not allow changes to a set Stripe object', async () => {
@@ -257,25 +225,25 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     consoleWarn.mockImplementation(() => {});
 
     const {rerender} = render(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={fakeOptions}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
     await act(() => mockEmbeddedCheckoutPromise);
 
     const mockStripe2: any = mocks.mockStripe();
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe2}
         options={fakeOptions}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
 
     expect(mockStripe.initEmbeddedCheckout.mock.calls).toHaveLength(1);
     expect(mockStripe2.initEmbeddedCheckout.mock.calls).toHaveLength(0);
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the `stripe` prop after setting it.'
+      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
     );
   });
 
@@ -287,22 +255,22 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     consoleWarn.mockImplementation(() => {});
 
     const {rerender} = render(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={optionsProp1}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
     await act(() => mockEmbeddedCheckoutPromise);
 
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={optionsProp2}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
 
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutSessionProvider instead.'
+      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
     );
   });
 
@@ -319,32 +287,32 @@ describe('EmbeddedCheckoutSessionProvider', () => {
     consoleWarn.mockImplementation(() => {});
 
     const {rerender} = render(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={optionsProp1}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
     await act(() => mockEmbeddedCheckoutPromise);
 
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={optionsProp2}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
 
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the onComplete option after setting it.'
+      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
     );
   });
 
   it('destroys Embedded Checkout when the component unmounts', async () => {
     const {rerender} = render(
       <div>
-        <EmbeddedCheckoutSessionProvider
+        <EmbeddedCheckoutProvider
           stripe={mockStripe}
           options={fakeOptions}
-        ></EmbeddedCheckoutSessionProvider>
+        ></EmbeddedCheckoutProvider>
       </div>
     );
 

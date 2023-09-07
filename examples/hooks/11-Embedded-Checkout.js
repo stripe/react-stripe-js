@@ -5,7 +5,7 @@
 
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
-import {EmbeddedCheckoutSessionProvider, EmbeddedCheckout} from '../../src';
+import {EmbeddedCheckoutProvider, EmbeddedCheckout} from '../../src';
 
 import '../styles/common.css';
 
@@ -61,12 +61,12 @@ const App = () => {
         </button>
       </form>
       {stripePromise && clientSecret && (
-        <EmbeddedCheckoutSessionProvider
+        <EmbeddedCheckoutProvider
           stripe={stripePromise}
           options={{clientSecret}}
         >
           <EmbeddedCheckout />
-        </EmbeddedCheckoutSessionProvider>
+        </EmbeddedCheckoutProvider>
       )}
     </>
   );

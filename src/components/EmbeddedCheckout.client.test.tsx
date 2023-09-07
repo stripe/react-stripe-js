@@ -1,11 +1,11 @@
 import React from 'react';
 import {render, act} from '@testing-library/react';
 
-import * as EmbeddedCheckoutSessionProviderModule from './EmbeddedCheckoutSessionProvider';
+import * as EmbeddedCheckoutProviderModule from './EmbeddedCheckoutProvider';
 import {EmbeddedCheckout} from './EmbeddedCheckout';
 import * as mocks from '../../test/mocks';
 
-const {EmbeddedCheckoutSessionProvider} = EmbeddedCheckoutSessionProviderModule;
+const {EmbeddedCheckoutProvider} = EmbeddedCheckoutProviderModule;
 
 describe('EmbeddedCheckout on the client', () => {
   let mockStripe: any;
@@ -33,12 +33,12 @@ describe('EmbeddedCheckout on the client', () => {
 
   it('passes id to the wrapping DOM element', async () => {
     const {container} = render(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripePromise}
         options={fakeOptions}
       >
         <EmbeddedCheckout id="foo" />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
     await act(async () => await mockStripePromise);
 
@@ -48,12 +48,12 @@ describe('EmbeddedCheckout on the client', () => {
 
   it('passes className to the wrapping DOM element', async () => {
     const {container} = render(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripePromise}
         options={fakeOptions}
       >
         <EmbeddedCheckout className="bar" />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
     await act(async () => await mockStripePromise);
 
@@ -63,12 +63,9 @@ describe('EmbeddedCheckout on the client', () => {
 
   it('mounts Embedded Checkout', async () => {
     const {container} = render(
-      <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
         <EmbeddedCheckout />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     await act(() => mockEmbeddedCheckoutPromise);
@@ -79,34 +76,31 @@ describe('EmbeddedCheckout on the client', () => {
   it('does not mount until Embedded Checkouts has been initialized', async () => {
     // Render with no stripe instance and client secret
     const {container, rerender} = render(
-      <EmbeddedCheckoutSessionProvider
-        stripe={null}
-        options={{clientSecret: null}}
-      >
+      <EmbeddedCheckoutProvider stripe={null} options={{clientSecret: null}}>
         <EmbeddedCheckout />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
     expect(mockEmbeddedCheckout.mount).not.toBeCalled();
 
     // Set stripe prop
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={{clientSecret: null}}
       >
         <EmbeddedCheckout />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
     expect(mockEmbeddedCheckout.mount).not.toBeCalled();
 
     // Set client secret
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={{clientSecret: fakeClientSecret}}
       >
         <EmbeddedCheckout />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
     expect(mockEmbeddedCheckout.mount).not.toBeCalled();
 
@@ -118,12 +112,9 @@ describe('EmbeddedCheckout on the client', () => {
 
   it('unmounts Embedded Checkout when the component unmounts', async () => {
     const {container, rerender} = render(
-      <EmbeddedCheckoutSessionProvider
-        stripe={mockStripe}
-        options={fakeOptions}
-      >
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
         <EmbeddedCheckout />
-      </EmbeddedCheckoutSessionProvider>
+      </EmbeddedCheckoutProvider>
     );
 
     await act(() => mockEmbeddedCheckoutPromise);
@@ -131,10 +122,10 @@ describe('EmbeddedCheckout on the client', () => {
     expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstChild);
 
     rerender(
-      <EmbeddedCheckoutSessionProvider
+      <EmbeddedCheckoutProvider
         stripe={mockStripe}
         options={fakeOptions}
-      ></EmbeddedCheckoutSessionProvider>
+      ></EmbeddedCheckoutProvider>
     );
     expect(mockEmbeddedCheckout.unmount).toBeCalled();
   });

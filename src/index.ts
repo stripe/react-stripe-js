@@ -39,7 +39,7 @@ export {
   CustomCheckoutProvider,
 } from './components/CustomCheckout';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
-export {EmbeddedCheckoutSessionProvider} from './components/EmbeddedCheckoutSessionProvider';
+export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
 
 /**
  * Requires beta access:

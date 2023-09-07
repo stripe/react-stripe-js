@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEmbeddedCheckoutContext} from './EmbeddedCheckoutSessionProvider';
+import {useEmbeddedCheckoutContext} from './EmbeddedCheckoutProvider';
 import {isServer} from '../utils/isServer';
 
 interface EmbeddedCheckoutProps {

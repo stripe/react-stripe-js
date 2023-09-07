@@ -20,19 +20,19 @@ export type EmbeddedCheckoutContextValue = {
 const EmbeddedCheckoutContext = React.createContext<EmbeddedCheckoutContextValue | null>(
   null
 );
-EmbeddedCheckoutContext.displayName = 'EmbeddedCheckoutSessionProviderContext';
+EmbeddedCheckoutContext.displayName = 'EmbeddedCheckoutProviderContext';
 
 export const useEmbeddedCheckoutContext = (): EmbeddedCheckoutContextValue => {
   const ctx = React.useContext(EmbeddedCheckoutContext);
   if (!ctx) {
     throw new Error(
-      '<EmbeddedCheckout> must be used within <EmbeddedCheckoutSessionProvider>'
+      '<EmbeddedCheckout> must be used within <EmbeddedCheckoutProvider>'
     );
   }
   return ctx;
 };
 
-interface EmbeddedCheckoutSessionProviderProps {
+interface EmbeddedCheckoutProviderProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise`
    * resolving to a `Stripe` object.
@@ -55,7 +55,7 @@ interface EmbeddedCheckoutSessionProviderProps {
   };
 }
 
-interface PrivateEmbeddedCheckoutSessionProviderProps {
+interface PrivateEmbeddedCheckoutProviderProps {
   stripe: unknown;
   options: UnknownOptions;
   children?: ReactNode;
@@ -63,13 +63,13 @@ interface PrivateEmbeddedCheckoutSessionProviderProps {
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
-export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildren<
-  EmbeddedCheckoutSessionProviderProps
+export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
+  EmbeddedCheckoutProviderProps
 >> = ({
   stripe: rawStripeProp,
   options,
   children,
-}: PrivateEmbeddedCheckoutSessionProviderProps) => {
+}: PrivateEmbeddedCheckoutProviderProps) => {
   const parsed = React.useMemo(() => {
     return parseStripeProp(rawStripeProp, INVALID_STRIPE_ERROR);
   }, [rawStripeProp]);
@@ -152,7 +152,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the `stripe` prop after setting it.'
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);
@@ -166,7 +166,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
 
     if (options == null) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot unset options after setting them.'
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot unset options after setting them.'
       );
       return;
     }
@@ -176,7 +176,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
       options.clientSecret !== prevOptions.clientSecret
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutSessionProvider instead.'
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     }
 
@@ -185,7 +185,7 @@ export const EmbeddedCheckoutSessionProvider: FunctionComponent<PropsWithChildre
       options.onComplete !== prevOptions.onComplete
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutSessionProvider: You cannot change the onComplete option after setting it.'
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
       );
     }
   }, [prevOptions, options]);
