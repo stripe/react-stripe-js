@@ -6,10 +6,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import {
-  useElementsContextWithUseCase,
-  useCartElementContextWithUseCase,
-} from './Elements';
+import {useCartElementContextWithUseCase} from './Elements';
 import {useAttachEvent} from '../utils/useAttachEvent';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
@@ -17,6 +14,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
+import {useElementsOrCustomCheckoutSdkContextWithUseCase} from './CustomCheckout';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -69,7 +67,12 @@ const createElementComponent = (
     onShippingAddressChange,
     onShippingRateChange,
   }) => {
-    const {elements} = useElementsContextWithUseCase(`mounts <${displayName}>`);
+    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(
+      `mounts <${displayName}>`
+    );
+    const elements = 'elements' in ctx ? ctx.elements : null;
+    const customCheckoutSdk =
+      'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null;
     const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
       null
     );
@@ -77,7 +80,8 @@ const createElementComponent = (
     const domNode = React.useRef<HTMLDivElement | null>(null);
 
     const {setCart, setCartState} = useCartElementContextWithUseCase(
-      `mounts <${displayName}>`
+      `mounts <${displayName}>`,
+      'customCheckoutSdk' in ctx
     );
 
     // For every event where the merchant provides a callback, call element.on
@@ -139,8 +143,18 @@ const createElementComponent = (
     useAttachEvent(element, 'checkout', checkoutCallback);
 
     React.useLayoutEffect(() => {
-      if (elementRef.current === null && elements && domNode.current !== null) {
-        const newElement = elements.create(type as any, options);
+      if (
+        elementRef.current === null &&
+        domNode.current !== null &&
+        (elements || customCheckoutSdk)
+      ) {
+        let newElement: stripeJs.StripeElement | null = null;
+        if (customCheckoutSdk) {
+          newElement = customCheckoutSdk.createElement(type as any, options);
+        } else if (elements) {
+          newElement = elements.create(type as any, options);
+        }
+
         if (type === 'cart' && setCart) {
           // we know that elements.create return value must be of type StripeCartElement if type is 'cart',
           // we need to cast because typescript is not able to infer which overloaded method is used based off param type
@@ -152,9 +166,11 @@ const createElementComponent = (
         // Store element in state to facilitate event listener attachment
         setElement(newElement);
 
-        newElement.mount(domNode.current);
+        if (newElement) {
+          newElement.mount(domNode.current);
+        }
       }
-    }, [elements, options, setCart]);
+    }, [elements, customCheckoutSdk, options, setCart]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
@@ -193,8 +209,14 @@ const createElementComponent = (
   // Only render the Element wrapper in a server environment.
   const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
     // Validate that we are in the right context by calling useElementsContextWithUseCase.
-    useElementsContextWithUseCase(`mounts <${displayName}>`);
-    useCartElementContextWithUseCase(`mounts <${displayName}>`);
+    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(
+      `mounts <${displayName}>`
+    );
+
+    useCartElementContextWithUseCase(
+      `mounts <${displayName}>`,
+      'customCheckoutSdk' in ctx
+    );
     const {id, className} = props;
     return <div id={id} className={className} />;
   };

@@ -1,7 +1,8 @@
 import React, {StrictMode} from 'react';
-import {render, act} from '@testing-library/react';
+import {render, act, waitFor} from '@testing-library/react';
 
 import * as ElementsModule from './Elements';
+import * as CustomCheckoutModule from './CustomCheckout';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
 import {
@@ -13,12 +14,14 @@ import {
 } from '../types';
 
 const {Elements} = ElementsModule;
+const {CustomCheckoutProvider} = CustomCheckoutModule;
 
 describe('createElementComponent', () => {
   let mockStripe: any;
   let mockElements: any;
   let mockElement: any;
   let mockCartElementContext: any;
+  let mockCustomCheckoutSdk: any;
 
   let simulateElementsEvents: Record<string, any[]>;
   let simulateOn: any;
@@ -30,9 +33,12 @@ describe('createElementComponent', () => {
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
     mockElements = mocks.mockElements();
+    mockCustomCheckoutSdk = mocks.mockCustomCheckoutSdk();
     mockElement = mocks.mockElement();
     mockStripe.elements.mockReturnValue(mockElements);
     mockElements.create.mockReturnValue(mockElement);
+    mockStripe.initCustomCheckout.mockResolvedValue(mockCustomCheckoutSdk);
+    mockCustomCheckoutSdk.createElement.mockReturnValue(mockElement);
     jest.spyOn(React, 'useLayoutEffect');
 
     simulateElementsEvents = {};
@@ -61,17 +67,8 @@ describe('createElementComponent', () => {
     jest.restoreAllMocks();
   });
 
-  describe('on the server', () => {
+  describe('on the server - only for Elements', () => {
     const CardElement = createElementComponent('card', true);
-
-    it('gives the element component a proper displayName', () => {
-      expect(CardElement.displayName).toBe('CardElement');
-    });
-
-    it('stores the element component`s type as a static property', () => {
-      expect((CardElement as any).__elementType).toBe('card');
-    });
-
     it('passes id to the wrapping DOM element', () => {
       const {container} = render(
         <Elements stripe={null}>
@@ -93,27 +90,63 @@ describe('createElementComponent', () => {
       const elementContainer = container.firstChild as Element;
       expect(elementContainer).toHaveClass('bar');
     });
+  });
 
-    it('throws when the Element is mounted outside of Elements context', () => {
-      // Prevent the console.errors to keep the test output clean
-      jest.spyOn(console, 'error');
-      (console.error as any).mockImplementation(() => {});
+  describe('on the server - only for CustomCheckoutProvider', () => {
+    const CardElement = createElementComponent('card', true);
 
-      expect(() => render(<CardElement />)).toThrow(
-        'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
-      );
-    });
-
-    it('does not call useLayoutEffect', () => {
-      render(
-        <Elements stripe={null}>
+    it('does not render anything', () => {
+      const {container} = render(
+        <CustomCheckoutProvider stripe={null} options={{clientSecret: ''}}>
           <CardElement />
-        </Elements>
+        </CustomCheckoutProvider>
       );
 
-      expect(React.useLayoutEffect).not.toHaveBeenCalled();
+      expect(container.firstChild).toBe(null);
     });
   });
+
+  describe.each([
+    ['Elements', Elements, {clientSecret: 'pi_123'}],
+    [
+      'CustomCheckoutProvider',
+      CustomCheckoutProvider,
+      {clientSecret: 'cs_123'},
+    ],
+  ])(
+    'on the server with Provider - %s',
+    (_providerName, Provider, providerOptions) => {
+      const CardElement = createElementComponent('card', true);
+
+      it('gives the element component a proper displayName', () => {
+        expect(CardElement.displayName).toBe('CardElement');
+      });
+
+      it('stores the element component`s type as a static property', () => {
+        expect((CardElement as any).__elementType).toBe('card');
+      });
+
+      it('throws when the Element is mounted outside of Elements context', () => {
+        // Prevent the console.errors to keep the test output clean
+        jest.spyOn(console, 'error');
+        (console.error as any).mockImplementation(() => {});
+
+        expect(() => render(<CardElement />)).toThrow(
+          'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.'
+        );
+      });
+
+      it('does not call useLayoutEffect', () => {
+        render(
+          <Provider stripe={null} options={providerOptions}>
+            <CardElement />
+          </Provider>
+        );
+
+        expect(React.useLayoutEffect).not.toHaveBeenCalled();
+      });
+    }
+  );
 
   describe('on the client', () => {
     const CardElement: CardElementComponent = createElementComponent(
@@ -296,7 +329,10 @@ describe('createElementComponent', () => {
 
     it('attaches event listeners once the element is created', () => {
       jest
-        .spyOn(ElementsModule, 'useElementsContextWithUseCase')
+        .spyOn(
+          CustomCheckoutModule,
+          'useElementsOrCustomCheckoutSdkContextWithUseCase'
+        )
         .mockReturnValueOnce({elements: null, stripe: null})
         .mockReturnValue({elements: mockElements, stripe: mockStripe});
 
@@ -960,6 +996,768 @@ describe('createElementComponent', () => {
 
       expect(mockElement.update).toHaveBeenCalledWith({
         style: {base: {fontSize: '30px'}},
+      });
+    });
+
+    describe('Within a CustomCheckoutProvider', () => {
+      let peMounted = false;
+      let result: any;
+      beforeEach(() => {
+        peMounted = false;
+        result = null;
+
+        mockElement.mount.mockImplementation(() => {
+          if (peMounted) {
+            throw new Error('Element already mounted');
+          }
+          peMounted = true;
+        });
+        mockElement.destroy.mockImplementation(() => {
+          peMounted = false;
+        });
+      });
+      it('Can remove and add PaymentElement at the same time', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement key={'100'} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        expect(mockElement.mount).toHaveBeenCalledTimes(1);
+
+        const rerender = result.rerender;
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement key={'200'} />
+            </CustomCheckoutProvider>
+          );
+        });
+
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        expect(mockElement.mount).toHaveBeenCalledTimes(2);
+      });
+
+      it('passes id to the wrapping DOM element', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement id="foo" />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {container} = result;
+        const elementContainer = container.firstChild as Element;
+
+        expect(elementContainer.id).toBe('foo');
+      });
+
+      it('passes className to the wrapping DOM element', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement className="bar" />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {container} = result;
+        const elementContainer = container.firstChild as Element;
+
+        expect(elementContainer).toHaveClass('bar');
+      });
+
+      it('creates the element with options', async () => {
+        const options: any = {foo: 'foo'};
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={options} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        expect(mockCustomCheckoutSdk.createElement).toHaveBeenCalledWith(
+          'payment',
+          options
+        );
+        expect(simulateOn).not.toBeCalled();
+        expect(simulateOff).not.toBeCalled();
+      });
+
+      it('creates, destroys, then re-creates element in strict mode', async () => {
+        let elementCreated = false;
+        let elementMounted = false;
+
+        mockCustomCheckoutSdk.createElement.mockImplementation(() => {
+          expect(elementCreated).toBe(false);
+          elementCreated = true;
+
+          return mockElement;
+        });
+        mockElement.mount.mockImplementation(() => {
+          expect(elementMounted).toBe(false);
+          elementMounted = true;
+        });
+
+        mockElement.destroy.mockImplementation(() => {
+          elementCreated = false;
+          elementMounted = false;
+        });
+
+        act(() => {
+          result = render(
+            <StrictMode>
+              <CustomCheckoutProvider
+                stripe={mockStripe}
+                options={{clientSecret: 'cs_123'}}
+              >
+                <PaymentElement />
+              </CustomCheckoutProvider>
+            </StrictMode>
+          );
+        });
+        await waitFor(() => expect(elementMounted).toBeTruthy());
+
+        expect(mockCustomCheckoutSdk.createElement).toHaveBeenCalledTimes(2);
+        expect(mockElement.mount).toHaveBeenCalledTimes(2);
+        expect(mockElement.destroy).toHaveBeenCalledTimes(1);
+      });
+
+      it('mounts the element', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        const {container} = result;
+
+        expect(mockElement.mount).toHaveBeenCalledWith(container.firstChild);
+        expect(React.useLayoutEffect).toHaveBeenCalled();
+
+        expect(simulateOn).not.toBeCalled();
+        expect(simulateOff).not.toBeCalled();
+      });
+
+      it('does not create and mount until CustomCheckoutSdk has been instantiated', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+
+        expect(mockElement.mount).not.toHaveBeenCalled();
+        expect(mockElements.create).not.toHaveBeenCalled();
+
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(mockElement.mount).toHaveBeenCalled();
+        expect(mockCustomCheckoutSdk.createElement).toHaveBeenCalled();
+      });
+
+      it('adds an event handlers to an Element', async () => {
+        const mockHandler = jest.fn();
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        const changeEventMock = Symbol('change');
+        simulateEvent('change', changeEventMock);
+        expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
+      });
+
+      it('attaches event listeners once the element is created', async () => {
+        const mockHandler = jest.fn();
+
+        // This won't create the element, since customCheckoutSdk is undefined on this render
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        expect(mockCustomCheckoutSdk.createElement).not.toBeCalled();
+
+        expect(simulateOn).not.toBeCalled();
+
+        // This creates the element now that customCheckoutSdk is defined
+        act(() => {
+          result.rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        expect(mockCustomCheckoutSdk.createElement).toBeCalled();
+
+        expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+        expect(simulateOff).not.toBeCalled();
+
+        const changeEventMock = Symbol('change');
+        simulateEvent('change', changeEventMock);
+        expect(mockHandler).toHaveBeenCalledWith(changeEventMock);
+      });
+
+      it('adds event handler on re-render', async () => {
+        const mockHandler = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+        expect(simulateOff).not.toBeCalled();
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+      });
+
+      it('removes event handler when removed on re-render', async () => {
+        const mockHandler = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+        expect(simulateOff).not.toBeCalled();
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(simulateOff).toBeCalledWith('change', expect.any(Function));
+      });
+
+      it('does not call on/off when an event handler changes', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        expect(simulateOn).toBeCalledWith('change', expect.any(Function));
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(simulateOn).toBeCalledTimes(1);
+        expect(simulateOff).not.toBeCalled();
+      });
+
+      it('propagates the Element`s ready event to the current onReady prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onReady={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onReady={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        const mockEvent = Symbol('ready');
+        simulateEvent('ready', mockEvent);
+        expect(mockHandler2).toHaveBeenCalledWith(mockElement);
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s change event to the current onChange prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onChange={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        const changeEventMock = Symbol('change');
+        simulateEvent('change', changeEventMock);
+        expect(mockHandler2).toHaveBeenCalledWith(changeEventMock);
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s blur event to the current onBlur prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onBlur={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onBlur={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        simulateEvent('blur');
+        expect(mockHandler2).toHaveBeenCalledWith();
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s focus event to the current onFocus prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onFocus={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onFocus={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        simulateEvent('focus');
+        expect(mockHandler2).toHaveBeenCalledWith();
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s escape event to the current onEscape prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onEscape={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onEscape={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        simulateEvent('escape');
+        expect(mockHandler2).toHaveBeenCalledWith();
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s loaderror event to the current onLoadError prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onLoadError={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onLoadError={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        simulateEvent('loaderror');
+        expect(mockHandler2).toHaveBeenCalledWith();
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the Element`s loaderstart event to the current onLoaderStart prop', async () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onLoaderStart={mockHandler} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement onLoaderStart={mockHandler2} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        simulateEvent('loaderstart');
+        expect(mockHandler2).toHaveBeenCalledWith();
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('updates the Element when options change', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={{layout: 'accordion'}} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={{layout: 'tabs'}} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(mockElement.update).toHaveBeenCalledWith({
+          layout: 'tabs',
+        });
+      });
+
+      it('does not trigger unnecessary updates', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={{layout: 'accordion'}} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={{layout: 'accordion'}} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(mockElement.update).not.toHaveBeenCalled();
+      });
+
+      it('updates the Element when options change from null to non-null value', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              {/* @ts-expect-error */}
+              <PaymentElement options={null} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {rerender} = result;
+
+        act(() => {
+          rerender(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement options={{layout: 'tabs'}} />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+
+        expect(mockElement.update).toHaveBeenCalledWith({
+          layout: 'tabs',
+        });
+      });
+
+      it('destroys an existing Element when the component unmounts', async () => {
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        const {unmount} = result;
+        unmount();
+
+        // not called when Element has not been mounted (because stripe is still loading)
+        expect(mockElement.destroy).not.toHaveBeenCalled();
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={mockStripe}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {unmount: unmount2} = result;
+        unmount2();
+
+        expect(mockElement.destroy).toHaveBeenCalled();
+      });
+
+      it('destroys an existing Element when the component unmounts with an async stripe prop', async () => {
+        const stripePromise = Promise.resolve(mockStripe);
+
+        act(() => {
+          result = render(
+            <CustomCheckoutProvider
+              stripe={stripePromise}
+              options={{clientSecret: 'cs_123'}}
+            >
+              <PaymentElement />
+            </CustomCheckoutProvider>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {unmount} = result;
+        unmount();
+
+        expect(mockElement.destroy).toHaveBeenCalled();
+      });
+
+      it('destroys an existing Element when the component unmounts with an async stripe prop in StrictMode', async () => {
+        const stripePromise = Promise.resolve(mockStripe);
+        act(() => {
+          result = render(
+            <StrictMode>
+              <CustomCheckoutProvider
+                stripe={stripePromise}
+                options={{clientSecret: 'cs_123'}}
+              >
+                <PaymentElement />
+              </CustomCheckoutProvider>
+            </StrictMode>
+          );
+        });
+        await waitFor(() => expect(peMounted).toBeTruthy());
+        const {unmount} = result;
+        unmount();
+
+        expect(mockElement.destroy).toHaveBeenCalled();
       });
     });
   });

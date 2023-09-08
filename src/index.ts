@@ -25,13 +25,18 @@ import {
 export * from './types';
 
 export {
-  useElements,
   useStripe,
+  useElements,
   useCartElement,
   useCartElementState,
   Elements,
   ElementsConsumer,
 } from './components/Elements';
+
+export {
+  useCustomCheckout,
+  CustomCheckoutProvider,
+} from './components/CustomCheckout';
 
 const isServer = typeof window === 'undefined';
 

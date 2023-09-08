@@ -5,10 +5,10 @@ import {renderHook} from '@testing-library/react-hooks';
 import {
   Elements,
   useElements,
-  useStripe,
   ElementsConsumer,
   useCartElement,
   useCartElementState,
+  useStripe,
 } from './Elements';
 import * as mocks from '../../test/mocks';
 
