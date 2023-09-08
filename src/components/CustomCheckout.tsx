@@ -100,12 +100,6 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     setSession,
   ] = React.useState<stripeJs.StripeCustomCheckoutSession | null>(null);
 
-  // State used to avoid calling initCustomCheckout multiple times when options changes
-  const [
-    initCustomCheckoutCalled,
-    setInitCustomCheckoutCalled,
-  ] = React.useState<boolean>(false);
-
   const [ctx, setContext] = React.useState<CustomCheckoutSdkContextValue>(
     () => ({
       stripe: parsed.tag === 'sync' ? parsed.stripe : null,
@@ -126,16 +120,19 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     });
   };
 
+  // Ref used to avoid calling initCustomCheckout multiple times when options changes
+  const initCustomCheckoutCalledRef = React.useRef(false);
+
   React.useEffect(() => {
     let isMounted = true;
 
     if (parsed.tag === 'async' && !ctx.stripe) {
       parsed.stripePromise.then((stripe) => {
-        if (stripe && isMounted && !initCustomCheckoutCalled) {
+        if (stripe && isMounted && !initCustomCheckoutCalledRef.current) {
           // Only update context if the component is still mounted
           // and stripe is not null. We allow stripe to be null to make
           // handling SSR easier.
-          setInitCustomCheckoutCalled(true);
+          initCustomCheckoutCalledRef.current = true;
           stripe.initCustomCheckout(options).then((customCheckoutSdk) => {
             if (customCheckoutSdk) {
               safeSetContext(stripe, customCheckoutSdk);
@@ -147,9 +144,9 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     } else if (
       parsed.tag === 'sync' &&
       parsed.stripe &&
-      !initCustomCheckoutCalled
+      !initCustomCheckoutCalledRef.current
     ) {
-      setInitCustomCheckoutCalled(true);
+      initCustomCheckoutCalledRef.current = true;
       parsed.stripe.initCustomCheckout(options).then((customCheckoutSdk) => {
         if (customCheckoutSdk) {
           safeSetContext(parsed.stripe, customCheckoutSdk);
@@ -161,14 +158,7 @@ export const CustomCheckoutProvider: FunctionComponent<PropsWithChildren<
     return () => {
       isMounted = false;
     };
-  }, [
-    parsed,
-    ctx,
-    options,
-    initCustomCheckoutCalled,
-    setInitCustomCheckoutCalled,
-    setSession,
-  ]);
+  }, [parsed, ctx, options, setSession]);
 
   // Warn on changes to stripe prop
   const prevStripe = usePrevious(rawStripeProp);

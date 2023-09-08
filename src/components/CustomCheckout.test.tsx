@@ -399,7 +399,7 @@ describe('CustomCheckoutProvider', () => {
   });
 
   describe('React.StrictMode', () => {
-    test('initCustomCheckout twice in StrictMode', async () => {
+    test('initCustomCheckout once in StrictMode', async () => {
       const TestComponent = () => {
         const _ = useCustomCheckout();
         return <div />;
@@ -419,7 +419,7 @@ describe('CustomCheckoutProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(2)
+        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1)
       );
     });
 
@@ -447,7 +447,7 @@ describe('CustomCheckoutProvider', () => {
       );
     });
 
-    test('allows changes to options via elements.update after setting the Stripe object in StrictMode', async () => {
+    test('allows changes to options via (mockCustomCheckoutSdk.changeAppearance after setting the Stripe object in StrictMode', async () => {
       let result: any;
       act(() => {
         result = render(
@@ -466,7 +466,7 @@ describe('CustomCheckoutProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(2);
+        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1);
         expect(mockStripe.initCustomCheckout).toHaveBeenCalledWith({
           clientSecret: 'cs_123',
           elementsOptions: {
