@@ -254,8 +254,14 @@ export const useElementsOrCustomCheckoutSdkContextWithUseCase = (
   return parseElementsContext(elementsContext, useCaseString);
 };
 
-export const useCustomCheckout = (): CustomCheckoutContextValue | null => {
+export const useCustomCheckout = (): CustomCheckoutContextValue => {
   // ensure it's in CustomCheckoutProvider
   useCustomCheckoutSdkContextWithUseCase('calls useCustomCheckout()');
-  return React.useContext(CustomCheckoutContext);
+  const ctx = React.useContext(CustomCheckoutContext);
+  if (!ctx) {
+    throw new Error(
+      'Could not find CustomCheckout Context; You need to wrap the part of your app that calls useCustomCheckout() in an <CustomCheckoutProvider> provider.'
+    );
+  }
+  return ctx;
 };
