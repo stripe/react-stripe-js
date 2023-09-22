@@ -32,8 +32,17 @@ const EmbeddedCheckoutClientElement = ({
     // Clean up on unmount
     return () => {
       if (isMounted.current && embeddedCheckout) {
-        embeddedCheckout.unmount();
-        isMounted.current = false;
+        try {
+          embeddedCheckout.unmount();
+          isMounted.current = false;
+        } catch (e) {
+          // Do nothing.
+          // Parent effects are destroyed before child effects, so
+          // in cases where both the EmbeddedCheckoutProvider and
+          // the EmbeddedCheckout component are removed at the same
+          // time, the embeddedCheckout instance will be destroyed,
+          // which causes an error when calling unmount.
+        }
       }
     };
   }, [embeddedCheckout]);
