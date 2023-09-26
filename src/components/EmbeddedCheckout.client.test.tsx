@@ -129,4 +129,29 @@ describe('EmbeddedCheckout on the client', () => {
     );
     expect(mockEmbeddedCheckout.unmount).toBeCalled();
   });
+
+  it('does not throw when the Embedded Checkout instance is already destroyed when unmounting', async () => {
+    const {container, rerender} = render(
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    );
+
+    await act(() => mockEmbeddedCheckoutPromise);
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstChild);
+
+    mockEmbeddedCheckout.unmount.mockImplementation(() => {
+      throw new Error('instance has been destroyed');
+    });
+
+    expect(() => {
+      rerender(
+        <EmbeddedCheckoutProvider
+          stripe={mockStripe}
+          options={fakeOptions}
+        ></EmbeddedCheckoutProvider>
+      );
+    }).not.toThrow();
+  });
 });
