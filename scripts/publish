@@ -79,6 +79,13 @@ verify_commit_is_signed() {
   fi
 }
 
+check_github_token() {
+  if [[ -z "${GITHUB_TOKEN}" ]]; then
+    echo "GITHUB_TOKEN is not set."
+    exit 1
+  fi
+}
+
 # Show help if no arguments passed
 if [ $# -eq 0 ]; then
   echo "Error! Missing release type argument"
@@ -137,6 +144,8 @@ if [ -n "$PREID" ]; then
     fi
   fi
 fi
+
+check_github_token
 
 # Make sure our working dir is the repo root directory
 cd "$(git rev-parse --show-toplevel)"
