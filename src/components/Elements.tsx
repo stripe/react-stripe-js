@@ -17,7 +17,6 @@ import {
 } from '../utils/extractAllowedOptionsUpdates';
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
-import {useElementsOrCustomCheckoutSdkContextWithUseCase} from './CustomCheckout';
 
 export interface ElementsContextValue {
   elements: stripeJs.StripeElements | null;
@@ -238,16 +237,6 @@ export const useCartElementContextWithUseCase = (
 export const useElements = (): stripeJs.StripeElements | null => {
   const {elements} = useElementsContextWithUseCase('calls useElements()');
   return elements;
-};
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook
- */
-export const useStripe = (): stripeJs.Stripe | null => {
-  const {stripe} = useElementsOrCustomCheckoutSdkContextWithUseCase(
-    'calls useStripe()'
-  );
-  return stripe;
 };
 
 /**
