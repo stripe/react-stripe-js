@@ -8,9 +8,9 @@ import {
   ElementsConsumer,
   useCartElement,
   useCartElementState,
-  useStripe,
 } from './Elements';
 import * as mocks from '../../test/mocks';
+import {useStripe} from './useStripe';
 
 describe('Elements', () => {
   let mockStripe: any;

@@ -26,7 +26,6 @@ import {isServer} from './utils/isServer';
 export * from './types';
 
 export {
-  useStripe,
   useElements,
   useCartElement,
   useCartElementState,
@@ -40,6 +39,7 @@ export {
 } from './components/CustomCheckout';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
+export {useStripe} from './components/useStripe';
 
 /**
  * Requires beta access:

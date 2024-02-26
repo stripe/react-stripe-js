@@ -3,7 +3,8 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CustomCheckoutProvider, useCustomCheckout} from './CustomCheckout';
-import {Elements, useStripe} from './Elements';
+import {Elements} from './Elements';
+import {useStripe} from './useStripe';
 import * as mocks from '../../test/mocks';
 
 describe('CustomCheckoutProvider', () => {
