@@ -38,8 +38,13 @@ export const parseCustomCheckoutSdkContext = (
   return ctx;
 };
 
+type StripeCustomCheckoutActions = Omit<
+  Omit<stripeJs.StripeCustomCheckout, 'session'>,
+  'on'
+>;
+
 interface CustomCheckoutContextValue
-  extends stripeJs.StripeCustomCheckoutActions,
+  extends StripeCustomCheckoutActions,
     stripeJs.StripeCustomCheckoutSession {}
 const CustomCheckoutContext = React.createContext<CustomCheckoutContextValue | null>(
   null
