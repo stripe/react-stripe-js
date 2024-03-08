@@ -46,11 +46,13 @@ interface EmbeddedCheckoutProviderProps {
   stripe: PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null;
   /**
    * Embedded Checkout configuration options.
-   * You can initially pass in `null` as `options.clientSecret` if you are
-   * performing an initial server-side render or when generating a static site.
+   * You can initially pass in `null` to `options.clientSecret` or
+   * `options.fetchClientSecret` if you are performing an initial server-side
+   * render or when generating a static site.
    */
   options: {
-    clientSecret: string | null;
+    clientSecret?: string | null;
+    fetchClientSecret?: (() => Promise<string>) | null;
     onComplete?: () => void;
   };
 }
@@ -102,7 +104,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     if (
       parsed.tag === 'async' &&
       !loadedStripe.current &&
-      options.clientSecret
+      (options.clientSecret || options.fetchClientSecret)
     ) {
       parsed.stripePromise.then((stripe) => {
         if (stripe) {
@@ -112,7 +114,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     } else if (
       parsed.tag === 'sync' &&
       !loadedStripe.current &&
-      options.clientSecret
+      (options.clientSecret || options.fetchClientSecret)
     ) {
       // Or, handle a sync stripe instance going from null -> populated
       setStripeAndInitEmbeddedCheckout(parsed.stripe);
@@ -172,11 +174,29 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     }
 
     if (
+      options.clientSecret === undefined &&
+      options.fetchClientSecret === undefined
+    ) {
+      console.warn(
+        'Invalid props passed to EmbeddedCheckoutProvider: You must provide one of either `options.fetchClientSecret` or `options.clientSecret`.'
+      );
+    }
+
+    if (
       prevOptions.clientSecret != null &&
       options.clientSecret !== prevOptions.clientSecret
     ) {
       console.warn(
         'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+      );
+    }
+
+    if (
+      prevOptions.fetchClientSecret != null &&
+      options.fetchClientSecret !== prevOptions.fetchClientSecret
+    ) {
+      console.warn(
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     }
 
