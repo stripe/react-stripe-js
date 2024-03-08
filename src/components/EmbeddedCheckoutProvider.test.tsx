@@ -14,7 +14,8 @@ describe('EmbeddedCheckoutProvider', () => {
   let mockEmbeddedCheckout: any;
   let mockEmbeddedCheckoutPromise: any;
   const fakeClientSecret = 'cs_123_secret_abc';
-  const fakeOptions = {clientSecret: fakeClientSecret};
+  const fetchClientSecret = () => Promise.resolve(fakeClientSecret);
+  const fakeOptions = {fetchClientSecret};
   let consoleWarn: any;
   let consoleError: any;
 
@@ -83,26 +84,6 @@ describe('EmbeddedCheckoutProvider', () => {
 
     stripeProp = mockStripe;
     rerender();
-    await act(() => mockEmbeddedCheckoutPromise);
-    expect(result.current.embeddedCheckout).toBe(mockEmbeddedCheckout);
-  });
-
-  it('allows a transition from null to a valid client secret', async () => {
-    let optionsProp: any = {clientSecret: null};
-    const wrapper = ({children}: {children?: React.ReactNode}) => (
-      <EmbeddedCheckoutProvider stripe={mockStripe} options={optionsProp}>
-        {children}
-      </EmbeddedCheckoutProvider>
-    );
-
-    const {result, rerender} = renderHook(() => useEmbeddedCheckoutContext(), {
-      wrapper,
-    });
-    expect(result.current.embeddedCheckout).toBe(null);
-
-    optionsProp = {clientSecret: fakeClientSecret};
-    rerender();
-
     await act(() => mockEmbeddedCheckoutPromise);
     expect(result.current.embeddedCheckout).toBe(mockEmbeddedCheckout);
   });
@@ -247,40 +228,135 @@ describe('EmbeddedCheckoutProvider', () => {
     );
   });
 
-  it('does not allow changes to clientSecret option', async () => {
-    const optionsProp1 = {clientSecret: 'cs_123_secret_abc'};
-    const optionsProp2 = {clientSecret: 'cs_abc_secret_123'};
+  describe('clientSecret param (deprecated)', () => {
+    it('allows a transition from null to a valid client secret', async () => {
+      let optionsProp: any = {clientSecret: null};
+      const wrapper = ({children}: {children?: React.ReactNode}) => (
+        <EmbeddedCheckoutProvider stripe={mockStripe} options={optionsProp}>
+          {children}
+        </EmbeddedCheckoutProvider>
+      );
 
+      const {result, rerender} = renderHook(
+        () => useEmbeddedCheckoutContext(),
+        {
+          wrapper,
+        }
+      );
+      expect(result.current.embeddedCheckout).toBe(null);
+
+      optionsProp = {clientSecret: fakeClientSecret};
+      rerender();
+
+      await act(() => mockEmbeddedCheckoutPromise);
+      expect(result.current.embeddedCheckout).toBe(mockEmbeddedCheckout);
+    });
+
+    it('does not allow changes to clientSecret option', async () => {
+      const optionsProp1 = {clientSecret: 'cs_123_secret_abc'};
+      const optionsProp2 = {clientSecret: 'cs_abc_secret_123'};
+
+      // Silence console output so test output is less noisy
+      consoleWarn.mockImplementation(() => {});
+
+      const {rerender} = render(
+        <EmbeddedCheckoutProvider
+          stripe={mockStripe}
+          options={optionsProp1}
+        ></EmbeddedCheckoutProvider>
+      );
+      await act(() => mockEmbeddedCheckoutPromise);
+
+      rerender(
+        <EmbeddedCheckoutProvider
+          stripe={mockStripe}
+          options={optionsProp2}
+        ></EmbeddedCheckoutProvider>
+      );
+
+      expect(consoleWarn).toHaveBeenCalledWith(
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+      );
+    });
+  });
+
+  describe('fetchClientSecret param', () => {
+    it('allows a transition from null to a valid fetchClientSecret', async () => {
+      let optionsProp: any = {fetchClientSecret: null};
+      const wrapper = ({children}: {children?: React.ReactNode}) => (
+        <EmbeddedCheckoutProvider stripe={mockStripe} options={optionsProp}>
+          {children}
+        </EmbeddedCheckoutProvider>
+      );
+
+      const {result, rerender} = renderHook(
+        () => useEmbeddedCheckoutContext(),
+        {
+          wrapper,
+        }
+      );
+      expect(result.current.embeddedCheckout).toBe(null);
+
+      optionsProp = {fetchClientSecret};
+      rerender();
+
+      await act(() => mockEmbeddedCheckoutPromise);
+      expect(result.current.embeddedCheckout).toBe(mockEmbeddedCheckout);
+    });
+
+    it('does not allow changes to fetchClientSecret option', async () => {
+      const optionsProp1 = {fetchClientSecret};
+      const optionsProp2 = {
+        fetchClientSecret: () => Promise.resolve('cs_abc_secret_123'),
+      };
+
+      // Silence console output so test output is less noisy
+      consoleWarn.mockImplementation(() => {});
+
+      const {rerender} = render(
+        <EmbeddedCheckoutProvider
+          stripe={mockStripe}
+          options={optionsProp1}
+        ></EmbeddedCheckoutProvider>
+      );
+      await act(() => mockEmbeddedCheckoutPromise);
+
+      rerender(
+        <EmbeddedCheckoutProvider
+          stripe={mockStripe}
+          options={optionsProp2}
+        ></EmbeddedCheckoutProvider>
+      );
+
+      expect(consoleWarn).toHaveBeenCalledWith(
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+      );
+    });
+  });
+
+  it('errors if both clientSecret and fetchClientSecret are undefined', async () => {
     // Silence console output so test output is less noisy
     consoleWarn.mockImplementation(() => {});
 
-    const {rerender} = render(
+    render(
       <EmbeddedCheckoutProvider
         stripe={mockStripe}
-        options={optionsProp1}
-      ></EmbeddedCheckoutProvider>
-    );
-    await act(() => mockEmbeddedCheckoutPromise);
-
-    rerender(
-      <EmbeddedCheckoutProvider
-        stripe={mockStripe}
-        options={optionsProp2}
+        options={{}}
       ></EmbeddedCheckoutProvider>
     );
 
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+      'Invalid props passed to EmbeddedCheckoutProvider: You must provide one of either `options.fetchClientSecret` or `options.clientSecret`.'
     );
   });
 
   it('does not allow changes to onComplete option', async () => {
     const optionsProp1 = {
-      clientSecret: 'cs_123_secret_abc',
+      fetchClientSecret,
       onComplete: () => 'foo',
     };
     const optionsProp2 = {
-      clientSecret: 'cs_123_secret_abc',
+      fetchClientSecret,
       onComplete: () => 'bar',
     };
     // Silence console output so test output is less noisy

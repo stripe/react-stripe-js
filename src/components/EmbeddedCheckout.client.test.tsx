@@ -13,7 +13,8 @@ describe('EmbeddedCheckout on the client', () => {
   let mockEmbeddedCheckout: any;
   let mockEmbeddedCheckoutPromise: any;
   const fakeClientSecret = 'cs_123_secret_abc';
-  const fakeOptions = {clientSecret: fakeClientSecret};
+  const fetchClientSecret = () => Promise.resolve(fakeClientSecret);
+  const fakeOptions = {fetchClientSecret};
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
@@ -73,10 +74,13 @@ describe('EmbeddedCheckout on the client', () => {
     expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstChild);
   });
 
-  it('does not mount until Embedded Checkouts has been initialized', async () => {
+  it('does not mount until Embedded Checkout has been initialized', async () => {
     // Render with no stripe instance and client secret
     const {container, rerender} = render(
-      <EmbeddedCheckoutProvider stripe={null} options={{clientSecret: null}}>
+      <EmbeddedCheckoutProvider
+        stripe={null}
+        options={{fetchClientSecret: null}}
+      >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
     );
@@ -86,18 +90,18 @@ describe('EmbeddedCheckout on the client', () => {
     rerender(
       <EmbeddedCheckoutProvider
         stripe={mockStripe}
-        options={{clientSecret: null}}
+        options={{fetchClientSecret: null}}
       >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
     );
     expect(mockEmbeddedCheckout.mount).not.toBeCalled();
 
-    // Set client secret
+    // Set fetchClientSecret
     rerender(
       <EmbeddedCheckoutProvider
         stripe={mockStripe}
-        options={{clientSecret: fakeClientSecret}}
+        options={{fetchClientSecret}}
       >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
@@ -153,5 +157,20 @@ describe('EmbeddedCheckout on the client', () => {
         ></EmbeddedCheckoutProvider>
       );
     }).not.toThrow();
+  });
+
+  it('still works with clientSecret param (deprecated)', async () => {
+    const {container} = render(
+      <EmbeddedCheckoutProvider
+        stripe={mockStripe}
+        options={{clientSecret: 'cs_123_456'}}
+      >
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    );
+
+    await act(() => mockEmbeddedCheckoutPromise);
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstChild);
   });
 });
