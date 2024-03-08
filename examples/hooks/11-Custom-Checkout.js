@@ -94,7 +94,7 @@ const CheckoutForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <CustomerDetails />
-      <h3>Payment Dettails</h3>
+      <h3>Payment Details</h3>
       <PaymentElement />
       <h3>Billing Details</h3>
       <AddressElement options={{mode: 'billing'}} />
