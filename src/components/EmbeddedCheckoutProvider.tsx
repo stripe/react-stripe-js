@@ -174,7 +174,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     }
 
     if (
-      options.clientSecret === undefined ||
+      options.clientSecret === undefined &&
       options.fetchClientSecret === undefined
     ) {
       console.warn(
