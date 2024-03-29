@@ -9,7 +9,6 @@ import {
   CardElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
-  CartElementComponent,
   ExpressCheckoutElementComponent,
 } from '../types';
 
@@ -20,7 +19,6 @@ describe('createElementComponent', () => {
   let mockStripe: any;
   let mockElements: any;
   let mockElement: any;
-  let mockCartElementContext: any;
   let mockCustomCheckoutSdk: any;
 
   let simulateElementsEvents: Record<string, any[]>;
@@ -56,11 +54,6 @@ describe('createElementComponent', () => {
 
     mockElement.on = simulateOn;
     mockElement.off = simulateOff;
-
-    mockCartElementContext = mocks.mockCartElementContext();
-    jest
-      .spyOn(ElementsModule, 'useCartElementContextWithUseCase')
-      .mockReturnValue(mockCartElementContext);
   });
 
   afterEach(() => {
@@ -159,11 +152,6 @@ describe('createElementComponent', () => {
     );
     const PaymentElement: PaymentElementComponent = createElementComponent(
       'payment',
-      false
-    );
-
-    const CartElement: CartElementComponent = createElementComponent(
-      'cart',
       false
     );
 
@@ -466,111 +454,6 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
-    it('sets cart in the CartElementContext', () => {
-      expect(mockCartElementContext.cart).toBe(null);
-
-      render(
-        <Elements stripe={mockStripe}>
-          <CartElement />
-        </Elements>
-      );
-
-      expect(mockCartElementContext.cart).toBe(mockElement);
-    });
-
-    it('sets cartState in the CartElementContext', () => {
-      render(
-        <Elements stripe={mockStripe}>
-          <CartElement />
-        </Elements>
-      );
-
-      expect(mockCartElementContext.cartState).toBe(null);
-
-      const readyEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_ready',
-        lineItems: {
-          count: 0,
-        },
-      };
-
-      simulateEvent('ready', readyEvent);
-      expect(mockCartElementContext.cartState).toBe(readyEvent);
-
-      const changeEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_change',
-        lineItems: {
-          count: 1,
-        },
-      };
-      simulateEvent('change', changeEvent);
-      expect(mockCartElementContext.cartState).toBe(changeEvent);
-
-      const checkoutEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_checkout',
-        lineItems: {
-          count: 2,
-        },
-      };
-      simulateEvent('checkout', checkoutEvent);
-      expect(mockCartElementContext.cartState).toBe(checkoutEvent);
-    });
-
-    it('sets cartState in the CartElementContext when passing in callbacks', () => {
-      const onReady = jest.fn();
-      const onChange = jest.fn();
-      const onCheckout = jest.fn();
-
-      render(
-        <Elements stripe={mockStripe}>
-          <CartElement
-            onReady={onReady}
-            onChange={onChange}
-            onCheckout={onCheckout}
-          />
-        </Elements>
-      );
-
-      expect(mockCartElementContext.cartState).toBe(null);
-
-      const readyEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_ready',
-        lineItems: {
-          count: 0,
-        },
-      };
-
-      simulateEvent('ready', readyEvent);
-      expect(mockCartElementContext.cartState).toBe(readyEvent);
-      expect(onReady).toBeCalledWith(readyEvent);
-
-      const changeEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_change',
-        lineItems: {
-          count: 1,
-        },
-      };
-      simulateEvent('change', changeEvent);
-      expect(mockCartElementContext.cartState).toBe(changeEvent);
-      expect(onChange).toBeCalledWith(changeEvent);
-
-      const checkoutEvent = {
-        elementType: 'cart',
-        id: 'cart_session_id_checkout',
-        lineItems: {
-          count: 2,
-        },
-      };
-      simulateEvent('checkout', checkoutEvent);
-      expect(mockCartElementContext.cartState).toBe(checkoutEvent);
-      expect(onCheckout).toBeCalledWith(checkoutEvent);
-    });
-
     it('propagates the Element`s change event to the current onChange prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
@@ -723,46 +606,6 @@ describe('createElementComponent', () => {
 
       simulateEvent('networkschange');
       expect(mockHandler2).toHaveBeenCalledWith();
-      expect(mockHandler).not.toHaveBeenCalled();
-    });
-
-    it('propagates the Element`s checkout event to the current onCheckout prop', () => {
-      const mockHandler = jest.fn();
-      const mockHandler2 = jest.fn();
-      const {rerender} = render(
-        <Elements stripe={mockStripe}>
-          <CartElement onCheckout={mockHandler} />
-        </Elements>
-      );
-      rerender(
-        <Elements stripe={mockStripe}>
-          <CartElement onCheckout={mockHandler2} />
-        </Elements>
-      );
-
-      const checkoutEventMock = Symbol('checkout');
-      simulateEvent('checkout', checkoutEventMock);
-      expect(mockHandler2).toHaveBeenCalledWith(checkoutEventMock);
-      expect(mockHandler).not.toHaveBeenCalled();
-    });
-
-    it('propagates the Element`s lineitemclick event to the current onLineItemClick prop', () => {
-      const mockHandler = jest.fn();
-      const mockHandler2 = jest.fn();
-      const {rerender} = render(
-        <Elements stripe={mockStripe}>
-          <CartElement onLineItemClick={mockHandler} />
-        </Elements>
-      );
-      rerender(
-        <Elements stripe={mockStripe}>
-          <CartElement onLineItemClick={mockHandler2} />
-        </Elements>
-      );
-
-      const lineItemClickEventMock = Symbol('lineitemclick');
-      simulateEvent('lineitemclick', lineItemClickEventMock);
-      expect(mockHandler2).toHaveBeenCalledWith(lineItemClickEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 

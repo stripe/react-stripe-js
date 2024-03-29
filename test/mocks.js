@@ -87,17 +87,3 @@ export const mockStripe = () => {
     ),
   };
 };
-
-export const mockCartElementContext = () => {
-  const cartElementContext = {
-    cart: null,
-    cartState: null,
-  };
-  cartElementContext.setCart = (val) => {
-    cartElementContext.cart = val;
-  };
-  cartElementContext.setCartState = (val) => {
-    cartElementContext.cartState = val;
-  };
-  return cartElementContext;
-};
