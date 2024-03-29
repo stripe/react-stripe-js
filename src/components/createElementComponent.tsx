@@ -6,7 +6,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import {useCartElementContextWithUseCase} from './Elements';
 import {useAttachEvent} from '../utils/useAttachEvent';
 import {ElementProps} from '../types';
 import {usePrevious} from '../utils/usePrevious';
@@ -30,8 +29,6 @@ interface PrivateElementProps {
   onLoadError?: UnknownCallback;
   onLoaderStart?: UnknownCallback;
   onNetworksChange?: UnknownCallback;
-  onCheckout?: UnknownCallback;
-  onLineItemClick?: UnknownCallback;
   onConfirm?: UnknownCallback;
   onCancel?: UnknownCallback;
   onShippingAddressChange?: UnknownCallback;
@@ -60,8 +57,6 @@ const createElementComponent = (
     onLoadError,
     onLoaderStart,
     onNetworksChange,
-    onCheckout,
-    onLineItemClick,
     onConfirm,
     onCancel,
     onShippingAddressChange,
@@ -79,11 +74,6 @@ const createElementComponent = (
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
 
-    const {setCart, setCartState} = useCartElementContextWithUseCase(
-      `mounts <${displayName}>`,
-      'customCheckoutSdk' in ctx
-    );
-
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
     // the old callback with element.off and then call element.on with the new one.
@@ -94,21 +84,14 @@ const createElementComponent = (
     useAttachEvent(element, 'loaderror', onLoadError);
     useAttachEvent(element, 'loaderstart', onLoaderStart);
     useAttachEvent(element, 'networkschange', onNetworksChange);
-    useAttachEvent(element, 'lineitemclick', onLineItemClick);
     useAttachEvent(element, 'confirm', onConfirm);
     useAttachEvent(element, 'cancel', onCancel);
     useAttachEvent(element, 'shippingaddresschange', onShippingAddressChange);
     useAttachEvent(element, 'shippingratechange', onShippingRateChange);
+    useAttachEvent(element, 'change', onChange);
 
     let readyCallback: UnknownCallback | undefined;
-    if (type === 'cart') {
-      readyCallback = (event) => {
-        setCartState(
-          (event as unknown) as stripeJs.StripeCartElementPayloadEvent
-        );
-        onReady && onReady(event);
-      };
-    } else if (onReady) {
+    if (onReady) {
       if (type === 'expressCheckout') {
         // Passes through the event, which includes visible PM types
         readyCallback = onReady;
@@ -121,26 +104,6 @@ const createElementComponent = (
     }
 
     useAttachEvent(element, 'ready', readyCallback);
-
-    const changeCallback =
-      type === 'cart'
-        ? (event: stripeJs.StripeCartElementPayloadEvent) => {
-            setCartState(event);
-            onChange && onChange(event);
-          }
-        : onChange;
-
-    useAttachEvent(element, 'change', changeCallback);
-
-    const checkoutCallback =
-      type === 'cart'
-        ? (event: stripeJs.StripeCartElementPayloadEvent) => {
-            setCartState(event);
-            onCheckout && onCheckout(event);
-          }
-        : onCheckout;
-
-    useAttachEvent(element, 'checkout', checkoutCallback);
 
     React.useLayoutEffect(() => {
       if (
@@ -155,12 +118,6 @@ const createElementComponent = (
           newElement = elements.create(type as any, options);
         }
 
-        if (type === 'cart' && setCart) {
-          // we know that elements.create return value must be of type StripeCartElement if type is 'cart',
-          // we need to cast because typescript is not able to infer which overloaded method is used based off param type
-          setCart((newElement as unknown) as stripeJs.StripeCartElement);
-        }
-
         // Store element in a ref to ensure it's _immediately_ available in cleanup hooks in StrictMode
         elementRef.current = newElement;
         // Store element in state to facilitate event listener attachment
@@ -170,7 +127,7 @@ const createElementComponent = (
           newElement.mount(domNode.current);
         }
       }
-    }, [elements, customCheckoutSdk, options, setCart]);
+    }, [elements, customCheckoutSdk, options]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
@@ -208,15 +165,7 @@ const createElementComponent = (
 
   // Only render the Element wrapper in a server environment.
   const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
-    // Validate that we are in the right context by calling useElementsContextWithUseCase.
-    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(
-      `mounts <${displayName}>`
-    );
-
-    useCartElementContextWithUseCase(
-      `mounts <${displayName}>`,
-      'customCheckoutSdk' in ctx
-    );
+    useElementsOrCustomCheckoutSdkContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
     return <div id={id} className={className} />;
   };
@@ -235,8 +184,6 @@ const createElementComponent = (
     onLoadError: PropTypes.func,
     onLoaderStart: PropTypes.func,
     onNetworksChange: PropTypes.func,
-    onCheckout: PropTypes.func,
-    onLineItemClick: PropTypes.func,
     onConfirm: PropTypes.func,
     onCancel: PropTypes.func,
     onShippingAddressChange: PropTypes.func,
