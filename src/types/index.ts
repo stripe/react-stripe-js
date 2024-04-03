@@ -84,10 +84,7 @@ export interface CardElementProps extends ElementProps {
   /**
    * Triggered when the Element fails to load.
    */
-  onLoadError?: (event: {
-    elementType: 'card';
-    error: StripeError;
-  }) => any;
+  onLoadError?: (event: {elementType: 'card'; error: StripeError}) => any;
 }
 
 export type CardElementComponent = FunctionComponent<CardElementProps>;
@@ -124,10 +121,7 @@ export interface CardNumberElementProps extends ElementProps {
   /**
    * Triggered when the Element fails to load.
    */
-  onLoadError?: (event: {
-    elementType: 'cardNumber';
-    error: StripeError;
-  }) => any;
+  onLoadError?: (event: {elementType: 'cardNumber'; error: StripeError}) => any;
 }
 
 export type CardNumberElementComponent = FunctionComponent<
