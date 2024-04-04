@@ -80,6 +80,11 @@ export interface CardElementProps extends ElementProps {
    * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_networkschange?type=cardElement).
    */
   onNetworksChange?: (event: {elementType: 'card'}) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'card'; error: StripeError}) => any;
 }
 
 export type CardElementComponent = FunctionComponent<CardElementProps>;
@@ -112,6 +117,11 @@ export interface CardNumberElementProps extends ElementProps {
    * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_networkschange?type=cardNumberElement).
    */
   onNetworksChange?: (event: {elementType: 'cardNumber'}) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'cardNumber'; error: StripeError}) => any;
 }
 
 export type CardNumberElementComponent = FunctionComponent<
