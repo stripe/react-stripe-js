@@ -173,6 +173,9 @@ fi
 echo "Installing dependencies according to lockfile"
 yarn -s install --frozen-lockfile
 
+echo "Building"
+yarn -s run build
+
 echo "Running tests"
 yarn -s run test
 
@@ -190,9 +193,6 @@ verify_commit_is_signed
 
 echo "Pushing git commit and tag"
 git push --follow-tags
-
-echo "Building"
-yarn -s run build
 
 echo "Publishing release"
 yarn --ignore-scripts publish --non-interactive --access=public
