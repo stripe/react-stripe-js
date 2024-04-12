@@ -194,6 +194,9 @@ git push --follow-tags
 echo "Building"
 yarn -s run build
 
+echo "Checking exported types"
+yarn run test:package-types
+
 echo "Publishing release"
 yarn --ignore-scripts publish --non-interactive --access=public
 
