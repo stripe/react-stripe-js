@@ -54,6 +54,9 @@ interface EmbeddedCheckoutProviderProps {
     clientSecret?: string | null;
     fetchClientSecret?: (() => Promise<string>) | null;
     onComplete?: () => void;
+    onShippingDetailsChange?: (
+      event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent
+    ) => Promise<stripeJs.ResultAction>;
   };
 }
 
@@ -206,6 +209,15 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     ) {
       console.warn(
         'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
+      );
+    }
+
+    if (
+      prevOptions.onShippingDetailsChange != null &&
+      options.onShippingDetailsChange !== prevOptions.onShippingDetailsChange
+    ) {
+      console.warn(
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
       );
     }
   }, [prevOptions, options]);
