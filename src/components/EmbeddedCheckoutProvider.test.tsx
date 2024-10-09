@@ -414,6 +414,37 @@ describe('EmbeddedCheckoutProvider', () => {
     );
   });
 
+  it('does not allow changes to onLineItemsChange option', async () => {
+    const optionsProp1 = {
+      fetchClientSecret,
+      onLineItemsChange: () => Promise.resolve({type: 'accept' as const}),
+    };
+    const optionsProp2 = {
+      fetchClientSecret,
+      onLineItemsChange: () => Promise.resolve({type: 'reject' as const}),
+    };
+
+    // Silence console output so test output is less noisy
+    consoleWarn.mockImplementation(() => {});
+    const {rerender} = render(
+      <EmbeddedCheckoutProvider
+        stripe={mockStripe}
+        options={optionsProp1}
+      ></EmbeddedCheckoutProvider>
+    );
+    await act(() => mockEmbeddedCheckoutPromise);
+
+    rerender(
+      <EmbeddedCheckoutProvider
+        stripe={mockStripe}
+        options={optionsProp2}
+      ></EmbeddedCheckoutProvider>
+    );
+    expect(consoleWarn).toHaveBeenCalledWith(
+      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
+    );
+  });
+
   it('destroys Embedded Checkout when the component unmounts', async () => {
     const {rerender} = render(
       <div>

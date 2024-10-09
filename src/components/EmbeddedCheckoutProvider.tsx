@@ -57,6 +57,9 @@ interface EmbeddedCheckoutProviderProps {
     onShippingDetailsChange?: (
       event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent
     ) => Promise<stripeJs.ResultAction>;
+    onLineItemsChange?: (
+      event: stripeJs.StripeEmbeddedCheckoutLineItemsChangeEvent
+    ) => Promise<stripeJs.ResultAction>;
   };
 }
 
@@ -218,6 +221,15 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
     ) {
       console.warn(
         'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
+      );
+    }
+
+    if (
+      prevOptions.onLineItemsChange != null &&
+      options.onLineItemsChange !== prevOptions.onLineItemsChange
+    ) {
+      console.warn(
+        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
       );
     }
   }, [prevOptions, options]);
