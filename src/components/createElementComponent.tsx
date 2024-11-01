@@ -139,7 +139,7 @@ const createElementComponent = (
         'paymentRequest',
       ]);
 
-      if (updates) {
+      if (updates && 'update' in elementRef.current) {
         elementRef.current.update(updates);
       }
     }, [options, prevOptions]);
