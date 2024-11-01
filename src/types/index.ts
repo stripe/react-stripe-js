@@ -475,6 +475,36 @@ export type PaymentRequestButtonElementComponent = FunctionComponent<
   PaymentRequestButtonElementProps
 >;
 
+export interface CurrencySelectorElementProps extends ElementProps {
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeCurrencySelectorElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'currencySelector';
+    error: StripeError;
+  }) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'currencySelector'}) => any;
+}
+
+export type CurrencySelectorElementComponent = FunctionComponent<
+  CurrencySelectorElementProps
+>;
+
 export interface AddressElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_address_element#address_element_create-options).

@@ -19,6 +19,7 @@ import {
   AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
+  CurrencySelectorElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
@@ -127,6 +128,15 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
  */
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
   'expressCheckout',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
+  'currencySelector',
   isServer
 );
 
