@@ -1,11 +1,11 @@
 import * as stripeJs from '@stripe/stripe-js';
-import {useElementsOrCustomCheckoutSdkContextWithUseCase} from './CustomCheckout';
+import {useElementsOrCheckoutSdkContextWithUseCase} from './CheckoutProvider';
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook
  */
 export const useStripe = (): stripeJs.Stripe | null => {
-  const {stripe} = useElementsOrCustomCheckoutSdkContextWithUseCase(
+  const {stripe} = useElementsOrCheckoutSdkContextWithUseCase(
     'calls useStripe()'
   );
   return stripe;

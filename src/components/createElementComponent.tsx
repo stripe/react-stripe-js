@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCustomCheckoutSdkContextWithUseCase} from './CustomCheckout';
+import {useElementsOrCheckoutSdkContextWithUseCase} from './CheckoutProvider';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -62,12 +62,11 @@ const createElementComponent = (
     onShippingAddressChange,
     onShippingRateChange,
   }) => {
-    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(
+    const ctx = useElementsOrCheckoutSdkContextWithUseCase(
       `mounts <${displayName}>`
     );
     const elements = 'elements' in ctx ? ctx.elements : null;
-    const customCheckoutSdk =
-      'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null;
+    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null;
     const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
       null
     );
@@ -109,11 +108,11 @@ const createElementComponent = (
       if (
         elementRef.current === null &&
         domNode.current !== null &&
-        (elements || customCheckoutSdk)
+        (elements || checkoutSdk)
       ) {
         let newElement: stripeJs.StripeElement | null = null;
-        if (customCheckoutSdk) {
-          newElement = customCheckoutSdk.createElement(type as any, options);
+        if (checkoutSdk) {
+          newElement = checkoutSdk.createElement(type as any, options);
         } else if (elements) {
           newElement = elements.create(type as any, options);
         }
@@ -127,7 +126,7 @@ const createElementComponent = (
           newElement.mount(domNode.current);
         }
       }
-    }, [elements, customCheckoutSdk, options]);
+    }, [elements, checkoutSdk, options]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
@@ -165,7 +164,7 @@ const createElementComponent = (
 
   // Only render the Element wrapper in a server environment.
   const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
-    useElementsOrCustomCheckoutSdkContextWithUseCase(`mounts <${displayName}>`);
+    useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
     return <div id={id} className={className} />;
   };

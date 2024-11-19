@@ -2,31 +2,31 @@ import React, {StrictMode} from 'react';
 import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
-import {CustomCheckoutProvider, useCustomCheckout} from './CustomCheckout';
+import {CheckoutProvider, useCheckout} from './CheckoutProvider';
 import {Elements} from './Elements';
 import {useStripe} from './useStripe';
 import * as mocks from '../../test/mocks';
 
-describe('CustomCheckoutProvider', () => {
+describe('CheckoutProvider', () => {
   let mockStripe: any;
   let mockStripePromise: any;
-  let mockCustomCheckoutSdk: any;
+  let mockCheckoutSdk: any;
   let mockSession: any;
   let consoleError: any;
   let consoleWarn: any;
-  let mockCustomCheckout: any;
+  let mockCheckout: any;
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe();
     mockStripePromise = Promise.resolve(mockStripe);
-    mockCustomCheckoutSdk = mocks.mockCustomCheckoutSdk();
-    mockStripe.initCustomCheckout.mockResolvedValue(mockCustomCheckoutSdk);
-    mockSession = mocks.mockCustomCheckoutSession();
-    mockCustomCheckoutSdk.session.mockReturnValue(mockSession);
+    mockCheckoutSdk = mocks.mockCheckoutSdk();
+    mockStripe.initCheckout.mockResolvedValue(mockCheckoutSdk);
+    mockSession = mocks.mockCheckoutSession();
+    mockCheckoutSdk.session.mockReturnValue(mockSession);
 
-    const {on: _on, session: _session, ...actions} = mockCustomCheckoutSdk;
+    const {on: _on, session: _session, ...actions} = mockCheckoutSdk;
 
-    mockCustomCheckout = {...actions, ...mockSession};
+    mockCheckout = {...actions, ...mockSession};
 
     jest.spyOn(console, 'error');
     jest.spyOn(console, 'warn');
@@ -38,17 +38,14 @@ describe('CustomCheckoutProvider', () => {
     jest.restoreAllMocks();
   });
 
-  test('injects CustomCheckoutProvider with the useCustomCheckout hook', async () => {
+  test('injects CheckoutProvider with the useCheckout hook', async () => {
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
-        stripe={mockStripe}
-        options={{clientSecret: 'cs_123'}}
-      >
+      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
         {children}
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
-    const {result, waitForNextUpdate} = renderHook(() => useCustomCheckout(), {
+    const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
       wrapper,
     });
 
@@ -56,17 +53,14 @@ describe('CustomCheckoutProvider', () => {
     await waitForNextUpdate();
 
     // wait for all (potentially multiple) updates to finish
-    await waitFor(() => expect(result.current).toEqual(mockCustomCheckout));
+    await waitFor(() => expect(result.current).toEqual(mockCheckout));
   });
 
-  test('injects CustomCheckoutProvider with the useStripe hook', async () => {
+  test('injects CheckoutProvider with the useStripe hook', async () => {
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
-        stripe={mockStripe}
-        options={{clientSecret: 'cs_123'}}
-      >
+      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
         {children}
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
     const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
@@ -83,33 +77,30 @@ describe('CustomCheckoutProvider', () => {
   test('allows a transition from null to a valid Stripe object', async () => {
     let stripeProp: any = null;
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
-        stripe={stripeProp}
-        options={{clientSecret: 'cs_123'}}
-      >
+      <CheckoutProvider stripe={stripeProp} options={{clientSecret: 'cs_123'}}>
         {children}
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
-    const {result, rerender} = renderHook(() => useCustomCheckout(), {wrapper});
+    const {result, rerender} = renderHook(() => useCheckout(), {wrapper});
     expect(result.current).toBe(undefined);
 
     stripeProp = mockStripe;
     act(() => rerender());
-    await waitFor(() => expect(result.current).toEqual(mockCustomCheckout));
+    await waitFor(() => expect(result.current).toEqual(mockCheckout));
   });
 
   test('works with a Promise resolving to a valid Stripe object', async () => {
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
+      <CheckoutProvider
         stripe={mockStripePromise}
         options={{clientSecret: 'cs_123'}}
       >
         {children}
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
-    const {result, waitForNextUpdate} = renderHook(() => useCustomCheckout(), {
+    const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
       wrapper,
     });
 
@@ -117,22 +108,19 @@ describe('CustomCheckoutProvider', () => {
 
     await waitForNextUpdate();
 
-    await waitFor(() => expect(result.current).toEqual(mockCustomCheckout));
+    await waitFor(() => expect(result.current).toEqual(mockCheckout));
   });
 
   test('allows a transition from null to a valid Promise', async () => {
     let stripeProp: any = null;
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
-        stripe={stripeProp}
-        options={{clientSecret: 'cs_123'}}
-      >
+      <CheckoutProvider stripe={stripeProp} options={{clientSecret: 'cs_123'}}>
         {children}
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
     const {result, rerender, waitForNextUpdate} = renderHook(
-      () => useCustomCheckout(),
+      () => useCheckout(),
       {wrapper}
     );
     expect(result.current).toBe(undefined);
@@ -144,22 +132,22 @@ describe('CustomCheckoutProvider', () => {
 
     await waitForNextUpdate();
 
-    await waitFor(() => expect(result.current).toEqual(mockCustomCheckout));
+    await waitFor(() => expect(result.current).toEqual(mockCheckout));
   });
 
-  test('does not set context if Promise resolves after Elements is unmounted', async () => {
+  test('does not set context if Promise resolves after CheckoutProvider is unmounted', async () => {
     // Silence console output so test output is less noisy
     consoleError.mockImplementation(() => {});
 
     let result: any;
     act(() => {
       result = render(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripePromise}
           options={{clientSecret: 'cs_123'}}
         >
           {null}
-        </CustomCheckoutProvider>
+        </CheckoutProvider>
       );
     });
 
@@ -172,19 +160,19 @@ describe('CustomCheckoutProvider', () => {
   test('works with a Promise resolving to null for SSR safety', async () => {
     const nullPromise = Promise.resolve(null);
     const TestComponent = () => {
-      const customCheckout = useCustomCheckout();
+      const customCheckout = useCheckout();
       return customCheckout ? <div>not empty</div> : null;
     };
 
     let result: any;
     act(() => {
       result = render(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={nullPromise}
           options={{clientSecret: 'cs_123'}}
         >
           <TestComponent />
-        </CustomCheckoutProvider>
+        </CheckoutProvider>
       );
     });
 
@@ -206,14 +194,14 @@ describe('CustomCheckoutProvider', () => {
 
       expect(() =>
         render(
-          <CustomCheckoutProvider
+          <CheckoutProvider
             stripe={stripeProp as any}
             options={{clientSecret: 'cs_123'}}
           >
             <div />
-          </CustomCheckoutProvider>
+          </CheckoutProvider>
         )
-      ).toThrow('Invalid prop `stripe` supplied to `CustomCheckoutProvider`.');
+      ).toThrow('Invalid prop `stripe` supplied to `CheckoutProvider`.');
     });
   });
 
@@ -223,7 +211,7 @@ describe('CustomCheckoutProvider', () => {
     let result: any;
     act(() => {
       result = render(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe}
           options={{clientSecret: 'cs_123'}}
         />
@@ -233,7 +221,7 @@ describe('CustomCheckoutProvider', () => {
     const mockStripe2: any = mocks.mockStripe();
     act(() => {
       result.rerender(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe2}
           options={{clientSecret: 'cs_123'}}
         />
@@ -241,19 +229,19 @@ describe('CustomCheckoutProvider', () => {
     });
 
     await waitFor(() => {
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1);
-      expect(mockStripe2.initCustomCheckout).toHaveBeenCalledTimes(0);
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+      expect(mockStripe2.initCheckout).toHaveBeenCalledTimes(0);
       expect(consoleWarn).toHaveBeenCalledWith(
-        'Unsupported prop change on CustomCheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
       );
     });
   });
 
-  test('initCustomCheckout only called once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
+  test('initCheckout only called once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
     let result: any;
     act(() => {
       result = render(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe}
           options={{
             clientSecret: 'cs_123',
@@ -266,7 +254,7 @@ describe('CustomCheckoutProvider', () => {
     });
 
     await waitFor(() =>
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
         clientSecret: 'cs_123',
         elementsOptions: {
           appearance: {theme: 'stripe'},
@@ -276,7 +264,7 @@ describe('CustomCheckoutProvider', () => {
 
     act(() => {
       result.rerender(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe}
           options={{
             clientSecret: 'cs_123',
@@ -287,9 +275,9 @@ describe('CustomCheckoutProvider', () => {
     });
 
     await waitFor(() => {
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1);
-      expect(mockCustomCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
-      expect(mockCustomCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+      expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
+      expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
         theme: 'night',
       });
     });
@@ -299,7 +287,7 @@ describe('CustomCheckoutProvider', () => {
     let result: any;
     act(() => {
       result = render(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={null}
           options={{
             clientSecret: 'cs_123',
@@ -312,12 +300,12 @@ describe('CustomCheckoutProvider', () => {
     });
 
     await waitFor(() =>
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(0)
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(0)
     );
 
     act(() => {
       result.rerender(
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe}
           options={{
             clientSecret: 'cs_123',
@@ -329,8 +317,8 @@ describe('CustomCheckoutProvider', () => {
 
     await waitFor(() => {
       expect(console.warn).not.toHaveBeenCalled();
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1);
-      expect(mockStripe.initCustomCheckout).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
         clientSecret: 'cs_123',
         elementsOptions: {
           appearance: {theme: 'stripe'},
@@ -339,15 +327,15 @@ describe('CustomCheckoutProvider', () => {
     });
   });
 
-  test('throws when trying to call useCustomCheckout outside of CustomCheckoutProvider context', () => {
-    const {result} = renderHook(() => useCustomCheckout());
+  test('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
+    const {result} = renderHook(() => useCheckout());
 
     expect(result.error && result.error.message).toBe(
-      'Could not find CustomCheckoutProvider context; You need to wrap the part of your app that calls useCustomCheckout() in an <CustomCheckoutProvider> provider.'
+      'Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.'
     );
   });
 
-  test('throws when trying to call useStripe outside of CustomCheckoutProvider context', () => {
+  test('throws when trying to call useStripe outside of CheckoutProvider context', () => {
     const {result} = renderHook(() => useStripe());
 
     expect(result.error && result.error.message).toBe(
@@ -355,15 +343,15 @@ describe('CustomCheckoutProvider', () => {
     );
   });
 
-  test('throws when trying to call useStripe in Elements -> CustomCheckoutProvider nested context', async () => {
+  test('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', async () => {
     const wrapper = ({children}: any) => (
       <Elements stripe={mockStripe}>
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={mockStripe}
           options={{clientSecret: 'cs_123'}}
         >
           {children}
-        </CustomCheckoutProvider>
+        </CheckoutProvider>
       </Elements>
     );
 
@@ -374,18 +362,15 @@ describe('CustomCheckoutProvider', () => {
     await waitForNextUpdate();
 
     expect(result.error && result.error.message).toBe(
-      'You cannot wrap the part of your app that calls useStripe() in both <CustomCheckoutProvider> and <Elements> providers.'
+      'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
     );
   });
 
-  test('throws when trying to call useStripe in CustomCheckoutProvider -> Elements nested context', async () => {
+  test('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', async () => {
     const wrapper = ({children}: any) => (
-      <CustomCheckoutProvider
-        stripe={mockStripe}
-        options={{clientSecret: 'cs_123'}}
-      >
+      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
         <Elements stripe={mockStripe}>{children}</Elements>
-      </CustomCheckoutProvider>
+      </CheckoutProvider>
     );
 
     const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
@@ -395,65 +380,65 @@ describe('CustomCheckoutProvider', () => {
     await waitForNextUpdate();
 
     expect(result.error && result.error.message).toBe(
-      'You cannot wrap the part of your app that calls useStripe() in both <CustomCheckoutProvider> and <Elements> providers.'
+      'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
     );
   });
 
   describe('React.StrictMode', () => {
-    test('initCustomCheckout once in StrictMode', async () => {
+    test('initCheckout once in StrictMode', async () => {
       const TestComponent = () => {
-        const _ = useCustomCheckout();
+        const _ = useCheckout();
         return <div />;
       };
 
       act(() => {
         render(
           <StrictMode>
-            <CustomCheckoutProvider
+            <CheckoutProvider
               stripe={mockStripe}
               options={{clientSecret: 'cs_123'}}
             >
               <TestComponent />
-            </CustomCheckoutProvider>
+            </CheckoutProvider>
           </StrictMode>
         );
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
       );
     });
 
-    test('initCustomCheckout once with stripePromise in StrictMode', async () => {
+    test('initCheckout once with stripePromise in StrictMode', async () => {
       const TestComponent = () => {
-        const _ = useCustomCheckout();
+        const _ = useCheckout();
         return <div />;
       };
 
       act(() => {
         render(
           <StrictMode>
-            <CustomCheckoutProvider
+            <CheckoutProvider
               stripe={mockStripePromise}
               options={{clientSecret: 'cs_123'}}
             >
               <TestComponent />
-            </CustomCheckoutProvider>
+            </CheckoutProvider>
           </StrictMode>
         );
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
       );
     });
 
-    test('allows changes to options via (mockCustomCheckoutSdk.changeAppearance after setting the Stripe object in StrictMode', async () => {
+    test('allows changes to options via (mockCheckoutSdk.changeAppearance after setting the Stripe object in StrictMode', async () => {
       let result: any;
       act(() => {
         result = render(
           <StrictMode>
-            <CustomCheckoutProvider
+            <CheckoutProvider
               stripe={mockStripe}
               options={{
                 clientSecret: 'cs_123',
@@ -467,8 +452,8 @@ describe('CustomCheckoutProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledTimes(1);
-        expect(mockStripe.initCustomCheckout).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckout).toHaveBeenCalledWith({
           clientSecret: 'cs_123',
           elementsOptions: {
             appearance: {theme: 'stripe'},
@@ -479,7 +464,7 @@ describe('CustomCheckoutProvider', () => {
       act(() => {
         result.rerender(
           <StrictMode>
-            <CustomCheckoutProvider
+            <CheckoutProvider
               stripe={mockStripe}
               options={{
                 clientSecret: 'cs_123',
@@ -491,8 +476,8 @@ describe('CustomCheckoutProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockCustomCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
-        expect(mockCustomCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
+        expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
+        expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
           theme: 'night',
         });
       });
