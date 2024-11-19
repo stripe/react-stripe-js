@@ -3,27 +3,20 @@ import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
   useStripe,
-  CustomCheckoutProvider,
-  useCustomCheckout,
+  CheckoutProvider,
+  useCheckout,
   AddressElement,
 } from '../../src';
 
 import '../styles/common.css';
 
-const CustomerDetails = () => {
-  const {
-    phoneNumber,
-    updatePhoneNumber,
-    email,
-    updateEmail,
-  } = useCustomCheckout();
-
+const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
   const handlePhoneNumberChange = (event) => {
-    updatePhoneNumber(event.target.value);
+    setPhoneNumber(event.target.value);
   };
 
   const handleEmailChange = (event) => {
-    updateEmail(event.target.value);
+    setEmail(event.target.value);
   };
 
   return (
@@ -52,35 +45,36 @@ const CustomerDetails = () => {
 };
 
 const CheckoutForm = () => {
-  const customCheckout = useCustomCheckout();
+  const checkout = useCheckout();
   const [status, setStatus] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const stripe = useStripe();
+  const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [email, setEmail] = React.useState('');
 
   React.useEffect(() => {
-    const {confirmationRequirements} = customCheckout || {};
+    const {confirmationRequirements} = checkout || {};
     setStatus(
       confirmationRequirements && confirmationRequirements.length > 0
         ? `Missing: ${confirmationRequirements.join(', ')}`
         : ''
     );
-  }, [customCheckout, setStatus]);
+  }, [checkout, setStatus]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!stripe || !customCheckout) {
-      return;
-    }
-
-    const {canConfirm, confirm} = customCheckout;
-    if (!canConfirm) {
+    if (!stripe || !checkout) {
       return;
     }
 
     try {
       setLoading(true);
-      await confirm({return_url: window.location.href});
+      await checkout.confirm({
+        email,
+        phoneNumber,
+        returnUrl: window.location.href,
+      });
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -88,12 +82,16 @@ const CheckoutForm = () => {
     }
   };
 
-  const buttonDisabled =
-    !stripe || !customCheckout || !customCheckout.canConfirm || loading;
+  const buttonDisabled = !stripe || !checkout || loading;
 
   return (
     <form onSubmit={handleSubmit}>
-      <CustomerDetails />
+      <CustomerDetails
+        email={email}
+        setEmail={setEmail}
+        phoneNumber={phoneNumber}
+        setPhoneNumber={setPhoneNumber}
+      />
       <h3>Payment Details</h3>
       <PaymentElement />
       <h3>Billing Details</h3>
@@ -125,7 +123,7 @@ const App = () => {
     e.preventDefault();
     setStripePromise(
       loadStripe(pk, {
-        betas: ['custom_checkout_beta_1'],
+        betas: ['custom_checkout_beta_5'],
       })
     );
   };
@@ -171,12 +169,12 @@ const App = () => {
         </label>
       </form>
       {stripePromise && clientSecret && (
-        <CustomCheckoutProvider
+        <CheckoutProvider
           stripe={stripePromise}
           options={{clientSecret, elementsOptions: {appearance: {theme}}}}
         >
           <CheckoutForm />
-        </CustomCheckoutProvider>
+        </CheckoutProvider>
       )}
     </>
   );
