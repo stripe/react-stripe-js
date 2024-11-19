@@ -27,10 +27,7 @@ export * from './types';
 
 export {useElements, Elements, ElementsConsumer} from './components/Elements';
 
-export {
-  useCustomCheckout,
-  CustomCheckoutProvider,
-} from './components/CustomCheckout';
+export {useCheckout, CheckoutProvider} from './components/CheckoutProvider';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
 export {useStripe} from './components/useStripe';

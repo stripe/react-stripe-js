@@ -19,7 +19,7 @@ export const mockElements = () => {
   };
 };
 
-export const mockCustomCheckoutSession = () => {
+export const mockCheckoutSession = () => {
   return {
     lineItems: [],
     currency: 'usd',
@@ -37,7 +37,7 @@ export const mockCustomCheckoutSession = () => {
   };
 };
 
-export const mockCustomCheckoutSdk = () => {
+export const mockCheckoutSdk = () => {
   const elements = {};
 
   return {
@@ -49,7 +49,7 @@ export const mockCustomCheckoutSdk = () => {
     getElement: jest.fn((type) => {
       return elements[type] || null;
     }),
-    session: jest.fn(() => mockCustomCheckoutSession()),
+    session: jest.fn(() => mockCheckoutSession()),
     applyPromotionCode: jest.fn(),
     removePromotionCode: jest.fn(),
     updateShippingAddress: jest.fn(),
@@ -70,7 +70,7 @@ export const mockEmbeddedCheckout = () => ({
 });
 
 export const mockStripe = () => {
-  const customCheckoutSdk = mockCustomCheckoutSdk();
+  const checkoutSdk = mockCheckoutSdk();
   return {
     elements: jest.fn(() => mockElements()),
     createToken: jest.fn(),
@@ -81,7 +81,7 @@ export const mockStripe = () => {
     paymentRequest: jest.fn(),
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
-    initCustomCheckout: jest.fn().mockResolvedValue(customCheckoutSdk),
+    initCheckout: jest.fn().mockResolvedValue(checkoutSdk),
     initEmbeddedCheckout: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),
