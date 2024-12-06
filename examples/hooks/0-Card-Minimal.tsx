@@ -5,6 +5,7 @@
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, useElements, useStripe} from '../../src';
+import {ChangeEvent} from 'react';
 
 import '../styles/common.css';
 
@@ -12,7 +13,7 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     // Block native form submission.
     event.preventDefault();
 
