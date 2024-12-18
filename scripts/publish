@@ -173,9 +173,6 @@ fi
 echo "Installing dependencies according to lockfile"
 yarn -s install --frozen-lockfile
 
-echo "Building"
-yarn -s run build
-
 echo "Running tests"
 yarn -s run test
 
@@ -187,6 +184,8 @@ else
   yarn -s version --$RELEASE_TYPE
 fi
 
+echo "Building"
+yarn -s run build
 
 create_github_release
 verify_commit_is_signed
