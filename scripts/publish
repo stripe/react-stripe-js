@@ -187,11 +187,14 @@ fi
 echo "Building"
 yarn -s run build
 
-create_github_release
 verify_commit_is_signed
 
 echo "Pushing git commit and tag"
 git push --follow-tags
+
+# Create release after commit and tag are pushed to ensure package.json
+# is bumped in the GitHub release.
+create_github_release
 
 echo "Publishing release"
 yarn --ignore-scripts publish --non-interactive --access=public
