@@ -59,10 +59,10 @@ export const extractCheckoutContextValue = (
 
   const {on: _on, session: _session, ...actions} = checkoutSdk;
   if (!sessionState) {
-    return {...actions, ...checkoutSdk.session()};
+    return Object.assign(checkoutSdk.session(), actions);
   }
 
-  return {...actions, ...sessionState};
+  return Object.assign(sessionState, actions);
 };
 
 interface CheckoutProviderProps {
