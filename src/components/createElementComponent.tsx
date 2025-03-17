@@ -112,7 +112,45 @@ const createElementComponent = (
       ) {
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
-          newElement = checkoutSdk.createElement(type as any, options);
+          switch (type) {
+            case 'payment':
+              newElement = checkoutSdk.createPaymentElement(options);
+              break;
+            case 'address':
+              if ('mode' in options) {
+                const {mode, ...restOptions} = options;
+                if (mode === 'shipping') {
+                  newElement = checkoutSdk.createShippingAddressElement(
+                    restOptions
+                  );
+                } else if (mode === 'billing') {
+                  newElement = checkoutSdk.createBillingAddressElement(
+                    restOptions
+                  );
+                } else {
+                  throw new Error(
+                    "Invalid options.mode. mode must be 'billing' or 'shipping'."
+                  );
+                }
+              } else {
+                throw new Error(
+                  "You must supply options.mode. mode must be 'billing' or 'shipping'."
+                );
+              }
+              break;
+            case 'expressCheckout':
+              newElement = checkoutSdk.createExpressCheckoutElement(
+                options as any
+              ) as stripeJs.StripeExpressCheckoutElement;
+              break;
+            case 'currencySelector':
+              newElement = checkoutSdk.createCurrencySelectorElement();
+              break;
+            default:
+              throw new Error(
+                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`
+              );
+          }
         } else if (elements) {
           newElement = elements.create(type as any, options);
         }

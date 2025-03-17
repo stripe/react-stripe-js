@@ -52,15 +52,6 @@ const CheckoutForm = () => {
   const [phoneNumber, setPhoneNumber] = React.useState('');
   const [email, setEmail] = React.useState('');
 
-  React.useEffect(() => {
-    const {confirmationRequirements} = checkout || {};
-    setStatus(
-      confirmationRequirements && confirmationRequirements.length > 0
-        ? `Missing: ${confirmationRequirements.join(', ')}`
-        : ''
-    );
-  }, [checkout, setStatus]);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -123,7 +114,7 @@ const App = () => {
     e.preventDefault();
     setStripePromise(
       loadStripe(pk, {
-        betas: ['custom_checkout_beta_5'],
+        betas: ['custom_checkout_beta_6'],
       })
     );
   };
@@ -171,7 +162,10 @@ const App = () => {
       {stripePromise && clientSecret && (
         <CheckoutProvider
           stripe={stripePromise}
-          options={{clientSecret, elementsOptions: {appearance: {theme}}}}
+          options={{
+            fetchClientSecret: async () => clientSecret,
+            elementsOptions: {appearance: {theme}},
+          }}
         >
           <CheckoutForm />
         </CheckoutProvider>

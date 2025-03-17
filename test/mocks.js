@@ -42,12 +42,33 @@ export const mockCheckoutSdk = () => {
 
   return {
     changeAppearance: jest.fn(),
-    createElement: jest.fn((type) => {
-      elements[type] = mockElement();
-      return elements[type];
+    createPaymentElement: jest.fn(() => {
+      elements.payment = mockElement();
+      return elements.payment;
     }),
-    getElement: jest.fn((type) => {
-      return elements[type] || null;
+    createBillingAddressElement: jest.fn(() => {
+      elements.billingAddress = mockElement();
+      return elements.billingAddress;
+    }),
+    createShippingAddressElement: jest.fn(() => {
+      elements.shippingAddress = mockElement();
+      return elements.shippingAddress;
+    }),
+    createExpressCheckoutElement: jest.fn(() => {
+      elements.expressCheckout = mockElement();
+      return elements.expressCheckout;
+    }),
+    getPaymentElement: jest.fn(() => {
+      return elements.payment || null;
+    }),
+    getBillingAddressElement: jest.fn(() => {
+      return elements.billingAddress || null;
+    }),
+    getShippingAddressElement: jest.fn(() => {
+      return elements.shippingAddress || null;
+    }),
+    getExpressCheckoutElement: jest.fn(() => {
+      return elements.expressCheckout || null;
     }),
     session: jest.fn(() => mockCheckoutSession()),
     applyPromotionCode: jest.fn(),

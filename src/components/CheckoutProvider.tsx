@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {usePrevious} from '../utils/usePrevious';
-import {isUnknownObject} from '../utils/guards';
 import {isEqual} from '../utils/isEqual';
 import {
   ElementsContext,
@@ -178,16 +177,6 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
       return;
     }
 
-    if (
-      options.clientSecret &&
-      !isUnknownObject(prevOptions) &&
-      !isEqual(options.clientSecret, prevOptions.clientSecret)
-    ) {
-      console.warn(
-        'Unsupported prop change: options.clientSecret is not a mutable property.'
-      );
-    }
-
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
     const currentAppearance = options?.elementsOptions?.appearance;
     if (currentAppearance && !isEqual(currentAppearance, previousAppearance)) {
@@ -221,7 +210,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
 CheckoutProvider.propTypes = {
   stripe: PropTypes.any,
   options: PropTypes.shape({
-    clientSecret: PropTypes.string.isRequired,
+    fetchClientSecret: PropTypes.func.isRequired,
     elementsOptions: PropTypes.object as any,
   }).isRequired,
 };
