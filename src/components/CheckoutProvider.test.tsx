@@ -40,7 +40,10 @@ describe('CheckoutProvider', () => {
 
   test('injects CheckoutProvider with the useCheckout hook', async () => {
     const wrapper = ({children}: any) => (
-      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
+      <CheckoutProvider
+        stripe={mockStripe}
+        options={{fetchClientSecret: async () => 'cs_123'}}
+      >
         {children}
       </CheckoutProvider>
     );
@@ -58,7 +61,10 @@ describe('CheckoutProvider', () => {
 
   test('injects CheckoutProvider with the useStripe hook', async () => {
     const wrapper = ({children}: any) => (
-      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
+      <CheckoutProvider
+        stripe={mockStripe}
+        options={{fetchClientSecret: async () => 'cs_123'}}
+      >
         {children}
       </CheckoutProvider>
     );
@@ -77,7 +83,10 @@ describe('CheckoutProvider', () => {
   test('allows a transition from null to a valid Stripe object', async () => {
     let stripeProp: any = null;
     const wrapper = ({children}: any) => (
-      <CheckoutProvider stripe={stripeProp} options={{clientSecret: 'cs_123'}}>
+      <CheckoutProvider
+        stripe={stripeProp}
+        options={{fetchClientSecret: async () => 'cs_123'}}
+      >
         {children}
       </CheckoutProvider>
     );
@@ -94,7 +103,7 @@ describe('CheckoutProvider', () => {
     const wrapper = ({children}: any) => (
       <CheckoutProvider
         stripe={mockStripePromise}
-        options={{clientSecret: 'cs_123'}}
+        options={{fetchClientSecret: async () => 'cs_123'}}
       >
         {children}
       </CheckoutProvider>
@@ -114,7 +123,10 @@ describe('CheckoutProvider', () => {
   test('allows a transition from null to a valid Promise', async () => {
     let stripeProp: any = null;
     const wrapper = ({children}: any) => (
-      <CheckoutProvider stripe={stripeProp} options={{clientSecret: 'cs_123'}}>
+      <CheckoutProvider
+        stripe={stripeProp}
+        options={{fetchClientSecret: async () => 'cs_123'}}
+      >
         {children}
       </CheckoutProvider>
     );
@@ -144,7 +156,7 @@ describe('CheckoutProvider', () => {
       result = render(
         <CheckoutProvider
           stripe={mockStripePromise}
-          options={{clientSecret: 'cs_123'}}
+          options={{fetchClientSecret: async () => 'cs_123'}}
         >
           {null}
         </CheckoutProvider>
@@ -169,7 +181,7 @@ describe('CheckoutProvider', () => {
       result = render(
         <CheckoutProvider
           stripe={nullPromise}
-          options={{clientSecret: 'cs_123'}}
+          options={{fetchClientSecret: async () => 'cs_123'}}
         >
           <TestComponent />
         </CheckoutProvider>
@@ -196,7 +208,7 @@ describe('CheckoutProvider', () => {
         render(
           <CheckoutProvider
             stripe={stripeProp as any}
-            options={{clientSecret: 'cs_123'}}
+            options={{fetchClientSecret: async () => 'cs_123'}}
           >
             <div />
           </CheckoutProvider>
@@ -213,7 +225,7 @@ describe('CheckoutProvider', () => {
       result = render(
         <CheckoutProvider
           stripe={mockStripe}
-          options={{clientSecret: 'cs_123'}}
+          options={{fetchClientSecret: async () => 'cs_123'}}
         />
       );
     });
@@ -223,7 +235,7 @@ describe('CheckoutProvider', () => {
       result.rerender(
         <CheckoutProvider
           stripe={mockStripe2}
-          options={{clientSecret: 'cs_123'}}
+          options={{fetchClientSecret: async () => 'cs_123'}}
         />
       );
     });
@@ -239,12 +251,13 @@ describe('CheckoutProvider', () => {
 
   test('initCheckout only called once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
     let result: any;
+    const fetchClientSecret = async () => 'cs_123';
     act(() => {
       result = render(
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            clientSecret: 'cs_123',
+            fetchClientSecret,
             elementsOptions: {
               appearance: {theme: 'stripe'},
             },
@@ -255,7 +268,7 @@ describe('CheckoutProvider', () => {
 
     await waitFor(() =>
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        clientSecret: 'cs_123',
+        fetchClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
         },
@@ -267,7 +280,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            clientSecret: 'cs_123',
+            fetchClientSecret: async () => 'cs_123',
             elementsOptions: {appearance: {theme: 'night'}},
           }}
         />
@@ -285,12 +298,13 @@ describe('CheckoutProvider', () => {
 
   test('allows options changes before setting the Stripe object', async () => {
     let result: any;
+    const fetchClientSecret = async () => 'cs_123';
     act(() => {
       result = render(
         <CheckoutProvider
           stripe={null}
           options={{
-            clientSecret: 'cs_123',
+            fetchClientSecret,
             elementsOptions: {
               appearance: {theme: 'stripe'},
             },
@@ -308,7 +322,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            clientSecret: 'cs_123',
+            fetchClientSecret,
             elementsOptions: {appearance: {theme: 'stripe'}},
           }}
         />
@@ -319,7 +333,7 @@ describe('CheckoutProvider', () => {
       expect(console.warn).not.toHaveBeenCalled();
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        clientSecret: 'cs_123',
+        fetchClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
         },
@@ -348,7 +362,7 @@ describe('CheckoutProvider', () => {
       <Elements stripe={mockStripe}>
         <CheckoutProvider
           stripe={mockStripe}
-          options={{clientSecret: 'cs_123'}}
+          options={{fetchClientSecret: async () => 'cs_123'}}
         >
           {children}
         </CheckoutProvider>
@@ -368,7 +382,10 @@ describe('CheckoutProvider', () => {
 
   test('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', async () => {
     const wrapper = ({children}: any) => (
-      <CheckoutProvider stripe={mockStripe} options={{clientSecret: 'cs_123'}}>
+      <CheckoutProvider
+        stripe={mockStripe}
+        options={{fetchClientSecret: async () => 'cs_123'}}
+      >
         <Elements stripe={mockStripe}>{children}</Elements>
       </CheckoutProvider>
     );
@@ -396,7 +413,7 @@ describe('CheckoutProvider', () => {
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripe}
-              options={{clientSecret: 'cs_123'}}
+              options={{fetchClientSecret: async () => 'cs_123'}}
             >
               <TestComponent />
             </CheckoutProvider>
@@ -420,7 +437,7 @@ describe('CheckoutProvider', () => {
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripePromise}
-              options={{clientSecret: 'cs_123'}}
+              options={{fetchClientSecret: async () => 'cs_123'}}
             >
               <TestComponent />
             </CheckoutProvider>
@@ -435,13 +452,14 @@ describe('CheckoutProvider', () => {
 
     test('allows changes to options via (mockCheckoutSdk.changeAppearance after setting the Stripe object in StrictMode', async () => {
       let result: any;
+      const fetchClientSecret = async () => 'cs_123';
       act(() => {
         result = render(
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripe}
               options={{
-                clientSecret: 'cs_123',
+                fetchClientSecret,
                 elementsOptions: {
                   appearance: {theme: 'stripe'},
                 },
@@ -454,7 +472,7 @@ describe('CheckoutProvider', () => {
       await waitFor(() => {
         expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
         expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-          clientSecret: 'cs_123',
+          fetchClientSecret,
           elementsOptions: {
             appearance: {theme: 'stripe'},
           },
@@ -467,7 +485,7 @@ describe('CheckoutProvider', () => {
             <CheckoutProvider
               stripe={mockStripe}
               options={{
-                clientSecret: 'cs_123',
+                fetchClientSecret: async () => 'cs_123',
                 elementsOptions: {appearance: {theme: 'night'}},
               }}
             />
