@@ -72,7 +72,7 @@ EOF
 verify_commit_is_signed() {
   local commit_hash=$(git log -1 --format="%H")
 
-  if ! git verify-commit "$commit_hash" &> /dev/null; then
+  if git show --no-patch --pretty=format:"%G?" "$commit_hash" | grep "N" &> /dev/null; then
     echo "Error! Commit $commit_hash is not signed"
     echo "Please follow https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account and sign your commit"
     exit 1
