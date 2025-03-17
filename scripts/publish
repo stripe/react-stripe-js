@@ -171,21 +171,21 @@ if ! grep -q 'working tree clean' <<< "$GIT_STATUS"; then
 fi
 
 echo "Installing dependencies according to lockfile"
-yarn -s install --frozen-lockfile
+yarn install --frozen-lockfile
 
 echo "Running tests"
-yarn -s run test
+yarn run test
 
 if [ -n "$PREID" ]; then
   echo "Bumping package.json $RELEASE_TYPE, $PREID version and tagging commit"
-  yarn -s version --$RELEASE_TYPE --preid $PREID
+  yarn version --$RELEASE_TYPE --preid $PREID
 else
   echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
-  yarn -s version --$RELEASE_TYPE
+  yarn version --$RELEASE_TYPE
 fi
 
 echo "Building"
-yarn -s run build
+yarn run build
 
 verify_commit_is_signed
 
