@@ -173,9 +173,6 @@ fi
 echo "Installing dependencies according to lockfile"
 yarn install --frozen-lockfile
 
-echo "Running tests"
-yarn run test
-
 if [ -n "$PREID" ]; then
   echo "Bumping package.json $RELEASE_TYPE, $PREID version and tagging commit"
   yarn version --$RELEASE_TYPE --preid $PREID
@@ -186,6 +183,9 @@ fi
 
 echo "Building"
 yarn run build
+
+echo "Running tests"
+yarn run test
 
 verify_commit_is_signed
 
