@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {useEmbeddedCheckoutContext} from './EmbeddedCheckoutProvider';
 import {isServer} from '../utils/isServer';
 

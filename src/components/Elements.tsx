@@ -7,7 +7,7 @@ import {
 } from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {usePrevious} from '../utils/usePrevious';
