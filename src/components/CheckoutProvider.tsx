@@ -42,7 +42,7 @@ type StripeCheckoutActions = Omit<
   'on'
 >;
 
-interface CheckoutContextValue
+export interface CheckoutContextValue
   extends StripeCheckoutActions,
     stripeJs.StripeCheckoutSession {}
 const CheckoutContext = React.createContext<CheckoutContextValue | null>(null);
