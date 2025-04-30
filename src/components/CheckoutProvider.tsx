@@ -172,17 +172,24 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
 
   // Apply updates to elements when options prop has relevant changes
   const prevOptions = usePrevious(options);
+  const prevCheckoutSdk = usePrevious(ctx.checkoutSdk);
   React.useEffect(() => {
+    // Ignore changes while checkout sdk is not initialized.
     if (!ctx.checkoutSdk) {
       return;
     }
 
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
     const currentAppearance = options?.elementsOptions?.appearance;
-    if (currentAppearance && !isEqual(currentAppearance, previousAppearance)) {
+    const hasAppearanceChanged = !isEqual(
+      currentAppearance,
+      previousAppearance
+    );
+    const hasSdkLoaded = !prevCheckoutSdk && ctx.checkoutSdk;
+    if (currentAppearance && (hasAppearanceChanged || hasSdkLoaded)) {
       ctx.checkoutSdk.changeAppearance(currentAppearance);
     }
-  }, [options, prevOptions, ctx.checkoutSdk]);
+  }, [options, prevOptions, ctx.checkoutSdk, prevCheckoutSdk]);
 
   // Attach react-stripe-js version to stripe.js instance
   React.useEffect(() => {
