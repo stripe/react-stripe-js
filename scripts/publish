@@ -19,6 +19,68 @@ ARGS:
 EOF
 }
 
+verify_prerequisites() {
+  echo "Verifying prerequisites..."
+  
+  # Check npm login status
+  if ! npm whoami &> /dev/null; then
+    echo "Error! You are not logged in to npm."
+    echo "Please run 'npm login' and try again."
+    exit 1
+  fi
+  
+  # Check yarn login status
+  if ! yarn login --silent &> /dev/null; then
+    echo "Error! You are not logged in to yarn."
+    echo "Please run 'yarn login' and try again."
+    exit 1
+  fi
+  
+  # Check for hub command
+  if ! which hub &> /dev/null; then
+    echo "Error! 'hub' command not found."
+    echo "Please install hub with 'brew install hub'."
+    exit 1
+  fi
+  
+  # Check GitHub token
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    echo "Error! GITHUB_TOKEN environment variable is not set."
+    exit 1
+  fi
+  
+  # Check git signing configuration
+  if [ "$(git config --get gpg.format)" != "ssh" ]; then
+    echo "Error! Git is not configured to use SSH for commit signing."
+    echo "Please run: git config --global gpg.format ssh"
+    exit 1
+  fi
+  
+  # Check signing key configuration
+  if [ -z "$(git config --get user.signingkey)" ]; then
+    echo "Error! Git signing key is not configured."
+    echo "Please run: git config --global user.signingkey ~/.ssh/id_ed25519.pub"
+    exit 1
+  fi
+  
+  # Check if signing key exists
+  local signing_key=$(git config --get user.signingkey)
+  if [ ! -f "$signing_key" ]; then
+    echo "Error! Git signing key does not exist at: $signing_key"
+    echo "Please set up SSH key for signing as described in the documentation."
+    exit 1
+  fi
+  
+  # Check if commit signing is enabled
+  if [ "$(git config --get commit.gpgsign)" != "true" ]; then
+    echo "Error! Git commit signing is not enabled."
+    echo "Please run: git config --global commit.gpgsign true"
+    exit 1
+  fi
+  
+  echo "All prerequisites verified successfully!"
+}
+
 create_github_release() {
   if which hub | grep -q "not found"; then
     create_github_release_fallback
@@ -149,6 +211,8 @@ check_github_token
 
 # Make sure our working dir is the repo root directory
 cd "$(git rev-parse --show-toplevel)"
+
+verify_prerequisites
 
 echo "Fetching git remotes"
 git fetch
