@@ -165,7 +165,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        '[stripe] Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);

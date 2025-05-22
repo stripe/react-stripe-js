@@ -233,7 +233,7 @@ describe('Elements', () => {
     expect(mockStripe.elements.mock.calls).toHaveLength(1);
     expect(mockStripe2.elements.mock.calls).toHaveLength(0);
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
+      '[stripe] Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
     );
   });
 

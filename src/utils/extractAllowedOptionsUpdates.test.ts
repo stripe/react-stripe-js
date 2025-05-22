@@ -31,7 +31,7 @@ describe('extractAllowedOptionsUpdates', () => {
       )
     ).toEqual(null);
     expect(consoleSpy).toHaveBeenCalledWith(
-      'Unsupported prop change: options.foo is not a mutable property.'
+      '[stripe] Unsupported prop change: options.foo is not a mutable property.'
     );
     expect(consoleSpy).toHaveBeenCalledTimes(1);
 

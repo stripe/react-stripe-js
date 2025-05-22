@@ -160,7 +160,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);
@@ -174,7 +174,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
 
     if (options == null) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot unset options after setting them.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot unset options after setting them.'
       );
       return;
     }
@@ -193,7 +193,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
       options.clientSecret !== prevOptions.clientSecret
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     }
 
@@ -202,7 +202,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
       options.fetchClientSecret !== prevOptions.fetchClientSecret
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     }
 
@@ -211,7 +211,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
       options.onComplete !== prevOptions.onComplete
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
       );
     }
 
@@ -220,7 +220,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
       options.onShippingDetailsChange !== prevOptions.onShippingDetailsChange
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
       );
     }
 
@@ -229,7 +229,7 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
       options.onLineItemsChange !== prevOptions.onLineItemsChange
     ) {
       console.warn(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
       );
     }
   }, [prevOptions, options]);

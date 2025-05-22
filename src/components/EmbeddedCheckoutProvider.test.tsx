@@ -224,7 +224,7 @@ describe('EmbeddedCheckoutProvider', () => {
     expect(mockStripe.initEmbeddedCheckout.mock.calls).toHaveLength(1);
     expect(mockStripe2.initEmbeddedCheckout.mock.calls).toHaveLength(0);
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
+      '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
     );
   });
 
@@ -275,7 +275,7 @@ describe('EmbeddedCheckoutProvider', () => {
       );
 
       expect(consoleWarn).toHaveBeenCalledWith(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     });
   });
@@ -329,7 +329,7 @@ describe('EmbeddedCheckoutProvider', () => {
       );
 
       expect(consoleWarn).toHaveBeenCalledWith(
-        'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
+        '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.'
       );
     });
   });
@@ -378,7 +378,7 @@ describe('EmbeddedCheckoutProvider', () => {
     );
 
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
+      '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.'
     );
   });
 
@@ -410,7 +410,7 @@ describe('EmbeddedCheckoutProvider', () => {
     );
 
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
+      '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.'
     );
   });
 
@@ -441,7 +441,7 @@ describe('EmbeddedCheckoutProvider', () => {
       ></EmbeddedCheckoutProvider>
     );
     expect(consoleWarn).toHaveBeenCalledWith(
-      'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
+      '[stripe] Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.'
     );
   });
 

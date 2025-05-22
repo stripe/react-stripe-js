@@ -21,7 +21,7 @@ export const extractAllowedOptionsUpdates = (
       if (immutableKeys.includes(key)) {
         if (isUpdated) {
           console.warn(
-            `Unsupported prop change: options.${key} is not a mutable property.`
+            `[stripe] Unsupported prop change: options.${key} is not a mutable property.`
           );
         }
 
