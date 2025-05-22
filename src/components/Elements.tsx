@@ -127,7 +127,7 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   const prevStripe = usePrevious(rawStripeProp);
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
-      console.warn(
+      console.error(
         '[stripe] Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.'
       );
     }
