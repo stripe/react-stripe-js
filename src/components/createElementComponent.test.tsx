@@ -1,4 +1,5 @@
-import React, {StrictMode} from 'react';
+import * as React from 'react';
+import {StrictMode} from 'react';
 import {render, act, waitFor} from '@testing-library/react';
 
 import * as ElementsModule from './Elements';
