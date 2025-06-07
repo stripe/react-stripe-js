@@ -244,7 +244,7 @@ describe('CheckoutProvider', () => {
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
       expect(mockStripe2.initCheckout).toHaveBeenCalledTimes(0);
       expect(consoleWarn).toHaveBeenCalledWith(
-        'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        '[stripe] Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
       );
     });
   });
