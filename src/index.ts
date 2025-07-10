@@ -199,3 +199,12 @@ export const AfterpayClearpayMessageElement: AfterpayClearpayMessageElementCompo
   'afterpayClearpayMessage',
   isServer
 );
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
+  isServer
+);

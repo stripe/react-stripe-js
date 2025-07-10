@@ -821,3 +821,37 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeAfterpayClearpayMessageElement | null;
   }
 }
+
+export interface TaxIdElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeTaxIdElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   */
+  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeAddressElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'address'}) => any;
+}
+
+export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
