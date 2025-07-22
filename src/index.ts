@@ -20,6 +20,7 @@ import {
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
   CurrencySelectorElementComponent,
+  TaxIdElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
@@ -197,5 +198,14 @@ export const AffirmMessageElement: AffirmMessageElementComponent = createElement
  */
 export const AfterpayClearpayMessageElement: AfterpayClearpayMessageElementComponent = createElementComponent(
   'afterpayClearpayMessage',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
   isServer
 );

@@ -146,6 +146,9 @@ const createElementComponent = (
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();
               break;
+            case 'taxId':
+              newElement = checkoutSdk.createTaxIdElement(options);
+              break;
             default:
               throw new Error(
                 `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`
