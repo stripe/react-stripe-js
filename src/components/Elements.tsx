@@ -72,7 +72,7 @@ interface PrivateElementsProps {
  * The `loadStripe` function will asynchronously load the Stripe.js script and initialize a `Stripe` object.
  * Pass the returned `Promise` to `Elements`.
  *
- * @docs https://stripe.com/docs/stripe-js/react#elements-provider
+ * @docs https://docs.stripe.com/sdks/stripejs-react?ui=elements#elements-provider
  */
 export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   stripe: rawStripeProp,
