@@ -2,7 +2,7 @@
 import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
-import React from 'react';
+import * as React from 'react';
 
 import PropTypes from 'prop-types';
 
