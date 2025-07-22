@@ -20,6 +20,7 @@ import {
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
   CurrencySelectorElementComponent,
+  TaxIdElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
