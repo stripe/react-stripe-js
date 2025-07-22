@@ -831,12 +831,12 @@ export interface TaxIdElementProps extends ElementProps {
   /**
    * Triggered when data exposed by this Element is changed (e.g., when there is an error).
    */
-  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
+  onChange?: (event: stripeJs.StripeTaxIdElementChangeEvent) => any;
 
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
    */
-  onReady?: (element: stripeJs.StripeAddressElement) => any;
+  onReady?: (element: stripeJs.StripeTaxIdElement) => any;
 
   /**
    * Triggered when the escape key is pressed within the Element.
@@ -846,12 +846,12 @@ export interface TaxIdElementProps extends ElementProps {
   /**
    * Triggered when the Element fails to load.
    */
-  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
+  onLoadError?: (event: {elementType: 'taxId'; error: StripeError}) => any;
 
   /**
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */
-  onLoaderStart?: (event: {elementType: 'address'}) => any;
+  onLoaderStart?: (event: {elementType: 'taxId'}) => any;
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
