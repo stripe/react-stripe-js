@@ -147,9 +147,7 @@ const createElementComponent = (
               newElement = checkoutSdk.createCurrencySelectorElement();
               break;
             case 'taxId':
-              newElement = checkoutSdk.createTaxIdElement(
-                options
-              ) as stripeJs.StripeTaxIdElement;
+              newElement = checkoutSdk.createTaxIdElement(options);
               break;
             default:
               throw new Error(
