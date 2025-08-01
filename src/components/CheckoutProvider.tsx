@@ -198,7 +198,6 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
     const hasFontsChanged = !isEqual(previousFonts, currentFonts);
 
     if (currentFonts && (hasFontsChanged || hasSdkLoaded)) {
-      // @ts-expect-error - Remove me before merging!
       ctx.checkoutSdk.loadFonts(currentFonts);
     }
   }, [options, prevOptions, ctx.checkoutSdk, prevCheckoutSdk]);
