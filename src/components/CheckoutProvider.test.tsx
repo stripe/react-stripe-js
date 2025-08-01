@@ -296,6 +296,135 @@ describe('CheckoutProvider', () => {
     });
   });
 
+  test('it does not call loadFonts a 2nd time if they do not change', async () => {
+    let result: any;
+    const fetchClientSecret = async () => 'cs_123';
+    act(() => {
+      result = render(
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{
+            fetchClientSecret,
+            elementsOptions: {
+              fonts: [
+                {
+                  cssSrc: 'https://example.com/font.css',
+                },
+              ],
+            },
+          }}
+        />
+      );
+    });
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
+        fetchClientSecret,
+        elementsOptions: {
+          fonts: [
+            {
+              cssSrc: 'https://example.com/font.css',
+            },
+          ],
+        },
+      })
+    );
+
+    act(() => {
+      result.rerender(
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{
+            fetchClientSecret: async () => 'cs_123',
+            elementsOptions: {
+              fonts: [
+                {
+                  cssSrc: 'https://example.com/font.css',
+                },
+              ],
+            },
+          }}
+        />
+      );
+    });
+
+    act(() => {
+      result.rerender(
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{
+            fetchClientSecret: async () => 'cs_123',
+            elementsOptions: {
+              fonts: [
+                {
+                  cssSrc: 'https://example.com/font.css',
+                },
+              ],
+            },
+          }}
+        />
+      );
+    });
+
+    await waitFor(() => {
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+
+      // This is called once, due to the sdk having loaded.
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test('allows changes to elementsOptions fonts', async () => {
+    let result: any;
+    const fetchClientSecret = async () => 'cs_123';
+    act(() => {
+      result = render(
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{
+            fetchClientSecret,
+            elementsOptions: {},
+          }}
+        />
+      );
+    });
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
+        fetchClientSecret,
+        elementsOptions: {},
+      })
+    );
+
+    act(() => {
+      result.rerender(
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{
+            fetchClientSecret: async () => 'cs_123',
+            elementsOptions: {
+              fonts: [
+                {
+                  cssSrc: 'https://example.com/font.css',
+                },
+              ],
+            },
+          }}
+        />
+      );
+    });
+
+    await waitFor(() => {
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledWith([
+        {
+          cssSrc: 'https://example.com/font.css',
+        },
+      ]);
+    });
+  });
+
   test('allows options changes before setting the Stripe object', async () => {
     let result: any;
     const fetchClientSecret = async () => 'cs_123';

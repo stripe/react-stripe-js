@@ -179,15 +179,26 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
       return;
     }
 
+    const hasSdkLoaded = Boolean(!prevCheckoutSdk && ctx.checkoutSdk);
+
+    // Handle appearance changes
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
     const currentAppearance = options?.elementsOptions?.appearance;
     const hasAppearanceChanged = !isEqual(
       currentAppearance,
       previousAppearance
     );
-    const hasSdkLoaded = !prevCheckoutSdk && ctx.checkoutSdk;
     if (currentAppearance && (hasAppearanceChanged || hasSdkLoaded)) {
       ctx.checkoutSdk.changeAppearance(currentAppearance);
+    }
+
+    // Handle fonts changes
+    const previousFonts = prevOptions?.elementsOptions?.fonts;
+    const currentFonts = options?.elementsOptions?.fonts;
+    const hasFontsChanged = !isEqual(previousFonts, currentFonts);
+
+    if (currentFonts && (hasFontsChanged || hasSdkLoaded)) {
+      ctx.checkoutSdk.loadFonts(currentFonts);
     }
   }, [options, prevOptions, ctx.checkoutSdk, prevCheckoutSdk]);
 
