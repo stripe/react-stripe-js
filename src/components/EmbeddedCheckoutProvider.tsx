@@ -1,5 +1,5 @@
 import {FunctionComponent, PropsWithChildren, ReactNode} from 'react';
-import React from 'react';
+import * as React from 'react';
 
 import {usePrevious} from '../utils/usePrevious';
 import {UnknownOptions} from '../utils/extractAllowedOptionsUpdates';
