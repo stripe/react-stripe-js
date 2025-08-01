@@ -42,6 +42,7 @@ export const mockCheckoutSdk = () => {
 
   return {
     changeAppearance: jest.fn(),
+    loadFonts: jest.fn(),
     createPaymentElement: jest.fn(() => {
       elements.payment = mockElement();
       return elements.payment;
