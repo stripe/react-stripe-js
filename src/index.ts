@@ -31,7 +31,7 @@ export {useElements, Elements, ElementsConsumer} from './components/Elements';
 export {
   useCheckout,
   CheckoutProvider,
-  CheckoutContextValue,
+  CheckoutState,
 } from './components/CheckoutProvider';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';

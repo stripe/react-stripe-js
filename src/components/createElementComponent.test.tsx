@@ -14,7 +14,7 @@ import {
 } from '../types';
 
 const {Elements} = ElementsModule;
-const {CheckoutProvider} = CheckoutModule;
+const {CheckoutProvider, useCheckout} = CheckoutModule;
 
 describe('createElementComponent', () => {
   let mockStripe: any;
@@ -98,11 +98,12 @@ describe('createElementComponent', () => {
           stripe={null}
           options={{fetchClientSecret: async () => ''}}
         >
-          <CardElement />
+          <CardElement id="foo" />
         </CheckoutProvider>
       );
 
-      expect(container.firstChild).toBe(null);
+      const elementContainer = container.firstChild as Element;
+      expect(elementContainer.id).toBe('foo');
     });
   });
 
@@ -328,7 +329,7 @@ describe('createElementComponent', () => {
 
     it('attaches event listeners once the element is created', () => {
       jest
-        .spyOn(CheckoutModule, 'useElementsOrCheckoutSdkContextWithUseCase')
+        .spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase')
         .mockReturnValueOnce({elements: null, stripe: null})
         .mockReturnValue({elements: mockElements, stripe: mockStripe});
 
@@ -973,6 +974,15 @@ describe('createElementComponent', () => {
           elementMounted = false;
         });
 
+        const TestComponent = () => {
+          const checkout = useCheckout();
+          if (checkout.type === 'success') {
+            return <PaymentElement />;
+          } else {
+            return null;
+          }
+        };
+
         act(() => {
           result = render(
             <StrictMode>
@@ -980,7 +990,7 @@ describe('createElementComponent', () => {
                 stripe={mockStripe}
                 options={{fetchClientSecret: async () => 'cs_123'}}
               >
-                <PaymentElement />
+                <TestComponent />
               </CheckoutProvider>
             </StrictMode>
           );
