@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import {useEmbeddedCheckoutContext} from './EmbeddedCheckoutProvider';
 import {isServer} from '../utils/isServer';
 
@@ -60,6 +60,8 @@ const EmbeddedCheckoutServerElement = ({
   return <div id={id} className={className} />;
 };
 
-export const EmbeddedCheckout = isServer
+type EmbeddedCheckoutComponent = FunctionComponent<EmbeddedCheckoutProps>;
+
+export const EmbeddedCheckout: EmbeddedCheckoutComponent = isServer
   ? EmbeddedCheckoutServerElement
   : EmbeddedCheckoutClientElement;
