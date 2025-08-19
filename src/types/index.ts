@@ -685,7 +685,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardNumberElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=cardNumber) for the `CardNumberElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `CardNumberElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -693,7 +693,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardNumberElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardCvcElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=cardCvc) for the `CardCvcElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `CardCvcElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -701,7 +701,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardCvcElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardExpiryElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=cardExpiry) for the `CardExpiryElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `CardExpiryElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -717,7 +717,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeFpxBankElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IbanElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=iban) for the `IbanElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `IbanElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -773,7 +773,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -805,7 +805,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripePaymentMethodMessagingElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AffirmMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=affirmMessage) for the `AffirmMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `AffirmMessageElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -813,7 +813,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeAffirmMessageElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `AfterpayClearpayMessageElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
