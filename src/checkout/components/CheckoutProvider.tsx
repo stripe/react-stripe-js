@@ -4,15 +4,15 @@ import * as stripeJs from '@stripe/stripe-js';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {parseStripeProp} from '../utils/parseStripeProp';
-import {usePrevious} from '../utils/usePrevious';
-import {isEqual} from '../utils/isEqual';
+import {parseStripeProp} from '../../utils/parseStripeProp';
+import {usePrevious} from '../../utils/usePrevious';
+import {isEqual} from '../../utils/isEqual';
 import {
   ElementsContext,
   ElementsContextValue,
   parseElementsContext,
-} from './Elements';
-import {registerWithStripeJs} from '../utils/registerWithStripeJs';
+} from '../../components/Elements';
+import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 
 interface CheckoutSdkContextValue {
   checkoutSdk: stripeJs.StripeCheckout | null;

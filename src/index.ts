@@ -19,7 +19,6 @@ import {
   AffirmMessageElementComponent,
   AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
-  CurrencySelectorElementComponent,
   TaxIdElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
@@ -28,11 +27,6 @@ export * from './types';
 
 export {useElements, Elements, ElementsConsumer} from './components/Elements';
 
-export {
-  useCheckout,
-  CheckoutProvider,
-  CheckoutContextValue,
-} from './components/CheckoutProvider';
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
 export {useStripe} from './components/useStripe';
@@ -133,14 +127,6 @@ export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createEle
   isServer
 );
 
-/**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- */
-export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
-  'currencySelector',
-  isServer
-);
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
