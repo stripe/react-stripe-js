@@ -30,6 +30,16 @@ export default [
     ],
     plugins: PLUGINS,
   },
+  // Checkout subpath build (CJS and ESM)
+  {
+    input: 'src/checkout/index.ts',
+    external: ['react', 'prop-types'],
+    output: [
+      {file: 'dist/checkout.js', format: 'cjs'},
+      {file: 'dist/checkout.esm.mjs', format: 'es'},
+    ],
+    plugins: PLUGINS,
+  },
   // UMD build with inline PropTypes
   {
     input: 'src/index.ts',

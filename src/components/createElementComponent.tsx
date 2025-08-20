@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCheckoutContextWithUseCase} from './CheckoutProvider';
+import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutProvider';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
