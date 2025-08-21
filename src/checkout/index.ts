@@ -10,6 +10,7 @@ export type {
 import createElementComponent from '../components/createElementComponent';
 import {isServer} from '../utils/isServer';
 import type {CurrencySelectorElementComponent} from './types';
+import type {PaymentElementComponent, ExpressCheckoutElementComponent} from '../types';
 
 /**
  * Requires beta access:
@@ -17,5 +18,16 @@ import type {CurrencySelectorElementComponent} from './types';
  */
 export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
   'currencySelector',
+  isServer
+);
+
+// PaymentElement is available for both regular Elements and Checkout SDK.
+export const PaymentElement: PaymentElementComponent = createElementComponent(
+  'payment',
+  isServer
+);
+
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
+  'expressCheckout',
   isServer
 );

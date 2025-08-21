@@ -79,7 +79,9 @@ const createElementComponent = (
     useAttachEvent(element, 'blur', onBlur);
     useAttachEvent(element, 'focus', onFocus);
     useAttachEvent(element, 'escape', onEscape);
-    useAttachEvent(element, 'click', onClick);
+    // Hide click event for ExpressCheckoutElement in Checkout SDK
+    const shouldAttachClick = !(checkoutSdk && type === 'expressCheckout');
+    useAttachEvent(element, 'click', shouldAttachClick ? onClick : undefined);
     useAttachEvent(element, 'loaderror', onLoadError);
     useAttachEvent(element, 'loaderstart', onLoaderStart);
     useAttachEvent(element, 'networkschange', onNetworksChange);
@@ -114,6 +116,7 @@ const createElementComponent = (
         if (checkoutSdk) {
           switch (type) {
             case 'payment':
+              // Do we need to check for ApplePay here and for ECE below?
               newElement = checkoutSdk.createPaymentElement(options);
               break;
             case 'address':
