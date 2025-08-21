@@ -32,3 +32,27 @@ export interface CurrencySelectorElementProps extends ElementProps {
 export type CurrencySelectorElementComponent = FunctionComponent<
   CurrencySelectorElementProps
 >;
+
+export interface BillingAddressElementProps extends ElementProps {
+  options?: stripeJs.StripeCheckoutAddressElementOptions;
+  onReady?: (element: stripeJs.StripeAddressElement) => any;
+  onEscape?: () => any;
+  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
+  onLoaderStart?: (event: {elementType: 'address'}) => any;
+}
+
+export type BillingAddressElementComponent = FunctionComponent<
+  BillingAddressElementProps
+>;
+
+export interface ShippingAddressElementProps extends ElementProps {
+  options?: stripeJs.StripeCheckoutAddressElementOptions;
+  onReady?: (element: stripeJs.StripeAddressElement) => any;
+  onEscape?: () => any;
+  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
+  onLoaderStart?: (event: {elementType: 'address'}) => any;
+}
+
+export type ShippingAddressElementComponent = FunctionComponent<
+  ShippingAddressElementProps
+>;

@@ -7,9 +7,14 @@ export type {
   CurrencySelectorElementProps,
   CurrencySelectorElementComponent,
 } from './types';
+import React from 'react';
 import createElementComponent from '../components/createElementComponent';
 import {isServer} from '../utils/isServer';
-import type {CurrencySelectorElementComponent} from './types';
+import type {
+  CurrencySelectorElementComponent,
+  BillingAddressElementComponent,
+  ShippingAddressElementComponent,
+} from './types';
 import type {PaymentElementComponent, ExpressCheckoutElementComponent} from '../types';
 
 /**
@@ -31,3 +36,21 @@ export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createEle
   'expressCheckout',
   isServer
 );
+
+export const BillingAddressElement: BillingAddressElementComponent = ((
+  props
+) => {
+  const Component = createElementComponent('address', isServer) as any;
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'billing'};
+  return React.createElement(Component, {...rest, options: merged});
+}) as BillingAddressElementComponent;
+
+export const ShippingAddressElement: ShippingAddressElementComponent = ((
+  props
+) => {
+  const Component = createElementComponent('address', isServer) as any;
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'shipping'};
+  return React.createElement(Component, {...rest, options: merged});
+}) as ShippingAddressElementComponent;
