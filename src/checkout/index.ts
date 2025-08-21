@@ -3,14 +3,19 @@ export {
   CheckoutProvider,
   CheckoutState,
 } from './components/CheckoutProvider';
-export type {
-  CurrencySelectorElementProps,
-  CurrencySelectorElementComponent,
-} from './types';
+export * from './types';
+import React from 'react';
 import createElementComponent from '../components/createElementComponent';
 import {isServer} from '../utils/isServer';
-import type {CurrencySelectorElementComponent} from './types';
-import type {PaymentElementComponent, ExpressCheckoutElementComponent} from '../types';
+import {
+  CurrencySelectorElementComponent,
+  BillingAddressElementComponent,
+  ShippingAddressElementComponent,
+} from './types';
+import {
+  PaymentElementComponent,
+  ExpressCheckoutElementComponent,
+} from '../types';
 
 /**
  * Requires beta access:
@@ -21,7 +26,6 @@ export const CurrencySelectorElement: CurrencySelectorElementComponent = createE
   isServer
 );
 
-// PaymentElement is available for both regular Elements and Checkout SDK.
 export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
   isServer
@@ -31,3 +35,21 @@ export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createEle
   'expressCheckout',
   isServer
 );
+
+export const BillingAddressElement: BillingAddressElementComponent = ((
+  props
+) => {
+  const Component = createElementComponent('address', isServer) as any;
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'billing'};
+  return React.createElement(Component, {...rest, options: merged});
+}) as BillingAddressElementComponent;
+
+export const ShippingAddressElement: ShippingAddressElementComponent = ((
+  props
+) => {
+  const Component = createElementComponent('address', isServer) as any;
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'shipping'};
+  return React.createElement(Component, {...rest, options: merged});
+}) as ShippingAddressElementComponent;

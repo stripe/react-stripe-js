@@ -127,7 +127,6 @@ export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createEle
   isServer
 );
 
-
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
