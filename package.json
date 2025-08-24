@@ -50,7 +50,9 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "checkout.js",
+    "checkout.d.ts"
   ],
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",
