@@ -30,7 +30,7 @@ export default [
     ],
     plugins: PLUGINS,
   },
-  // Checkout subpath build (CJS and ESM)
+  // Checkout subpath build
   {
     input: 'src/checkout/index.ts',
     external: ['react', 'prop-types'],

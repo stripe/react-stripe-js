@@ -26,7 +26,6 @@ export const CurrencySelectorElement: CurrencySelectorElementComponent = createE
   isServer
 );
 
-// PaymentElement is available for both regular Elements and Checkout SDK.
 export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
   isServer
