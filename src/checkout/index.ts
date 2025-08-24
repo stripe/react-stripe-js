@@ -1,21 +1,21 @@
 export {
-    useCheckout,
-    CheckoutProvider,
-    CheckoutContextValue,
-  } from './components/CheckoutProvider';
-export type {
-  CurrencySelectorElementProps,
-  CurrencySelectorElementComponent,
-} from './types';
+  useCheckout,
+  CheckoutProvider,
+  CheckoutContextValue,
+} from './components/CheckoutProvider';
+export * from './types';
 import React from 'react';
 import createElementComponent from '../components/createElementComponent';
 import {isServer} from '../utils/isServer';
-import type {
+import {
   CurrencySelectorElementComponent,
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
 } from './types';
-import type {PaymentElementComponent, ExpressCheckoutElementComponent} from '../types';
+import {
+  PaymentElementComponent,
+  ExpressCheckoutElementComponent,
+} from '../types';
 
 /**
  * Requires beta access:
