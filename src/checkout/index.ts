@@ -14,7 +14,6 @@ import {
   CheckoutPaymentElementComponent,
   CheckoutExpressCheckoutElementComponent,
 } from './types';
-import {PaymentElementComponent, ExpressCheckoutElementComponent} from '../types';
 
 /**
  * Requires beta access:

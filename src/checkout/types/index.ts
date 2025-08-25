@@ -1,7 +1,11 @@
 import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 import {StripeError} from '@stripe/stripe-js';
-import {ElementProps, PaymentElementProps, ExpressCheckoutElementProps} from '../../types';
+import {
+  ElementProps,
+  PaymentElementProps,
+  ExpressCheckoutElementProps,
+} from '../../types';
 
 export interface CurrencySelectorElementProps extends ElementProps {
   /**
