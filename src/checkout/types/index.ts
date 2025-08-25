@@ -1,7 +1,7 @@
 import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 import {StripeError} from '@stripe/stripe-js';
-import {ElementProps} from '../../types';
+import {ElementProps, PaymentElementProps, ExpressCheckoutElementProps} from '../../types';
 
 export interface CurrencySelectorElementProps extends ElementProps {
   /**
@@ -55,4 +55,22 @@ export interface ShippingAddressElementProps extends ElementProps {
 
 export type ShippingAddressElementComponent = FunctionComponent<
   ShippingAddressElementProps
+>;
+
+export type CheckoutPaymentElementProps = Omit<
+  PaymentElementProps,
+  'options'
+> & {options?: stripeJs.StripeCheckoutPaymentElementOptions};
+
+export type CheckoutPaymentElementComponent = FunctionComponent<
+  CheckoutPaymentElementProps
+>;
+
+export type CheckoutExpressCheckoutElementProps = Omit<
+  ExpressCheckoutElementProps,
+  'options' | 'onClick'
+> & {options?: stripeJs.StripeCheckoutExpressCheckoutElementOptions};
+
+export type CheckoutExpressCheckoutElementComponent = FunctionComponent<
+  CheckoutExpressCheckoutElementProps
 >;
