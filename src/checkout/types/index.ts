@@ -1,7 +1,11 @@
 import {FunctionComponent} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 import {StripeError} from '@stripe/stripe-js';
-import {ElementProps} from '../../types';
+import {
+  ElementProps,
+  PaymentElementProps as RootPaymentElementProps,
+  ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
+} from '../../types';
 
 export interface CurrencySelectorElementProps extends ElementProps {
   /**
@@ -56,3 +60,33 @@ export interface ShippingAddressElementProps extends ElementProps {
 export type ShippingAddressElementComponent = FunctionComponent<
   ShippingAddressElementProps
 >;
+
+export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
+  options?: stripeJs.StripeCheckoutPaymentElementOptions;
+};
+
+export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
+
+export type ExpressCheckoutElementProps = Omit<
+  RootExpressCheckoutElementProps,
+  | 'options'
+  | 'onClick'
+  | 'onCancel'
+  | 'onShippingAddressChange'
+  | 'onShippingRateChange'
+> & {options?: stripeJs.StripeCheckoutExpressCheckoutElementOptions};
+
+export type ExpressCheckoutElementComponent = FunctionComponent<
+  ExpressCheckoutElementProps
+>;
+
+export interface TaxIdElementProps extends ElementProps {
+  options: stripeJs.StripeTaxIdElementOptions;
+  onChange?: (event: stripeJs.StripeTaxIdElementChangeEvent) => any;
+  onReady?: (element: stripeJs.StripeTaxIdElement) => any;
+  onEscape?: () => any;
+  onLoadError?: (event: {elementType: 'taxId'; error: StripeError}) => any;
+  onLoaderStart?: (event: {elementType: 'taxId'}) => any;
+}
+
+export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;

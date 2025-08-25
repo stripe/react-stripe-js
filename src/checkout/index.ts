@@ -11,11 +11,10 @@ import {
   CurrencySelectorElementComponent,
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
-} from './types';
-import {
   PaymentElementComponent,
   ExpressCheckoutElementComponent,
-} from '../types';
+  TaxIdElementComponent,
+} from './types';
 
 /**
  * Requires beta access:
@@ -33,6 +32,11 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
 
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
   'expressCheckout',
+  isServer
+);
+
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
   isServer
 );
 
