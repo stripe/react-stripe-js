@@ -11,8 +11,9 @@ import {
   CurrencySelectorElementComponent,
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
-  CheckoutPaymentElementComponent,
-  CheckoutExpressCheckoutElementComponent,
+  PaymentElementComponent,
+  ExpressCheckoutElementComponent,
+  TaxIdElementComponent,
 } from './types';
 
 /**
@@ -24,13 +25,18 @@ export const CurrencySelectorElement: CurrencySelectorElementComponent = createE
   isServer
 );
 
-export const PaymentElement: CheckoutPaymentElementComponent = createElementComponent(
+export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
   isServer
 );
 
-export const ExpressCheckoutElement: CheckoutExpressCheckoutElementComponent = createElementComponent(
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
   'expressCheckout',
+  isServer
+);
+
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
   isServer
 );
 
