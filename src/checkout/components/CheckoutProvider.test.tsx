@@ -6,6 +6,7 @@ import {CheckoutProvider, useCheckout} from './CheckoutProvider';
 import {Elements} from '../../components/Elements';
 import {useStripe} from '../../components/useStripe';
 import * as mocks from '../../../test/mocks';
+import makeDeferred from '../../../test/makeDeferred';
 
 describe('CheckoutProvider', () => {
   let mockStripe: any;
@@ -38,122 +39,114 @@ describe('CheckoutProvider', () => {
     jest.restoreAllMocks();
   });
 
-  test('injects CheckoutProvider with the useCheckout hook', async () => {
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={mockStripe}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        {children}
-      </CheckoutProvider>
-    );
+  const makeFetchClientSecret = () => async () => {
+    return 'cs_123';
+  };
 
-    const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
-      wrapper,
+  const wrapper = ({stripe, fetchClientSecret, children}: any) => (
+    <CheckoutProvider
+      stripe={stripe === undefined ? mockStripe : stripe}
+      options={{
+        fetchClientSecret: fetchClientSecret || makeFetchClientSecret(),
+      }}
+    >
+      {children}
+    </CheckoutProvider>
+  );
+
+  describe('interaction with useStripe()', () => {
+    it('works with a Stripe instance', async () => {
+      const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
+        wrapper,
+        initialProps: {stripe: mockStripe},
+      });
+
+      expect(result.current).toBe(mockStripe);
+
+      await waitForNextUpdate();
+
+      expect(result.current).toBe(mockStripe);
     });
 
-    // observe intermediate states
-    await waitForNextUpdate();
+    it('works when updating null to a Stripe instance', async () => {
+      const {result, rerender, waitForNextUpdate} = renderHook(
+        () => useStripe(),
+        {
+          wrapper,
+          initialProps: {stripe: null},
+        }
+      );
 
-    // wait for all (potentially multiple) updates to finish
-    await waitFor(() => expect(result.current).toEqual(mockCheckout));
-  });
+      expect(result.current).toBe(null);
 
-  test('injects CheckoutProvider with the useStripe hook', async () => {
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={mockStripe}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        {children}
-      </CheckoutProvider>
-    );
+      rerender({stripe: mockStripe});
+      await waitForNextUpdate();
 
-    const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
-      wrapper,
+      expect(result.current).toBe(mockStripe);
     });
 
-    // observe intermediate states
-    await waitForNextUpdate();
+    it('works with a Promise', async () => {
+      const deferred = makeDeferred();
+      const {result} = renderHook(() => useStripe(), {
+        wrapper,
+        initialProps: {stripe: deferred.promise},
+      });
 
-    // wait for all (potentially multiple) updates to finish
-    await waitFor(() => expect(result.current).toBe(mockStripe));
+      expect(result.current).toBe(null);
+
+      await act(() => deferred.resolve(mockStripe));
+
+      expect(result.current).toBe(mockStripe);
+    });
   });
 
-  test('allows a transition from null to a valid Stripe object', async () => {
-    let stripeProp: any = null;
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={stripeProp}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        {children}
-      </CheckoutProvider>
-    );
+  describe('interaction with useCheckout()', () => {
+    it('works when initCheckout resolves', async () => {
+      const stripe: any = mocks.mockStripe();
+      const deferred = makeDeferred();
+      stripe.initCheckout.mockReturnValue(deferred.promise);
 
-    const {result, rerender} = renderHook(() => useCheckout(), {wrapper});
-    expect(result.current).toBe(undefined);
+      const {result} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe},
+      });
 
-    stripeProp = mockStripe;
-    act(() => rerender());
-    await waitFor(() => expect(result.current).toEqual(mockCheckout));
-  });
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-  test('works with a Promise resolving to a valid Stripe object', async () => {
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={mockStripePromise}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        {children}
-      </CheckoutProvider>
-    );
+      await act(() => deferred.resolve(mockCheckoutSdk));
 
-    const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
-      wrapper,
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckout,
+      });
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
     });
 
-    expect(result.current).toBe(undefined);
+    it('works when initCheckout rejects', async () => {
+      const stripe: any = mocks.mockStripe();
+      const deferred = makeDeferred();
+      stripe.initCheckout.mockReturnValue(deferred.promise);
 
-    await waitForNextUpdate();
+      const {result} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe},
+      });
 
-    await waitFor(() => expect(result.current).toEqual(mockCheckout));
-  });
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-  test('allows a transition from null to a valid Promise', async () => {
-    let stripeProp: any = null;
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={stripeProp}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        {children}
-      </CheckoutProvider>
-    );
+      await act(() => deferred.reject(new Error('initCheckout error')));
 
-    const {result, rerender, waitForNextUpdate} = renderHook(
-      () => useCheckout(),
-      {wrapper}
-    );
-    expect(result.current).toBe(undefined);
+      expect(result.current).toEqual({
+        type: 'error',
+        error: new Error('initCheckout error'),
+      });
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+    });
 
-    stripeProp = mockStripePromise;
-    act(() => rerender());
-
-    expect(result.current).toBe(undefined);
-
-    await waitForNextUpdate();
-
-    await waitFor(() => expect(result.current).toEqual(mockCheckout));
-  });
-
-  test('does not set context if Promise resolves after CheckoutProvider is unmounted', async () => {
-    // Silence console output so test output is less noisy
-    consoleError.mockImplementation(() => {});
-
-    let result: any;
-    act(() => {
-      result = render(
+    it('does not set context if Promise resolves after CheckoutProvider is unmounted', async () => {
+      const result = render(
         <CheckoutProvider
           stripe={mockStripePromise}
           options={{fetchClientSecret: async () => 'cs_123'}}
@@ -161,50 +154,20 @@ describe('CheckoutProvider', () => {
           {null}
         </CheckoutProvider>
       );
+
+      result.unmount();
+      await act(() => mockStripePromise);
+
+      expect(consoleError).not.toHaveBeenCalled();
     });
-
-    result.unmount();
-    await act(() => mockStripePromise);
-
-    expect(consoleError).not.toHaveBeenCalled();
   });
 
-  test('works with a Promise resolving to null for SSR safety', async () => {
-    const nullPromise = Promise.resolve(null);
-    const TestComponent = () => {
-      const customCheckout = useCheckout();
-      return customCheckout ? <div>not empty</div> : null;
-    };
-
-    let result: any;
-    act(() => {
-      result = render(
-        <CheckoutProvider
-          stripe={nullPromise}
-          options={{fetchClientSecret: async () => 'cs_123'}}
-        >
-          <TestComponent />
-        </CheckoutProvider>
-      );
-    });
-
-    expect(result.container).toBeEmptyDOMElement();
-
-    await act(() => nullPromise.then(() => undefined));
-    expect(result.container).toBeEmptyDOMElement();
-  });
-
-  describe.each([
-    ['undefined', undefined],
-    ['false', false],
-    ['string', 'foo'],
-    ['random object', {foo: 'bar'}],
-  ])('invalid stripe prop', (name, stripeProp) => {
-    test(`errors when props.stripe is ${name}`, () => {
+  describe('stripe prop', () => {
+    it('validates stripe prop type', async () => {
       // Silence console output so test output is less noisy
       consoleError.mockImplementation(() => {});
 
-      expect(() =>
+      const renderWithProp = (stripeProp: unknown) => () => {
         render(
           <CheckoutProvider
             stripe={stripeProp as any}
@@ -212,68 +175,181 @@ describe('CheckoutProvider', () => {
           >
             <div />
           </CheckoutProvider>
-        )
-      ).toThrow('Invalid prop `stripe` supplied to `CheckoutProvider`.');
+        );
+      };
+
+      expect(renderWithProp(undefined)).toThrow(
+        'Invalid prop `stripe` supplied to `CheckoutProvider`.'
+      );
+      expect(renderWithProp(false)).toThrow(
+        'Invalid prop `stripe` supplied to `CheckoutProvider`.'
+      );
+      expect(renderWithProp('foo')).toThrow(
+        'Invalid prop `stripe` supplied to `CheckoutProvider`.'
+      );
+      expect(renderWithProp({foo: 'bar'})).toThrow(
+        'Invalid prop `stripe` supplied to `CheckoutProvider`.'
+      );
+    });
+
+    it('when stripe prop changes from null to a Stripe instance', async () => {
+      const stripe: any = mocks.mockStripe();
+      const deferred = makeDeferred();
+      stripe.initCheckout.mockReturnValue(deferred.promise);
+
+      const {result, rerender} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe: null},
+      });
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
+
+      rerender({stripe});
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+
+      await act(() => deferred.resolve(mockCheckoutSdk));
+
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckout,
+      });
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+    });
+
+    it('when the stripe prop is a Promise', async () => {
+      const stripe: any = mocks.mockStripe();
+      const stripeDeferred = makeDeferred();
+      const deferred = makeDeferred();
+      stripe.initCheckout.mockReturnValue(deferred.promise);
+
+      const {result} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe: stripeDeferred.promise},
+      });
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
+
+      await act(() => stripeDeferred.resolve(stripe));
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+
+      await act(() => deferred.resolve(mockCheckoutSdk));
+
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckout,
+      });
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+    });
+
+    it('when the stripe prop changes from null to a Promise', async () => {
+      const stripe: any = mocks.mockStripe();
+      const stripeDeferred = makeDeferred();
+      const deferred = makeDeferred();
+      stripe.initCheckout.mockReturnValue(deferred.promise);
+
+      const {result, rerender} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe: null},
+      });
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
+
+      rerender({stripe});
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+
+      await act(() => stripeDeferred.resolve(stripe));
+
+      expect(result.current).toEqual({type: 'loading'});
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+
+      await act(() => deferred.resolve(mockCheckoutSdk));
+
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckout,
+      });
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+    });
+
+    it('when the stripe prop is a Promise(null)', async () => {
+      const stripeDeferred = makeDeferred<any>();
+
+      const {result} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe: stripeDeferred.promise},
+      });
+
+      expect(result.current).toEqual({type: 'loading'});
+
+      await act(() => stripeDeferred.resolve(null));
+
+      expect(result.current).toEqual({type: 'loading'});
+    });
+
+    it('does not allow changes to an already set Stripe object', async () => {
+      // Silence console output so test output is less noisy
+      consoleWarn.mockImplementation(() => {});
+      let result: any;
+      act(() => {
+        result = render(
+          <CheckoutProvider
+            stripe={mockStripe}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          />
+        );
+      });
+
+      const mockStripe2: any = mocks.mockStripe();
+      act(() => {
+        result.rerender(
+          <CheckoutProvider
+            stripe={mockStripe2}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          />
+        );
+      });
+
+      await waitFor(() => {
+        expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
+        expect(mockStripe2.initCheckout).toHaveBeenCalledTimes(0);
+        expect(consoleWarn).toHaveBeenCalledWith(
+          'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        );
+      });
     });
   });
 
-  test('does not allow changes to an already set Stripe object', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {});
-    let result: any;
-    act(() => {
-      result = render(
-        <CheckoutProvider
-          stripe={mockStripe}
-          options={{fetchClientSecret: async () => 'cs_123'}}
-        />
-      );
-    });
-
-    const mockStripe2: any = mocks.mockStripe();
-    act(() => {
-      result.rerender(
-        <CheckoutProvider
-          stripe={mockStripe2}
-          options={{fetchClientSecret: async () => 'cs_123'}}
-        />
-      );
-    });
+  it('only calls initCheckout once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
+    const fetchClientSecret = async () => 'cs_123';
+    const result = render(
+      <CheckoutProvider
+        stripe={mockStripe}
+        options={{
+          fetchClientSecret,
+          elementsOptions: {
+            appearance: {theme: 'stripe'},
+          },
+        }}
+      />
+    );
 
     await waitFor(() => {
-      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
-      expect(mockStripe2.initCheckout).toHaveBeenCalledTimes(0);
-      expect(consoleWarn).toHaveBeenCalledWith(
-        'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
-      );
-    });
-  });
-
-  test('initCheckout only called once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
-    let result: any;
-    const fetchClientSecret = async () => 'cs_123';
-    act(() => {
-      result = render(
-        <CheckoutProvider
-          stripe={mockStripe}
-          options={{
-            fetchClientSecret,
-            elementsOptions: {
-              appearance: {theme: 'stripe'},
-            },
-          }}
-        />
-      );
-    });
-
-    await waitFor(() =>
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
         fetchClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
         },
-      })
-    );
+      });
+    });
 
     act(() => {
       result.rerender(
@@ -425,22 +501,19 @@ describe('CheckoutProvider', () => {
     });
   });
 
-  test('allows options changes before setting the Stripe object', async () => {
-    let result: any;
+  it('allows options changes before setting the Stripe object', async () => {
     const fetchClientSecret = async () => 'cs_123';
-    act(() => {
-      result = render(
-        <CheckoutProvider
-          stripe={null}
-          options={{
-            fetchClientSecret,
-            elementsOptions: {
-              appearance: {theme: 'stripe'},
-            },
-          }}
-        />
-      );
-    });
+    const result = render(
+      <CheckoutProvider
+        stripe={null}
+        options={{
+          fetchClientSecret,
+          elementsOptions: {
+            appearance: {theme: 'stripe'},
+          },
+        }}
+      />
+    );
 
     await waitFor(() =>
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(0)
@@ -468,66 +541,6 @@ describe('CheckoutProvider', () => {
         },
       });
     });
-  });
-
-  test('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
-    const {result} = renderHook(() => useCheckout());
-
-    expect(result.error && result.error.message).toBe(
-      'Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.'
-    );
-  });
-
-  test('throws when trying to call useStripe outside of CheckoutProvider context', () => {
-    const {result} = renderHook(() => useStripe());
-
-    expect(result.error && result.error.message).toBe(
-      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
-    );
-  });
-
-  test('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', async () => {
-    const wrapper = ({children}: any) => (
-      <Elements stripe={mockStripe}>
-        <CheckoutProvider
-          stripe={mockStripe}
-          options={{fetchClientSecret: async () => 'cs_123'}}
-        >
-          {children}
-        </CheckoutProvider>
-      </Elements>
-    );
-
-    const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
-      wrapper,
-    });
-
-    await waitForNextUpdate();
-
-    expect(result.error && result.error.message).toBe(
-      'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
-    );
-  });
-
-  test('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', async () => {
-    const wrapper = ({children}: any) => (
-      <CheckoutProvider
-        stripe={mockStripe}
-        options={{fetchClientSecret: async () => 'cs_123'}}
-      >
-        <Elements stripe={mockStripe}>{children}</Elements>
-      </CheckoutProvider>
-    );
-
-    const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
-      wrapper,
-    });
-
-    await waitForNextUpdate();
-
-    expect(result.error && result.error.message).toBe(
-      'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
-    );
   });
 
   describe('React.StrictMode', () => {
@@ -628,6 +641,63 @@ describe('CheckoutProvider', () => {
           theme: 'night',
         });
       });
+    });
+  });
+
+  describe('providers <> hooks', () => {
+    it('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
+      const {result} = renderHook(() => useCheckout());
+
+      expect(result.error && result.error.message).toBe(
+        'Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in a <CheckoutProvider> provider.'
+      );
+    });
+
+    it('throws when trying to call useStripe outside of CheckoutProvider context', () => {
+      const {result} = renderHook(() => useStripe());
+
+      expect(result.error && result.error.message).toBe(
+        'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
+      );
+    });
+
+    it('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', async () => {
+      const wrapper = ({children}: any) => (
+        <Elements stripe={mockStripe}>
+          <CheckoutProvider
+            stripe={mockStripe}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          >
+            {children}
+          </CheckoutProvider>
+        </Elements>
+      );
+
+      const {result} = renderHook(() => useStripe(), {
+        wrapper,
+      });
+
+      expect(result.error && result.error.message).toBe(
+        'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
+      );
+    });
+
+    it('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', async () => {
+      const wrapper = ({children}: any) => (
+        <CheckoutProvider
+          stripe={mockStripe}
+          options={{fetchClientSecret: async () => 'cs_123'}}
+        >
+          <Elements stripe={mockStripe}>{children}</Elements>
+        </CheckoutProvider>
+      );
+
+      const {result} = renderHook(() => useStripe(), {
+        wrapper,
+      });
+      expect(result.error && result.error.message).toBe(
+        'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
+      );
     });
   });
 });

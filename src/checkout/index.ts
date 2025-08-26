@@ -1,7 +1,7 @@
 export {
   useCheckout,
   CheckoutProvider,
-  CheckoutContextValue,
+  CheckoutState,
 } from './components/CheckoutProvider';
 export * from './types';
 import React from 'react';
