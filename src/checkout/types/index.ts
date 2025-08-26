@@ -61,14 +61,11 @@ export type ShippingAddressElementComponent = FunctionComponent<
   ShippingAddressElementProps
 >;
 
-export type PaymentElementProps = Omit<
-  RootPaymentElementProps,
-  'options'
-> & {options?: stripeJs.StripeCheckoutPaymentElementOptions};
+export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
+  options?: stripeJs.StripeCheckoutPaymentElementOptions;
+};
 
-export type PaymentElementComponent = FunctionComponent<
-  PaymentElementProps
->;
+export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
 export type ExpressCheckoutElementProps = Omit<
   RootExpressCheckoutElementProps,
