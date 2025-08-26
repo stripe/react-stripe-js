@@ -69,7 +69,7 @@ export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
 export type ExpressCheckoutElementProps = Omit<
   RootExpressCheckoutElementProps,
-  'options' | 'onClick'
+  'options' | 'onClick' | 'onCancel' | 'onShippingAddressChange' | 'onShippingRateChange'
 > & {options?: stripeJs.StripeCheckoutExpressCheckoutElementOptions};
 
 export type ExpressCheckoutElementComponent = FunctionComponent<
