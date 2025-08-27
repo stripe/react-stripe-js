@@ -22,6 +22,11 @@
       "types": "./dist/checkout.d.ts"
     }
   },
+  "typesVersions": {
+    "*": {
+      "checkout": ["dist/checkout.d.ts"]
+    }
+  },
   "scripts": {
     "test": "yarn run lint && yarn run lint:prettier && yarn run test:unit && yarn test:package-types && yarn run typecheck",
     "test:package-types": "attw --pack .",
