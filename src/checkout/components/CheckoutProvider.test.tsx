@@ -3,9 +3,9 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CheckoutProvider, useCheckout} from './CheckoutProvider';
-import {Elements} from './Elements';
-import {useStripe} from './useStripe';
-import * as mocks from '../../test/mocks';
+import {Elements} from '../../components/Elements';
+import {useStripe} from '../../components/useStripe';
+import * as mocks from '../../../test/mocks';
 
 describe('CheckoutProvider', () => {
   let mockStripe: any;

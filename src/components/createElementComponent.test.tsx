@@ -2,7 +2,7 @@ import React, {StrictMode} from 'react';
 import {render, act, waitFor} from '@testing-library/react';
 
 import * as ElementsModule from './Elements';
-import * as CheckoutModule from './CheckoutProvider';
+import * as CheckoutModule from '../checkout/components/CheckoutProvider';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
 import {
