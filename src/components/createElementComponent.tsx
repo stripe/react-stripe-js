@@ -33,6 +33,8 @@ interface PrivateElementProps {
   onCancel?: UnknownCallback;
   onShippingAddressChange?: UnknownCallback;
   onShippingRateChange?: UnknownCallback;
+  onSavedPaymentMethodRemove?: UnknownCallback;
+  onSavedPaymentMethodUpdate?: UnknownCallback;
   options?: UnknownOptions;
 }
 
@@ -61,6 +63,8 @@ const createElementComponent = (
     onCancel,
     onShippingAddressChange,
     onShippingRateChange,
+    onSavedPaymentMethodRemove,
+    onSavedPaymentMethodUpdate,
   }) => {
     const ctx = useElementsOrCheckoutSdkContextWithUseCase(
       `mounts <${displayName}>`
@@ -87,6 +91,16 @@ const createElementComponent = (
     useAttachEvent(element, 'cancel', onCancel);
     useAttachEvent(element, 'shippingaddresschange', onShippingAddressChange);
     useAttachEvent(element, 'shippingratechange', onShippingRateChange);
+    useAttachEvent(
+      element,
+      'savedpaymentmethodremove',
+      onSavedPaymentMethodRemove
+    );
+    useAttachEvent(
+      element,
+      'savedpaymentmethodupdate',
+      onSavedPaymentMethodUpdate
+    );
     useAttachEvent(element, 'change', onChange);
 
     let readyCallback: UnknownCallback | undefined;
@@ -228,6 +242,8 @@ const createElementComponent = (
     onCancel: PropTypes.func,
     onShippingAddressChange: PropTypes.func,
     onShippingRateChange: PropTypes.func,
+    onSavedPaymentMethodRemove: PropTypes.func,
+    onSavedPaymentMethodUpdate: PropTypes.func,
     options: PropTypes.object as any,
   };
 
