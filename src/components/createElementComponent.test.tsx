@@ -712,6 +712,46 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
+    it('propagates the Element`s savedpaymentmethodremove event to the current onSavedPaymentMethodRemove prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onSavedPaymentMethodRemove={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onSavedPaymentMethodRemove={mockHandler2} />
+        </Elements>
+      );
+
+      const removeEventMock = Symbol('savedpaymentmethodremove');
+      simulateEvent('savedpaymentmethodremove', removeEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(removeEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s savedpaymentmethodupdate event to the current onSavedPaymentMethodUpdate prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onSavedPaymentMethodUpdate={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onSavedPaymentMethodUpdate={mockHandler2} />
+        </Elements>
+      );
+
+      const updateEventMock = Symbol('savedpaymentmethodupdate');
+      simulateEvent('savedpaymentmethodupdate', updateEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(updateEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
     it('updates the Element when options change', () => {
       const {rerender} = render(
         <Elements stripe={mockStripe}>

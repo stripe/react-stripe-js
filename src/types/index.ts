@@ -388,6 +388,32 @@ export interface PaymentElementProps extends ElementProps {
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */
   onLoaderStart?: (event: {elementType: 'payment'}) => any;
+
+  /**
+   * Requires beta access:
+   * Contact [Stripe support](https://support.stripe.com/) for more information.
+   *
+   * Triggered when the user removes a saved payment method from the Payment Element.
+   */
+  onSavedPaymentMethodRemove?: (event: {
+    elementType: 'payment';
+    success: boolean;
+    error?: string;
+    payment_method: stripeJs.StripePaymentElementChangeEvent['value']['payment_method'];
+  }) => any;
+
+  /**
+   * Requires beta access:
+   * Contact [Stripe support](https://support.stripe.com/) for more information.
+   *
+   * Triggered when the user updates a saved payment method from the Payment Element.
+   */
+  onSavedPaymentMethodUpdate?: (event: {
+    elementType: 'payment';
+    success: boolean;
+    error?: string;
+    payment_method: stripeJs.StripePaymentElementChangeEvent['value']['payment_method'];
+  }) => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
