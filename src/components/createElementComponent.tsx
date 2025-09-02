@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCheckoutSdkContextWithUseCase} from './CheckoutProvider';
+import {useElementsOrCheckoutContextWithUseCase} from './CheckoutProvider';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -66,11 +66,13 @@ const createElementComponent = (
     onSavedPaymentMethodRemove,
     onSavedPaymentMethodUpdate,
   }) => {
-    const ctx = useElementsOrCheckoutSdkContextWithUseCase(
+    const ctx = useElementsOrCheckoutContextWithUseCase(
       `mounts <${displayName}>`
     );
     const elements = 'elements' in ctx ? ctx.elements : null;
-    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null;
+    const checkoutState = 'checkoutState' in ctx ? ctx.checkoutState : null;
+    const checkoutSdk =
+      checkoutState?.type === 'success' ? checkoutState.checkout : null;
     const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
       null
     );
@@ -219,7 +221,7 @@ const createElementComponent = (
 
   // Only render the Element wrapper in a server environment.
   const ServerElement: FunctionComponent<PrivateElementProps> = (props) => {
-    useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`);
+    useElementsOrCheckoutContextWithUseCase(`mounts <${displayName}>`);
     const {id, className} = props;
     return <div id={id} className={className} />;
   };
