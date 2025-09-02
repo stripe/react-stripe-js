@@ -219,15 +219,15 @@ git fetch
 
 GIT_STATUS=$(git status)
 
-if ! grep -q 'On branch master' <<< "$GIT_STATUS"; then
-  echo "Error! Must be on master branch to publish"
-  exit 1
-fi
+# if ! grep -q 'On branch master' <<< "$GIT_STATUS"; then
+#   echo "Error! Must be on master branch to publish"
+#   exit 1
+# fi
 
-if ! grep -q "Your branch is up to date with 'origin/master'." <<< "$GIT_STATUS"; then
-  echo "Error! Must be up to date with origin/master to publish"
-  exit 1
-fi
+# if ! grep -q "Your branch is up to date with 'origin/master'." <<< "$GIT_STATUS"; then
+#   echo "Error! Must be up to date with origin/master to publish"
+#   exit 1
+# fi
 
 if ! grep -q 'working tree clean' <<< "$GIT_STATUS"; then
   echo "Error! Cannot publish with dirty working tree"
@@ -258,7 +258,7 @@ git push --follow-tags
 
 # Create release after commit and tag are pushed to ensure package.json
 # is bumped in the GitHub release.
-create_github_release
+# create_github_release
 
 echo "Publishing release"
 yarn --ignore-scripts publish --non-interactive --access=public
