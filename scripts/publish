@@ -224,10 +224,10 @@ GIT_STATUS=$(git status)
 #   exit 1
 # fi
 
-# if ! grep -q "Your branch is up to date with 'origin/master'." <<< "$GIT_STATUS"; then
-#   echo "Error! Must be up to date with origin/master to publish"
-#   exit 1
-# fi
+if ! grep -q "Your branch is up to date with 'origin/cbala/v3.9.3'." <<< "$GIT_STATUS"; then
+  echo "Error! Must be up to date with origin/master to publish"
+  exit 1
+fi
 
 if ! grep -q 'working tree clean' <<< "$GIT_STATUS"; then
   echo "Error! Cannot publish with dirty working tree"
