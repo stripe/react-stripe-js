@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe-js",
-  "version": "3.9.1",
+  "version": "4.0.0",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.mjs",
@@ -24,7 +24,9 @@
   },
   "typesVersions": {
     "*": {
-      "checkout": ["dist/checkout.d.ts"]
+      "checkout": [
+        "dist/checkout.d.ts"
+      ]
     }
   },
   "scripts": {
