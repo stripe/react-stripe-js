@@ -14,6 +14,12 @@ import {
 } from '../../components/Elements';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 
+type StripeCheckoutActions = Omit<
+  stripeJs.StripeCheckout,
+  'on' | 'loadActions'
+> &
+  Omit<stripeJs.LoadActionsSuccess, 'getSession'>;
+
 export type CheckoutValue = StripeCheckoutActions &
   stripeJs.StripeCheckoutSession;
 
@@ -45,18 +51,19 @@ const validateCheckoutContext = (
   return ctx;
 };
 
-type StripeCheckoutActions = Omit<
-  Omit<stripeJs.StripeCheckout, 'session'>,
-  'on'
->;
-
 const getContextValue = (
   stripe: stripeJs.Stripe | null,
   state: State
 ): CheckoutContextValue => {
   if (state.type === 'success') {
-    const {sdk, session} = state;
-    const {on: _on, session: _session, ...actions} = sdk;
+    const {sdk, session, checkoutActions} = state;
+    const {on: _on, loadActions: _loadActions, ...elementsMethods} = sdk;
+    const {getSession: _getSession, ...otherCheckoutActions} = checkoutActions;
+    const actions = {
+      ...elementsMethods,
+      ...otherCheckoutActions,
+    };
+
     return {
       stripe,
       checkoutState: {
@@ -94,6 +101,7 @@ type State =
   | {
       type: 'success';
       sdk: stripeJs.StripeCheckout;
+      checkoutActions: stripeJs.LoadActionsSuccess;
       session: stripeJs.StripeCheckoutSession;
     }
   | {type: 'error'; error: {message: string}};
@@ -133,27 +141,40 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
         // and stripe is not null. We allow stripe to be null to make
         // handling SSR easier.
         initCheckoutCalledRef.current = true;
-        stripe.initCheckout(options).then(
-          (sdk) => {
-            setState({type: 'success', sdk, session: sdk.session()});
-            sdk.on('change', (session) => {
-              setState((prevState) => {
-                if (prevState.type === 'success') {
-                  return {
-                    type: 'success',
-                    sdk: prevState.sdk,
-                    session,
-                  };
-                } else {
-                  return prevState;
-                }
+        const sdk = stripe.initCheckout(options);
+        sdk
+          .loadActions()
+          .then((result) => {
+            if (result.type === 'success') {
+              const {actions} = result;
+              setState({
+                type: 'success',
+                sdk,
+                checkoutActions: actions,
+                session: actions.getSession(),
               });
-            });
-          },
-          (error) => {
+
+              sdk.on('change', (session) => {
+                setState((prevState) => {
+                  if (prevState.type === 'success') {
+                    return {
+                      type: 'success',
+                      sdk: prevState.sdk,
+                      checkoutActions: prevState.checkoutActions,
+                      session,
+                    };
+                  } else {
+                    return prevState;
+                  }
+                });
+              });
+            } else {
+              setState({type: 'error', error: result.error});
+            }
+          })
+          .catch((error) => {
             setState({type: 'error', error});
-          }
-        );
+          });
       }
     };
 
@@ -241,10 +262,13 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
 CheckoutProvider.propTypes = {
   stripe: PropTypes.any,
   options: PropTypes.shape({
-    fetchClientSecret: PropTypes.func.isRequired,
-    elementsOptions: PropTypes.object as any,
+    clientSecret: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Promise),
+    ]).isRequired,
+    elementsOptions: PropTypes.object,
   }).isRequired,
-};
+} as PropTypes.ValidationMap<CheckoutProviderProps>;
 
 export const useElementsOrCheckoutContextWithUseCase = (
   useCaseString: string

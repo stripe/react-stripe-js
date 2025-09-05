@@ -37,6 +37,21 @@ export const mockCheckoutSession = () => {
   };
 };
 
+export const mockCheckoutActions = () => {
+  return {
+    getSession: jest.fn(() => mockCheckoutSession()),
+    applyPromotionCode: jest.fn(),
+    removePromotionCode: jest.fn(),
+    updateShippingAddress: jest.fn(),
+    updateBillingAddress: jest.fn(),
+    updatePhoneNumber: jest.fn(),
+    updateEmail: jest.fn(),
+    updateLineItemQuantity: jest.fn(),
+    updateShippingOption: jest.fn(),
+    confirm: jest.fn(),
+  };
+};
+
 export const mockCheckoutSdk = () => {
   const elements = {};
 
@@ -71,17 +86,17 @@ export const mockCheckoutSdk = () => {
     getExpressCheckoutElement: jest.fn(() => {
       return elements.expressCheckout || null;
     }),
-    session: jest.fn(() => mockCheckoutSession()),
-    applyPromotionCode: jest.fn(),
-    removePromotionCode: jest.fn(),
-    updateShippingAddress: jest.fn(),
-    updateBillingAddress: jest.fn(),
-    updatePhoneNumber: jest.fn(),
-    updateEmail: jest.fn(),
-    updateLineItemQuantity: jest.fn(),
-    updateShippingOption: jest.fn(),
-    confirm: jest.fn(),
-    on: jest.fn(),
+
+    on: jest.fn((event, callback) => {
+      if (event === 'change') {
+        // Simulate initial session call
+        setTimeout(() => callback(mockCheckoutSession()), 0);
+      }
+    }),
+    loadActions: jest.fn().mockResolvedValue({
+      type: 'success',
+      actions: mockCheckoutActions(),
+    }),
   };
 };
 
@@ -93,6 +108,7 @@ export const mockEmbeddedCheckout = () => ({
 
 export const mockStripe = () => {
   const checkoutSdk = mockCheckoutSdk();
+
   return {
     elements: jest.fn(() => mockElements()),
     createToken: jest.fn(),
@@ -103,7 +119,7 @@ export const mockStripe = () => {
     paymentRequest: jest.fn(),
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
-    initCheckout: jest.fn().mockResolvedValue(checkoutSdk),
+    initCheckout: jest.fn(() => checkoutSdk),
     initEmbeddedCheckout: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),
