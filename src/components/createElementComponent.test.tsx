@@ -36,7 +36,7 @@ describe('createElementComponent', () => {
     mockElement = mocks.mockElement();
     mockStripe.elements.mockReturnValue(mockElements);
     mockElements.create.mockReturnValue(mockElement);
-    mockStripe.initCheckout.mockResolvedValue(mockCheckoutSdk);
+    mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk);
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
@@ -94,10 +94,7 @@ describe('createElementComponent', () => {
 
     it('does not render anything', () => {
       const {container} = render(
-        <CheckoutProvider
-          stripe={null}
-          options={{fetchClientSecret: async () => ''}}
-        >
+        <CheckoutProvider stripe={null} options={{clientSecret: 'cs_123'}}>
           <CardElement id="foo" />
         </CheckoutProvider>
       );
@@ -109,11 +106,7 @@ describe('createElementComponent', () => {
 
   describe.each([
     ['Elements', Elements, {clientSecret: 'pi_123'}],
-    [
-      'CheckoutProvider',
-      CheckoutProvider,
-      {fetchClientSecret: async () => 'cs_123'} as any,
-    ],
+    ['CheckoutProvider', CheckoutProvider, {clientSecret: 'cs_123'} as any],
   ])(
     'on the server with Provider - %s',
     (_providerName, Provider, providerOptions) => {
@@ -913,7 +906,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement key={'100'} />
             </CheckoutProvider>
@@ -927,7 +920,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement key={'200'} />
             </CheckoutProvider>
@@ -943,7 +936,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement id="foo" />
             </CheckoutProvider>
@@ -961,7 +954,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement className="bar" />
             </CheckoutProvider>
@@ -980,7 +973,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={options} />
             </CheckoutProvider>
@@ -1028,7 +1021,7 @@ describe('createElementComponent', () => {
             <StrictMode>
               <CheckoutProvider
                 stripe={mockStripe}
-                options={{fetchClientSecret: async () => 'cs_123'}}
+                options={{clientSecret: 'cs_123'}}
               >
                 <TestComponent />
               </CheckoutProvider>
@@ -1047,7 +1040,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement />
             </CheckoutProvider>
@@ -1067,10 +1060,7 @@ describe('createElementComponent', () => {
       it('does not create and mount until CheckoutSdk has been instantiated', async () => {
         act(() => {
           result = render(
-            <CheckoutProvider
-              stripe={null}
-              options={{fetchClientSecret: async () => 'cs_123'}}
-            >
+            <CheckoutProvider stripe={null} options={{clientSecret: 'cs_123'}}>
               <PaymentElement />
             </CheckoutProvider>
           );
@@ -1085,7 +1075,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement />
             </CheckoutProvider>
@@ -1104,7 +1094,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1123,10 +1113,7 @@ describe('createElementComponent', () => {
         // This won't create the element, since checkoutSdk is undefined on this render
         act(() => {
           result = render(
-            <CheckoutProvider
-              stripe={null}
-              options={{fetchClientSecret: async () => 'cs_123'}}
-            >
+            <CheckoutProvider stripe={null} options={{clientSecret: 'cs_123'}}>
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
           );
@@ -1140,7 +1127,7 @@ describe('createElementComponent', () => {
           result.rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1164,7 +1151,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1180,7 +1167,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1197,7 +1184,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1213,7 +1200,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement />
             </CheckoutProvider>
@@ -1232,7 +1219,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1247,7 +1234,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler2} />
             </CheckoutProvider>
@@ -1267,7 +1254,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onReady={mockHandler} />
             </CheckoutProvider>
@@ -1279,7 +1266,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onReady={mockHandler2} />
             </CheckoutProvider>
@@ -1301,7 +1288,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler} />
             </CheckoutProvider>
@@ -1314,7 +1301,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onChange={mockHandler2} />
             </CheckoutProvider>
@@ -1335,7 +1322,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onBlur={mockHandler} />
             </CheckoutProvider>
@@ -1348,7 +1335,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onBlur={mockHandler2} />
             </CheckoutProvider>
@@ -1368,7 +1355,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onFocus={mockHandler} />
             </CheckoutProvider>
@@ -1381,7 +1368,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onFocus={mockHandler2} />
             </CheckoutProvider>
@@ -1401,7 +1388,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onEscape={mockHandler} />
             </CheckoutProvider>
@@ -1414,7 +1401,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onEscape={mockHandler2} />
             </CheckoutProvider>
@@ -1434,7 +1421,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onLoadError={mockHandler} />
             </CheckoutProvider>
@@ -1447,7 +1434,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onLoadError={mockHandler2} />
             </CheckoutProvider>
@@ -1467,7 +1454,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onLoaderStart={mockHandler} />
             </CheckoutProvider>
@@ -1480,7 +1467,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement onLoaderStart={mockHandler2} />
             </CheckoutProvider>
@@ -1498,7 +1485,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={{layout: 'accordion'}} />
             </CheckoutProvider>
@@ -1511,7 +1498,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={{layout: 'tabs'}} />
             </CheckoutProvider>
@@ -1529,7 +1516,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={{layout: 'accordion'}} />
             </CheckoutProvider>
@@ -1542,7 +1529,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={{layout: 'accordion'}} />
             </CheckoutProvider>
@@ -1558,7 +1545,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               {/* @ts-expect-error */}
               <PaymentElement options={null} />
@@ -1572,7 +1559,7 @@ describe('createElementComponent', () => {
           rerender(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement options={{layout: 'tabs'}} />
             </CheckoutProvider>
@@ -1588,10 +1575,7 @@ describe('createElementComponent', () => {
       it('destroys an existing Element when the component unmounts', async () => {
         act(() => {
           result = render(
-            <CheckoutProvider
-              stripe={null}
-              options={{fetchClientSecret: async () => 'cs_123'}}
-            >
+            <CheckoutProvider stripe={null} options={{clientSecret: 'cs_123'}}>
               <PaymentElement />
             </CheckoutProvider>
           );
@@ -1606,7 +1590,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement />
             </CheckoutProvider>
@@ -1626,7 +1610,7 @@ describe('createElementComponent', () => {
           result = render(
             <CheckoutProvider
               stripe={stripePromise}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: 'cs_123'}}
             >
               <PaymentElement />
             </CheckoutProvider>
@@ -1646,7 +1630,7 @@ describe('createElementComponent', () => {
             <StrictMode>
               <CheckoutProvider
                 stripe={stripePromise}
-                options={{fetchClientSecret: async () => 'cs_123'}}
+                options={{clientSecret: 'cs_123'}}
               >
                 <PaymentElement />
               </CheckoutProvider>
@@ -1670,7 +1654,7 @@ describe('createElementComponent', () => {
             render(
               <CheckoutProvider
                 stripe={mockStripe}
-                options={{fetchClientSecret: async () => 'cs_123'}}
+                options={{clientSecret: 'cs_123'}}
               >
                 <CardElement />
               </CheckoutProvider>
@@ -1693,7 +1677,7 @@ describe('createElementComponent', () => {
             render(
               <CheckoutProvider
                 stripe={mockStripe}
-                options={{fetchClientSecret: async () => 'cs_123'}}
+                options={{clientSecret: 'cs_123'}}
               >
                 {/* @ts-expect-error Testing invalid mode */}
                 <AddressElement options={{mode: 'foo'}} />
@@ -1715,7 +1699,7 @@ describe('createElementComponent', () => {
             render(
               <CheckoutProvider
                 stripe={mockStripe}
-                options={{fetchClientSecret: async () => 'cs_123'}}
+                options={{clientSecret: 'cs_123'}}
               >
                 {/* @ts-expect-error Testing missing mode */}
                 <AddressElement />
