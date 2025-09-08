@@ -40,20 +40,20 @@ export const TaxIdElement: TaxIdElementComponent = createElementComponent(
   isServer
 );
 
+const AddressElementBase = createElementComponent('address', isServer) as any;
+
 export const BillingAddressElement: BillingAddressElementComponent = ((
   props
 ) => {
-  const Component = createElementComponent('address', isServer) as any;
   const {options, ...rest} = props as any;
   const merged = {...options, mode: 'billing'};
-  return React.createElement(Component, {...rest, options: merged});
+  return React.createElement(AddressElementBase, {...rest, options: merged});
 }) as BillingAddressElementComponent;
 
 export const ShippingAddressElement: ShippingAddressElementComponent = ((
   props
 ) => {
-  const Component = createElementComponent('address', isServer) as any;
   const {options, ...rest} = props as any;
   const merged = {...options, mode: 'shipping'};
-  return React.createElement(Component, {...rest, options: merged});
+  return React.createElement(AddressElementBase, {...rest, options: merged});
 }) as ShippingAddressElementComponent;
