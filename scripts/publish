@@ -4,18 +4,16 @@ set -euo pipefail
 IFS=$'\n\t'
 
 RELEASE_TYPE=${1:-}
-PREID=${2:-}
+IS_RELEASE_CANDIDATE=$(node scripts/is_release_candidate.js)
 
 echo_help() {
   cat << EOF
 USAGE:
-    ./scripts/publish <release_type> <pre_id>
+    ./scripts/publish <release_type>
 
 ARGS:
     <release_type>
-            A Semantic Versioning release type used to bump the version number. Either "patch", "minor", "major", "prepatch", "preminor", "premajor", or "prerelease".
-    <pre_id>
-            Adds an identifier to be used to prefix premajor, preminor, prepatch or prerelease version increments. Either "alpha" or "beta".
+            A Semantic Versioning release type used to bump the version number. Either "patch", "minor", or "major".
 EOF
 }
 
@@ -87,8 +85,8 @@ create_github_release() {
     return
   fi
 
-  # Get the last two releases. For example, `("v1.3.1" "v1.3.2")`
-  local versions=($(git tag --sort version:refname | grep '^v' | tail -n 2))
+  # Get the last two non-release-candidate releases. For example, `("v1.3.1" "v1.3.2")`
+  local versions=($(git tag --sort version:refname | grep '^v' | grep -v "rc" | tail -n 2))
 
   # If we didn't find exactly two previous version versions, give up
   if [ ${#versions[@]} -ne 2 ]; then
@@ -141,73 +139,40 @@ verify_commit_is_signed() {
   fi
 }
 
-check_github_token() {
-  if [[ -z "${GITHUB_TOKEN}" ]]; then
-    echo "GITHUB_TOKEN is not set."
+# Require release type when not a beta release
+# Not necessary for beta releases because the prerelease versions
+# can be incremented automatically
+if [ "$IS_RELEASE_CANDIDATE" -ne 1 ]; then
+
+  # Show help if no arguments passed
+  if [ $# -eq 0 ]; then
+    echo "Error! Missing release type argument"
+    echo ""
+    echo_help
     exit 1
   fi
-}
 
-# Show help if no arguments passed
-if [ $# -eq 0 ]; then
-  echo "Error! Missing release type argument"
-  echo ""
-  echo_help
-  exit 1
+  # Validate passed release type
+  case $RELEASE_TYPE in
+    patch | minor | major)
+      ;;
+
+    *)
+      echo "Error! Invalid release type supplied"
+      echo ""
+      echo_help
+      exit 1
+      ;;
+  esac
 fi
 
 # Show help message if -h, --help, or help passed
-case $1 in
+case "${1:-}" in
   -h | --help | help)
     echo_help
     exit 0
     ;;
 esac
-
-# Validate passed release type
-case $RELEASE_TYPE in
-  patch | minor | major | prepatch | preminor | premajor | prerelease)
-    ;;
-
-  *)
-    echo "Error! Invalid release type supplied"
-    echo ""
-    echo_help
-    exit 1
-    ;;
-esac
-
-# validate preid if passed
-ALLOWED_PRERELEASE_TYPES=(prepatch preminor premajor prerelease)
-if [ -n "$PREID" ]; then
-  if [ "$PREID" != "alpha" ] && [ "$PREID" != "beta" ]; then
-    echo "Invalid pre_id. It should be either 'alpha' or 'beta'"
-    echo ""
-    echo_help
-    exit 1
-  fi
-
-  if [ -n "$RELEASE_TYPE" ]; then
-    valid=false
-
-    for type in "${ALLOWED_PRERELEASE_TYPES[@]}"; do
-      if [ "$type" = "$RELEASE_TYPE" ]; then
-        valid=true
-        break
-      fi
-    done
-
-    if [ "$valid" = false ]; then
-      ALLOWED_PRERELEASE_TYPES_STRING=$(printf "'%s', " "${ALLOWED_PRERELEASE_TYPES[@]}")
-      echo "Invalid release_type. It should be one of: $ALLOWED_PRERELEASE_TYPES_STRING when pre_id is set"
-      echo ""
-      echo_help
-      exit 1
-    fi
-  fi
-fi
-
-check_github_token
 
 # Make sure our working dir is the repo root directory
 cd "$(git rev-parse --show-toplevel)"
@@ -237,12 +202,27 @@ fi
 echo "Installing dependencies according to lockfile"
 yarn install --frozen-lockfile
 
-if [ -n "$PREID" ]; then
-  echo "Bumping package.json $RELEASE_TYPE, $PREID version and tagging commit"
-  yarn version --$RELEASE_TYPE --preid $PREID
+echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
+if [ "$IS_RELEASE_CANDIDATE" -eq 1 ]; then
+  # The Github changelog is based on tag history, so do not create tags for beta versions
+  # rc = release candidate
+  if [ -z "$RELEASE_TYPE" ]; then
+    # increment only the prerelease version if necessary, e.g. 
+    # 1.2.3-rc.0 -> 1.2.3-rc.1
+    # 1.2.3 -> 1.2.3-rc.0
+    yarn version --prerelease --preid=rc
+  else
+    # always increment the main version, e.g. 
+    # patch: 1.2.3-rc.0 -> 1.2.4-rc.0
+    # patch: 1.2.3 -> 1.2.4-rc.0
+    # major: 1.2.3 -> 2.0.0-rc.0
+    yarn version "--pre$RELEASE_TYPE" --preid=rc
+  fi
 else
-  echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
-  yarn version --$RELEASE_TYPE
+  # increment the main version with no prerelease version, e.g.
+  # patch: 1.2.3-rc.0 -> 1.2.4
+  # major: 1.2.3 -> 2.0.0
+  yarn version "--$RELEASE_TYPE" 
 fi
 
 echo "Building"
@@ -256,12 +236,18 @@ verify_commit_is_signed
 echo "Pushing git commit and tag"
 git push --follow-tags
 
-# Create release after commit and tag are pushed to ensure package.json
-# is bumped in the GitHub release.
-create_github_release
+if [ "$IS_RELEASE_CANDIDATE" -ne 1 ]; then
+  # Create release after commit and tag are pushed to ensure package.json
+  # is bumped in the GitHub release.
+  create_github_release
+fi
 
 echo "Publishing release"
-yarn --ignore-scripts publish --non-interactive --access=public
+if [ "$IS_RELEASE_CANDIDATE" -eq 1 ]; then
+  yarn --ignore-scripts publish --tag=rc --non-interactive --access=public
+else
+  yarn --ignore-scripts publish --non-interactive --access=public
+fi
 
 echo "Publish successful!"
 echo ""
