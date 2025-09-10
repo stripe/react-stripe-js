@@ -52,6 +52,7 @@ const CheckoutForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setStatus(undefined);
 
     if (checkoutState.type === 'loading') {
       setStatus('Loading...');
