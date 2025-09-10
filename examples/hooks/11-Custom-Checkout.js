@@ -2,11 +2,10 @@ import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
-  useStripe,
   CheckoutProvider,
   useCheckout,
-  AddressElement,
-} from '../../src';
+  BillingAddressElement,
+} from '../../src/checkout';
 
 import '../styles/common.css';
 
@@ -45,23 +44,27 @@ const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
 };
 
 const CheckoutForm = () => {
-  const checkout = useCheckout();
+  const checkoutState = useCheckout();
   const [status, setStatus] = React.useState();
   const [loading, setLoading] = React.useState(false);
-  const stripe = useStripe();
   const [phoneNumber, setPhoneNumber] = React.useState('');
   const [email, setEmail] = React.useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setStatus(undefined);
 
-    if (!stripe || !checkout) {
+    if (checkoutState.type === 'loading') {
+      setStatus('Loading...');
+      return;
+    } else if (checkoutState.type === 'error') {
+      setStatus(`Error: ${checkoutState.error.message}`);
       return;
     }
 
     try {
       setLoading(true);
-      await checkout.confirm({
+      await checkoutState.checkout.confirm({
         email,
         phoneNumber,
         returnUrl: window.location.href,
@@ -73,7 +76,7 @@ const CheckoutForm = () => {
     }
   };
 
-  const buttonDisabled = !stripe || !checkout || loading;
+  const buttonDisabled = checkoutState.type !== 'success' || loading;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -86,7 +89,7 @@ const CheckoutForm = () => {
       <h3>Payment Details</h3>
       <PaymentElement />
       <h3>Billing Details</h3>
-      <AddressElement options={{mode: 'billing'}} />
+      <BillingAddressElement />
       <button type="submit" disabled={buttonDisabled}>
         {loading ? 'Processing...' : 'Pay'}
       </button>
@@ -112,11 +115,7 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setStripePromise(
-      loadStripe(pk, {
-        betas: ['custom_checkout_beta_6'],
-      })
-    );
+    setStripePromise(loadStripe(pk));
   };
 
   const handleThemeChange = (e) => {
