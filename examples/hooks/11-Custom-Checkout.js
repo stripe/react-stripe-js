@@ -114,9 +114,7 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setStripePromise(
-      loadStripe(pk)
-    );
+    setStripePromise(loadStripe(pk));
   };
 
   const handleThemeChange = (e) => {
