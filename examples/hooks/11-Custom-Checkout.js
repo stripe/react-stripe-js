@@ -73,7 +73,7 @@ const CheckoutForm = () => {
     }
   };
 
-  const buttonDisabled = checkoutState.type !== 'success';
+  const buttonDisabled = checkoutState.type !== 'success' || loading;
 
   return (
     <form onSubmit={handleSubmit}>
