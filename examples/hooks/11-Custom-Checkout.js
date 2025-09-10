@@ -1,5 +1,6 @@
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
+import {useStripe} from '../../src';
 import {
   PaymentElement,
   CheckoutProvider,
@@ -13,6 +14,7 @@ const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
   const handlePhoneNumberChange = (event) => {
     setPhoneNumber(event.target.value);
   };
+  const stripe = useStripe();
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -113,9 +115,7 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setStripePromise(
-      loadStripe(pk, {
-        betas: ['custom_checkout_beta_6'],
-      })
+      loadStripe(pk)
     );
   };
 
