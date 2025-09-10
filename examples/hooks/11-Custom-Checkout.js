@@ -54,9 +54,11 @@ const CheckoutForm = () => {
     event.preventDefault();
 
     if (checkoutState.type === 'loading') {
-      return <div>Loading...</div>;
+      setStatus('Loading...');
+      return;
     } else if (checkoutState.type === 'error') {
-      return <div>Error: {checkoutState.error.message}</div>;
+      setStatus(`Error: ${checkoutState.error.message}`);
+      return;
     }
 
     try {
