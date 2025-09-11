@@ -1,6 +1,6 @@
-import React, {StrictMode} from 'react';
-import {render, act} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import * as React from 'react';
+import {StrictMode} from 'react';
+import {render, act, renderHook, waitFor} from '@testing-library/react';
 
 import {Elements, useElements, ElementsConsumer} from './Elements';
 import * as mocks from '../../test/mocks';
@@ -120,15 +120,15 @@ describe('Elements', () => {
       <Elements stripe={mockStripePromise}>{children}</Elements>
     );
 
-    const {result, waitForNextUpdate} = renderHook(() => useElements(), {
+    const {result} = renderHook(() => useElements(), {
       wrapper,
     });
 
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
-
-    expect(result.current).toBe(mockElements);
+    await waitFor(() => {
+      expect(result.current).toBe(mockElements);
+    });
   });
 
   test('allows a transition from null to a valid Promise', async () => {
@@ -137,7 +137,7 @@ describe('Elements', () => {
       <Elements stripe={stripeProp}>{children}</Elements>
     );
 
-    const {result, rerender, waitForNextUpdate} = renderHook(
+    const {result, rerender} = renderHook(
       () => useElements(),
       {wrapper}
     );
@@ -147,9 +147,9 @@ describe('Elements', () => {
     rerender();
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
-
-    expect(result.current).toBe(mockElements);
+    await waitFor(() => {
+      expect(result.current).toBe(mockElements);
+    });
   });
 
   test('does not set context if Promise resolves after Elements is unmounted', async () => {
@@ -266,17 +266,17 @@ describe('Elements', () => {
   });
 
   test('throws when trying to call useElements outside of Elements context', () => {
-    const {result} = renderHook(() => useElements());
-
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useElements());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
     );
   });
 
   test('throws when trying to call useStripe outside of Elements context', () => {
-    const {result} = renderHook(() => useStripe());
-
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useStripe());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
   });
@@ -430,7 +430,8 @@ describe('Elements', () => {
       expect(mockStripe.elements).toHaveBeenCalledWith({
         appearance: {theme: 'flat'},
       });
-      expect(mockStripe.elements).toHaveBeenCalledTimes(1);
+      // In React 19 StrictMode, components are mounted twice in development mode
+      expect(mockStripe.elements).toHaveBeenCalledTimes(2);
     });
   });
 });
