@@ -14,26 +14,22 @@ import {
 } from '../../components/Elements';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 
-type StripeCheckoutActions = Omit<
-  stripeJs.StripeCheckout,
-  'on' | 'loadActions'
-> &
-  Omit<stripeJs.LoadActionsSuccess, 'getSession'>;
-
-export type CheckoutValue = StripeCheckoutActions &
-  stripeJs.StripeCheckoutSession;
-
-export type CheckoutState =
-  | {type: 'loading'}
+type State =
+  | {
+      type: 'loading';
+      sdk: stripeJs.StripeCheckout | null;
+    }
   | {
       type: 'success';
-      checkout: CheckoutValue;
+      sdk: stripeJs.StripeCheckout;
+      checkoutActions: stripeJs.LoadActionsSuccess;
+      session: stripeJs.StripeCheckoutSession;
     }
   | {type: 'error'; error: {message: string}};
 
 type CheckoutContextValue = {
   stripe: stripeJs.Stripe | null;
-  checkoutState: CheckoutState;
+  checkoutState: State;
 };
 
 const CheckoutContext = React.createContext<CheckoutContextValue | null>(null);
@@ -49,31 +45,6 @@ const validateCheckoutContext = (
     );
   }
   return ctx;
-};
-
-const getContextValue = (
-  stripe: stripeJs.Stripe | null,
-  state: State
-): CheckoutContextValue => {
-  if (state.type === 'success') {
-    const {sdk, session, checkoutActions} = state;
-    const {on: _on, loadActions: _loadActions, ...elementsMethods} = sdk;
-    const {getSession: _getSession, ...otherCheckoutActions} = checkoutActions;
-    const actions = {
-      ...elementsMethods,
-      ...otherCheckoutActions,
-    };
-
-    return {
-      stripe,
-      checkoutState: {
-        type: 'success',
-        checkout: Object.assign({}, session, actions),
-      },
-    };
-  } else {
-    return {stripe, checkoutState: state};
-  }
 };
 
 interface CheckoutProviderProps {
@@ -96,18 +67,8 @@ interface PrivateCheckoutProviderProps {
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
-type State =
-  | {type: 'loading'}
-  | {
-      type: 'success';
-      sdk: stripeJs.StripeCheckout;
-      checkoutActions: stripeJs.LoadActionsSuccess;
-      session: stripeJs.StripeCheckoutSession;
-    }
-  | {type: 'error'; error: {message: string}};
-
 const maybeSdk = (state: State): stripeJs.StripeCheckout | null => {
-  if (state.type === 'success') {
+  if (state.type === 'success' || state.type === 'loading') {
     return state.sdk;
   } else {
     return null;
@@ -126,7 +87,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
     [rawStripeProp]
   );
 
-  const [state, setState] = React.useState<State>({type: 'loading'});
+  const [state, setState] = React.useState<State>({type: 'loading', sdk: null});
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
   // Ref used to avoid calling initCheckout multiple times when options changes
@@ -142,6 +103,8 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
         // handling SSR easier.
         initCheckoutCalledRef.current = true;
         const sdk = stripe.initCheckout(options);
+        setState({type: 'loading', sdk});
+
         sdk
           .loadActions()
           .then((result) => {
@@ -212,14 +175,11 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
   // Apply updates to elements when options prop has relevant changes
   const sdk = maybeSdk(state);
   const prevOptions = usePrevious(options);
-  const prevCheckoutSdk = usePrevious(sdk);
   React.useEffect(() => {
     // Ignore changes while checkout sdk is not initialized.
     if (!sdk) {
       return;
     }
-
-    const hasSdkLoaded = Boolean(!prevCheckoutSdk && sdk);
 
     // Handle appearance changes
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
@@ -228,7 +188,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
       currentAppearance,
       previousAppearance
     );
-    if (currentAppearance && (hasAppearanceChanged || hasSdkLoaded)) {
+    if (currentAppearance && hasAppearanceChanged) {
       sdk.changeAppearance(currentAppearance);
     }
 
@@ -237,20 +197,25 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
     const currentFonts = options?.elementsOptions?.fonts;
     const hasFontsChanged = !isEqual(previousFonts, currentFonts);
 
-    if (currentFonts && (hasFontsChanged || hasSdkLoaded)) {
+    if (currentFonts && hasFontsChanged) {
       sdk.loadFonts(currentFonts);
     }
-  }, [options, prevOptions, sdk, prevCheckoutSdk]);
+  }, [options, prevOptions, sdk]);
 
   // Attach react-stripe-js version to stripe.js instance
   React.useEffect(() => {
     registerWithStripeJs(stripe);
   }, [stripe]);
 
-  const contextValue = React.useMemo(() => getContextValue(stripe, state), [
-    stripe,
-    state,
-  ]);
+  // Use useMemo to prevent unnecessary re-renders of child components
+  // when the context value object reference changes but the actual values haven't
+  const contextValue = React.useMemo(
+    () => ({
+      stripe,
+      checkoutState: state,
+    }),
+    [stripe, state]
+  );
 
   return (
     <CheckoutContext.Provider value={contextValue}>
@@ -289,8 +254,55 @@ export const useElementsOrCheckoutContextWithUseCase = (
   }
 };
 
-export const useCheckout = (): CheckoutState => {
+type StripeCheckoutActions = Omit<
+  stripeJs.StripeCheckout,
+  'on' | 'loadActions'
+> &
+  Omit<stripeJs.LoadActionsSuccess, 'getSession'>;
+
+export type StripeCheckoutValue = StripeCheckoutActions &
+  stripeJs.StripeCheckoutSession;
+
+export type StripeUseCheckoutResult =
+  | {type: 'loading'}
+  | {
+      type: 'success';
+      checkout: StripeCheckoutValue;
+    }
+  | {type: 'error'; error: {message: string}};
+
+const mapStateToUseCheckoutResult = (
+  checkoutState: State
+): StripeUseCheckoutResult => {
+  if (checkoutState.type === 'success') {
+    const {sdk, session, checkoutActions} = checkoutState;
+    const {on: _on, loadActions: _loadActions, ...elementsMethods} = sdk;
+    const {getSession: _getSession, ...otherCheckoutActions} = checkoutActions;
+    const actions = {
+      ...elementsMethods,
+      ...otherCheckoutActions,
+    };
+    return {
+      type: 'success',
+      checkout: {
+        ...session,
+        ...actions,
+      },
+    };
+  } else if (checkoutState.type === 'loading') {
+    return {
+      type: 'loading',
+    };
+  } else {
+    return {
+      type: 'error',
+      error: checkoutState.error,
+    };
+  }
+};
+
+export const useCheckout = (): StripeUseCheckoutResult => {
   const ctx = React.useContext(CheckoutContext);
   const {checkoutState} = validateCheckoutContext(ctx, 'calls useCheckout()');
-  return checkoutState;
+  return mapStateToUseCheckoutResult(checkoutState);
 };

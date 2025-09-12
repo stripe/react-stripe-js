@@ -530,8 +530,8 @@ describe('CheckoutProvider', () => {
     await waitFor(() => {
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      // This is called once, due to the sdk having loaded.
-      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
+      // This is not called, due to the fonts not changing.
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(0);
     });
   });
 
