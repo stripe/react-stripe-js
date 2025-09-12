@@ -1,7 +1,7 @@
 export {
   useCheckout,
   CheckoutProvider,
-  CheckoutState,
+  StripeUseCheckoutResult,
 } from './components/CheckoutProvider';
 export * from './types';
 import React from 'react';

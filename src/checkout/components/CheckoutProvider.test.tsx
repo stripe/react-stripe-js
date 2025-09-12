@@ -12,22 +12,21 @@ describe('CheckoutProvider', () => {
   let mockStripe: any;
   let mockStripePromise: any;
   let mockCheckoutSdk: any;
-  let mockSession: any;
   let consoleError: any;
   let consoleWarn: any;
-  let mockCheckout: any;
+  let mockCheckoutActions: any;
 
   beforeEach(() => {
-    mockStripe = mocks.mockStripe();
-    mockStripePromise = Promise.resolve(mockStripe);
     mockCheckoutSdk = mocks.mockCheckoutSdk();
-    mockStripe.initCheckout.mockResolvedValue(mockCheckoutSdk);
-    mockSession = mocks.mockCheckoutSession();
-    mockCheckoutSdk.session.mockReturnValue(mockSession);
+    mockCheckoutActions = mocks.mockCheckoutActions();
+    mockCheckoutSdk.loadActions.mockResolvedValue({
+      type: 'success',
+      actions: mockCheckoutActions,
+    });
 
-    const {on: _on, session: _session, ...actions} = mockCheckoutSdk;
-
-    mockCheckout = {...actions, ...mockSession};
+    mockStripe = mocks.mockStripe();
+    mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk);
+    mockStripePromise = Promise.resolve(mockStripe);
 
     jest.spyOn(console, 'error');
     jest.spyOn(console, 'warn');
@@ -39,15 +38,13 @@ describe('CheckoutProvider', () => {
     jest.restoreAllMocks();
   });
 
-  const makeFetchClientSecret = () => async () => {
-    return 'cs_123';
-  };
+  const fakeClientSecret = 'cs_123';
 
-  const wrapper = ({stripe, fetchClientSecret, children}: any) => (
+  const wrapper = ({stripe, clientSecret, children}: any) => (
     <CheckoutProvider
       stripe={stripe === undefined ? mockStripe : stripe}
       options={{
-        fetchClientSecret: fetchClientSecret || makeFetchClientSecret(),
+        clientSecret: clientSecret || fakeClientSecret,
       }}
     >
       {children}
@@ -101,10 +98,15 @@ describe('CheckoutProvider', () => {
   });
 
   describe('interaction with useCheckout()', () => {
-    it('works when initCheckout resolves', async () => {
+    it('works when loadActions resolves', async () => {
       const stripe: any = mocks.mockStripe();
       const deferred = makeDeferred();
-      stripe.initCheckout.mockReturnValue(deferred.promise);
+      const mockSdk = mocks.mockCheckoutSdk();
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      const testMockSession = mocks.mockCheckoutSession();
+
+      mockSdk.loadActions.mockReturnValue(deferred.promise);
+      stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -114,19 +116,38 @@ describe('CheckoutProvider', () => {
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.resolve(mockCheckoutSdk));
+      await act(() =>
+        deferred.resolve({
+          type: 'success',
+          actions: testMockCheckoutActions,
+        })
+      );
+
+      const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
+      const {
+        getSession: _getSession,
+        ...otherCheckoutActions
+      } = testMockCheckoutActions;
+
+      const expectedCheckout = {
+        ...elementsMethods,
+        ...otherCheckoutActions,
+        ...testMockSession,
+      };
 
       expect(result.current).toEqual({
         type: 'success',
-        checkout: mockCheckout,
+        checkout: expectedCheckout,
       });
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
     });
 
-    it('works when initCheckout rejects', async () => {
+    it('works when loadActions rejects', async () => {
       const stripe: any = mocks.mockStripe();
       const deferred = makeDeferred();
-      stripe.initCheckout.mockReturnValue(deferred.promise);
+      const mockSdk = mocks.mockCheckoutSdk();
+      mockSdk.loadActions.mockReturnValue(deferred.promise);
+      stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -149,7 +170,7 @@ describe('CheckoutProvider', () => {
       const result = render(
         <CheckoutProvider
           stripe={mockStripePromise}
-          options={{fetchClientSecret: async () => 'cs_123'}}
+          options={{clientSecret: Promise.resolve(fakeClientSecret)}}
         >
           {null}
         </CheckoutProvider>
@@ -171,7 +192,7 @@ describe('CheckoutProvider', () => {
         render(
           <CheckoutProvider
             stripe={stripeProp as any}
-            options={{fetchClientSecret: async () => 'cs_123'}}
+            options={{clientSecret: fakeClientSecret}}
           >
             <div />
           </CheckoutProvider>
@@ -195,7 +216,12 @@ describe('CheckoutProvider', () => {
     it('when stripe prop changes from null to a Stripe instance', async () => {
       const stripe: any = mocks.mockStripe();
       const deferred = makeDeferred();
-      stripe.initCheckout.mockReturnValue(deferred.promise);
+      const mockSdk = mocks.mockCheckoutSdk();
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      const testMockSession = mocks.mockCheckoutSession();
+
+      mockSdk.loadActions.mockReturnValue(deferred.promise);
+      stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result, rerender} = renderHook(() => useCheckout(), {
         wrapper,
@@ -210,11 +236,28 @@ describe('CheckoutProvider', () => {
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.resolve(mockCheckoutSdk));
+      await act(() =>
+        deferred.resolve({
+          type: 'success',
+          actions: testMockCheckoutActions,
+        })
+      );
+
+      const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
+      const {
+        getSession: _getSession,
+        ...otherCheckoutActions
+      } = testMockCheckoutActions;
+
+      const expectedCheckout = {
+        ...elementsMethods,
+        ...otherCheckoutActions,
+        ...testMockSession,
+      };
 
       expect(result.current).toEqual({
         type: 'success',
-        checkout: mockCheckout,
+        checkout: expectedCheckout,
       });
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
     });
@@ -223,7 +266,12 @@ describe('CheckoutProvider', () => {
       const stripe: any = mocks.mockStripe();
       const stripeDeferred = makeDeferred();
       const deferred = makeDeferred();
-      stripe.initCheckout.mockReturnValue(deferred.promise);
+      const mockSdk = mocks.mockCheckoutSdk();
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      const testMockSession = mocks.mockCheckoutSession();
+
+      mockSdk.loadActions.mockReturnValue(deferred.promise);
+      stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -238,11 +286,28 @@ describe('CheckoutProvider', () => {
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.resolve(mockCheckoutSdk));
+      await act(() =>
+        deferred.resolve({
+          type: 'success',
+          actions: testMockCheckoutActions,
+        })
+      );
+
+      const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
+      const {
+        getSession: _getSession,
+        ...otherCheckoutActions
+      } = testMockCheckoutActions;
+
+      const expectedCheckout = {
+        ...elementsMethods,
+        ...otherCheckoutActions,
+        ...testMockSession,
+      };
 
       expect(result.current).toEqual({
         type: 'success',
-        checkout: mockCheckout,
+        checkout: expectedCheckout,
       });
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
     });
@@ -251,7 +316,12 @@ describe('CheckoutProvider', () => {
       const stripe: any = mocks.mockStripe();
       const stripeDeferred = makeDeferred();
       const deferred = makeDeferred();
-      stripe.initCheckout.mockReturnValue(deferred.promise);
+      const mockSdk = mocks.mockCheckoutSdk();
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      const testMockSession = mocks.mockCheckoutSession();
+
+      mockSdk.loadActions.mockReturnValue(deferred.promise);
+      stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result, rerender} = renderHook(() => useCheckout(), {
         wrapper,
@@ -261,21 +331,38 @@ describe('CheckoutProvider', () => {
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
-      rerender({stripe});
+      rerender({stripe: stripeDeferred.promise as any});
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
       await act(() => stripeDeferred.resolve(stripe));
 
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.resolve(mockCheckoutSdk));
+      await act(() =>
+        deferred.resolve({
+          type: 'success',
+          actions: testMockCheckoutActions,
+        })
+      );
+
+      const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
+      const {
+        getSession: _getSession,
+        ...otherCheckoutActions
+      } = testMockCheckoutActions;
+
+      const expectedCheckout = {
+        ...elementsMethods,
+        ...otherCheckoutActions,
+        ...testMockSession,
+      };
 
       expect(result.current).toEqual({
         type: 'success',
-        checkout: mockCheckout,
+        checkout: expectedCheckout,
       });
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
     });
@@ -303,7 +390,7 @@ describe('CheckoutProvider', () => {
         result = render(
           <CheckoutProvider
             stripe={mockStripe}
-            options={{fetchClientSecret: async () => 'cs_123'}}
+            options={{clientSecret: fakeClientSecret}}
           />
         );
       });
@@ -313,7 +400,7 @@ describe('CheckoutProvider', () => {
         result.rerender(
           <CheckoutProvider
             stripe={mockStripe2}
-            options={{fetchClientSecret: async () => 'cs_123'}}
+            options={{clientSecret: fakeClientSecret}}
           />
         );
       });
@@ -329,12 +416,11 @@ describe('CheckoutProvider', () => {
   });
 
   it('only calls initCheckout once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
-    const fetchClientSecret = async () => 'cs_123';
     const result = render(
       <CheckoutProvider
         stripe={mockStripe}
         options={{
-          fetchClientSecret,
+          clientSecret: fakeClientSecret,
           elementsOptions: {
             appearance: {theme: 'stripe'},
           },
@@ -344,7 +430,7 @@ describe('CheckoutProvider', () => {
 
     await waitFor(() => {
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        fetchClientSecret,
+        clientSecret: fakeClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
         },
@@ -356,7 +442,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret: async () => 'cs_123',
+            clientSecret: fakeClientSecret,
             elementsOptions: {appearance: {theme: 'night'}},
           }}
         />
@@ -374,13 +460,12 @@ describe('CheckoutProvider', () => {
 
   test('it does not call loadFonts a 2nd time if they do not change', async () => {
     let result: any;
-    const fetchClientSecret = async () => 'cs_123';
     act(() => {
       result = render(
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret,
+            clientSecret: fakeClientSecret,
             elementsOptions: {
               fonts: [
                 {
@@ -395,7 +480,7 @@ describe('CheckoutProvider', () => {
 
     await waitFor(() =>
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        fetchClientSecret,
+        clientSecret: fakeClientSecret,
         elementsOptions: {
           fonts: [
             {
@@ -411,7 +496,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret: async () => 'cs_123',
+            clientSecret: fakeClientSecret,
             elementsOptions: {
               fonts: [
                 {
@@ -429,7 +514,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret: async () => 'cs_123',
+            clientSecret: fakeClientSecret,
             elementsOptions: {
               fonts: [
                 {
@@ -445,20 +530,19 @@ describe('CheckoutProvider', () => {
     await waitFor(() => {
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
 
-      // This is called once, due to the sdk having loaded.
-      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
+      // This is not called, due to the fonts not changing.
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(0);
     });
   });
 
   test('allows changes to elementsOptions fonts', async () => {
     let result: any;
-    const fetchClientSecret = async () => 'cs_123';
     act(() => {
       result = render(
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret,
+            clientSecret: fakeClientSecret,
             elementsOptions: {},
           }}
         />
@@ -467,7 +551,7 @@ describe('CheckoutProvider', () => {
 
     await waitFor(() =>
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        fetchClientSecret,
+        clientSecret: fakeClientSecret,
         elementsOptions: {},
       })
     );
@@ -477,7 +561,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret: async () => 'cs_123',
+            clientSecret: fakeClientSecret,
             elementsOptions: {
               fonts: [
                 {
@@ -502,12 +586,11 @@ describe('CheckoutProvider', () => {
   });
 
   it('allows options changes before setting the Stripe object', async () => {
-    const fetchClientSecret = async () => 'cs_123';
     const result = render(
       <CheckoutProvider
         stripe={null}
         options={{
-          fetchClientSecret,
+          clientSecret: fakeClientSecret,
           elementsOptions: {
             appearance: {theme: 'stripe'},
           },
@@ -524,7 +607,7 @@ describe('CheckoutProvider', () => {
         <CheckoutProvider
           stripe={mockStripe}
           options={{
-            fetchClientSecret,
+            clientSecret: fakeClientSecret,
             elementsOptions: {appearance: {theme: 'stripe'}},
           }}
         />
@@ -535,7 +618,7 @@ describe('CheckoutProvider', () => {
       expect(console.warn).not.toHaveBeenCalled();
       expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
       expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-        fetchClientSecret,
+        clientSecret: fakeClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
         },
@@ -546,7 +629,7 @@ describe('CheckoutProvider', () => {
   describe('React.StrictMode', () => {
     test('initCheckout once in StrictMode', async () => {
       const TestComponent = () => {
-        const _ = useCheckout();
+        useCheckout();
         return <div />;
       };
 
@@ -555,7 +638,7 @@ describe('CheckoutProvider', () => {
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripe}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: fakeClientSecret}}
             >
               <TestComponent />
             </CheckoutProvider>
@@ -570,7 +653,7 @@ describe('CheckoutProvider', () => {
 
     test('initCheckout once with stripePromise in StrictMode', async () => {
       const TestComponent = () => {
-        const _ = useCheckout();
+        useCheckout();
         return <div />;
       };
 
@@ -579,7 +662,7 @@ describe('CheckoutProvider', () => {
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripePromise}
-              options={{fetchClientSecret: async () => 'cs_123'}}
+              options={{clientSecret: fakeClientSecret}}
             >
               <TestComponent />
             </CheckoutProvider>
@@ -594,14 +677,13 @@ describe('CheckoutProvider', () => {
 
     test('allows changes to options via (mockCheckoutSdk.changeAppearance after setting the Stripe object in StrictMode', async () => {
       let result: any;
-      const fetchClientSecret = async () => 'cs_123';
       act(() => {
         result = render(
           <StrictMode>
             <CheckoutProvider
               stripe={mockStripe}
               options={{
-                fetchClientSecret,
+                clientSecret: fakeClientSecret,
                 elementsOptions: {
                   appearance: {theme: 'stripe'},
                 },
@@ -614,7 +696,7 @@ describe('CheckoutProvider', () => {
       await waitFor(() => {
         expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1);
         expect(mockStripe.initCheckout).toHaveBeenCalledWith({
-          fetchClientSecret,
+          clientSecret: fakeClientSecret,
           elementsOptions: {
             appearance: {theme: 'stripe'},
           },
@@ -627,7 +709,7 @@ describe('CheckoutProvider', () => {
             <CheckoutProvider
               stripe={mockStripe}
               options={{
-                fetchClientSecret: async () => 'cs_123',
+                clientSecret: fakeClientSecret,
                 elementsOptions: {appearance: {theme: 'night'}},
               }}
             />
@@ -666,7 +748,7 @@ describe('CheckoutProvider', () => {
         <Elements stripe={mockStripe}>
           <CheckoutProvider
             stripe={mockStripe}
-            options={{fetchClientSecret: async () => 'cs_123'}}
+            options={{clientSecret: fakeClientSecret}}
           >
             {children}
           </CheckoutProvider>
@@ -686,7 +768,7 @@ describe('CheckoutProvider', () => {
       const wrapper = ({children}: any) => (
         <CheckoutProvider
           stripe={mockStripe}
-          options={{fetchClientSecret: async () => 'cs_123'}}
+          options={{clientSecret: fakeClientSecret}}
         >
           <Elements stripe={mockStripe}>{children}</Elements>
         </CheckoutProvider>
