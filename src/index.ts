@@ -6,18 +6,12 @@ import {
   CardExpiryElementComponent,
   CardCvcElementComponent,
   ExpressCheckoutElementComponent,
-  FpxBankElementComponent,
   IbanElementComponent,
-  IdealBankElementComponent,
-  P24BankElementComponent,
-  EpsBankElementComponent,
   LinkAuthenticationElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   ShippingAddressElementComponent,
   AddressElementComponent,
-  AffirmMessageElementComponent,
-  AfterpayClearpayMessageElementComponent,
   PaymentMethodMessagingElementComponent,
   TaxIdElementComponent,
 } from './types';
@@ -77,40 +71,8 @@ export const CardCvcElement: CardCvcElementComponent = createElementComponent(
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
  */
-export const FpxBankElement: FpxBankElementComponent = createElementComponent(
-  'fpxBank',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
 export const IbanElement: IbanElementComponent = createElementComponent(
   'iban',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const IdealBankElement: IdealBankElementComponent = createElementComponent(
-  'idealBank',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const P24BankElement: P24BankElementComponent = createElementComponent(
-  'p24Bank',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const EpsBankElement: EpsBankElementComponent = createElementComponent(
-  'epsBank',
   isServer
 );
 
@@ -167,22 +129,6 @@ export const ShippingAddressElement: ShippingAddressElementComponent = createEle
  */
 export const PaymentMethodMessagingElement: PaymentMethodMessagingElementComponent = createElementComponent(
   'paymentMethodMessaging',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const AffirmMessageElement: AffirmMessageElementComponent = createElementComponent(
-  'affirmMessage',
-  isServer
-);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const AfterpayClearpayMessageElement: AfterpayClearpayMessageElementComponent = createElementComponent(
-  'afterpayClearpayMessage',
   isServer
 );
 
