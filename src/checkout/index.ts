@@ -2,12 +2,10 @@ export {
   useCheckout,
   CheckoutProvider,
 } from './components/CheckoutProvider';
-// prettier-ignore-start
 export type {
   StripeUseCheckoutResult,
   StripeCheckoutValue,
 } from './components/CheckoutProvider';
-// prettier-ignore-end
 export * from './types';
 import React from 'react';
 import createElementComponent from '../components/createElementComponent';
