@@ -1,10 +1,10 @@
 export {
   useCheckout,
-  CheckoutProvider
+  CheckoutProvider,
 } from './components/CheckoutProvider';
 export type {
   StripeUseCheckoutResult,
-  StripeCheckoutValue
+  StripeCheckoutValue,
 } from './components/CheckoutProvider';
 export * from './types';
 import React from 'react';
