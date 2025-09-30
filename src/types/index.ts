@@ -182,32 +182,6 @@ export interface CardCvcElementProps extends ElementProps {
 
 export type CardCvcElementComponent = FunctionComponent<CardCvcElementProps>;
 
-export interface FpxBankElementProps extends ElementProps {
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank).
-   */
-  options?: stripeJs.StripeFpxBankElementOptions;
-
-  /**
-   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
-   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=fpxBankElement).
-   */
-  onChange?: (event: stripeJs.StripeFpxBankElementChangeEvent) => any;
-
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeFpxBankElement) => any;
-
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  onEscape?: () => any;
-}
-
-export type FpxBankElementComponent = FunctionComponent<FpxBankElementProps>;
-
 export interface IbanElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=iban).
@@ -233,58 +207,6 @@ export interface IbanElementProps extends ElementProps {
 }
 
 export type IbanElementComponent = FunctionComponent<IbanElementProps>;
-
-export interface IdealBankElementProps extends ElementProps {
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=idealBank).
-   */
-  options?: stripeJs.StripeIdealBankElementOptions;
-
-  /**
-   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
-   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=idealBankElement).
-   */
-  onChange?: (event: stripeJs.StripeIdealBankElementChangeEvent) => any;
-
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeIdealBankElement) => any;
-
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  onEscape?: () => any;
-}
-
-export type IdealBankElementComponent = FunctionComponent<
-  IdealBankElementProps
->;
-
-export interface P24BankElementProps extends ElementProps {
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=p24Bank).
-   */
-  options?: stripeJs.StripeP24BankElementOptions;
-
-  /**
-   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
-   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=p24BankElement).
-   */
-  onChange?: (event: stripeJs.StripeP24BankElementChangeEvent) => any;
-
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeP24BankElement) => any;
-
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  onEscape?: () => any;
-}
 
 export interface LinkAuthenticationElementProps extends ElementProps {
   /**
@@ -328,34 +250,6 @@ export interface LinkAuthenticationElementProps extends ElementProps {
 export type LinkAuthenticationElementComponent = FunctionComponent<
   LinkAuthenticationElementProps
 >;
-
-export type P24BankElementComponent = FunctionComponent<P24BankElementProps>;
-
-export interface EpsBankElementProps extends ElementProps {
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=epsBank).
-   */
-  options?: stripeJs.StripeEpsBankElementOptions;
-
-  /**
-   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
-   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=epsBankElement).
-   */
-  onChange?: (event: stripeJs.StripeEpsBankElementChangeEvent) => any;
-
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeEpsBankElement) => any;
-
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  onEscape?: () => any;
-}
-
-export type EpsBankElementComponent = FunctionComponent<EpsBankElementProps>;
 
 export interface PaymentElementProps extends ElementProps {
   /**
@@ -605,60 +499,6 @@ export type PaymentMethodMessagingElementComponent = FunctionComponent<
   PaymentMethodMessagingElementProps
 >;
 
-export interface AffirmMessageElementProps {
-  /**
-   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
-   */
-  id?: string;
-
-  /**
-   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
-   */
-  className?: string;
-
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
-   */
-  options?: stripeJs.StripeAffirmMessageElementOptions;
-
-  /**
-   * Triggered when the Element has been fully loaded, after initial method calls have been fired.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeAffirmMessageElement) => any;
-}
-
-export type AffirmMessageElementComponent = FunctionComponent<
-  AffirmMessageElementProps
->;
-
-export interface AfterpayClearpayMessageElementProps {
-  /**
-   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
-   */
-  id?: string;
-
-  /**
-   * Passes through to the [Element’s container](https://stripe.com/docs/js/element/the_element_container).
-   */
-  className?: string;
-
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage).
-   */
-  options?: stripeJs.StripeAfterpayClearpayMessageElementOptions;
-
-  /**
-   * Triggered when the Element has been fully loaded, after initial method calls have been fired.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripeAfterpayClearpayMessageElement) => any;
-}
-
-export type AfterpayClearpayMessageElementComponent = FunctionComponent<
-  AfterpayClearpayMessageElementProps
->;
-
 declare module '@stripe/stripe-js' {
   interface StripeElements {
     /**
@@ -705,44 +545,12 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardExpiryElement | null;
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `FpxBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: FpxBankElementComponent
-    ): stripeJs.StripeFpxBankElement | null;
-
-    /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=iban) for the `IbanElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `IbanElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
       component: IbanElementComponent
     ): stripeJs.StripeIbanElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=idealBank) for the `IdealBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `IdealBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: IdealBankElementComponent
-    ): stripeJs.StripeIdealBankElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=p24Bank) for the `P24BankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `P24BankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: P24BankElementComponent
-    ): stripeJs.StripeP24BankElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=epsBank) for the `EpsBankElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `EpsBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: EpsBankElementComponent
-    ): stripeJs.StripeEpsBankElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_link_authentication_element) for the `LinkAuthenticationElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
@@ -799,22 +607,6 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentMethodMessagingElementComponent
     ): stripeJs.StripePaymentMethodMessagingElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=affirmMessage) for the `AffirmMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `AffirmMessageElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: AffirmMessageElementComponent
-    ): stripeJs.StripeAffirmMessageElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=afterpayClearpayMessage) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `AfterpayClearpayMessageElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: AfterpayClearpayMessageElementComponent
-    ): stripeJs.StripeAfterpayClearpayMessageElement | null;
   }
 }
 
