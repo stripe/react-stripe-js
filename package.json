@@ -8,7 +8,7 @@
   "browser:min": "dist/react-stripe.umd.min.js",
   "browser": "dist/react-stripe.umd.js",
   "types": "dist/react-stripe.d.ts",
-  "releaseCandidate": true,
+  "releaseCandidate": false,
   "exports": {
     ".": {
       "require": "./dist/react-stripe.js",
