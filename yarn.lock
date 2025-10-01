@@ -2350,10 +2350,10 @@
     regenerator-runtime "^0.13.7"
     resolve-from "^5.0.0"
 
-"@stripe/stripe-js@^8.0.0-rc.1":
-  version "8.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-8.0.0-rc.1.tgz#8c61f167b610bcfa92b65828b5fabbee133b70c8"
-  integrity sha512-lj6BFGL4gqx8iiIZ0znZTIQFguERi53lOKP3ZqIfc9E1ui7eJ4S6ZyWejcuuohuiQFPT3bpag3E9xZRS6qSujg==
+"@stripe/stripe-js@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-8.0.0.tgz#826c96834309a2b8f60394ad4496b71ae98fea86"
+  integrity sha512-dLvD55KT1cBmrqzgYRgY42qNcw6zW4HS5oRZs0xRvHw9gBWig5yDnWNop/E+/t2JK+OZO30zsnupVBN2MqW2mg==
 
 "@testing-library/dom@^8.5.0":
   version "8.13.0"
