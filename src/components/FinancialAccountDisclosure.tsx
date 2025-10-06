@@ -12,9 +12,10 @@ interface FinancialAccountDisclosureProps {
    * Once this prop has been set, it can not be changed.
    *
    * You can also pass in `null` or a `Promise` resolving to `null` if you are performing an initial server-side render or when generating a static site.
-   */  
+   */
+
   stripe: PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null;
-  
+
   /**
    * Callback function called when the disclosure content is loading.
    */
@@ -27,7 +28,7 @@ interface FinancialAccountDisclosureProps {
 
   /**
    * Optional Financial Account Disclosure configuration options.
-   * 
+   *
    * businessName: The name of your business as you would like it to appear in the disclosure. If not provided, the business name will be inferred from the Stripe account.
    * learnMoreLink: A supplemental link to for your users to learn more about Financial Accounts for platforms or any other relevant information included in the disclosure.
    */
@@ -90,12 +91,14 @@ const FinancialAccountDisclosure = ({
         return;
       }
 
-      const disclosurePromise = (stripeState as any).createFinancialAccountDisclosure(options);
-      
+      const disclosurePromise = (stripeState as any).createFinancialAccountDisclosure(
+        options
+      );
+
       if (onLoad) {
         onLoad();
       }
-      
+
       const {htmlElement: disclosureContent, error} = await disclosurePromise;
 
       if (error && onError) {
@@ -110,7 +113,7 @@ const FinancialAccountDisclosure = ({
     createDisclosure();
   }, [stripeState, options, onLoad, onError]);
 
-  return React.createElement('div', { ref: containerRef });
+  return React.createElement('div', {ref: containerRef});
 };
 
 export default FinancialAccountDisclosure;

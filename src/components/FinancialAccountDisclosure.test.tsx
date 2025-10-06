@@ -1,12 +1,15 @@
 import React from 'react';
 import {render} from '@testing-library/react';
 import FinancialAccountDisclosure from './FinancialAccountDisclosure';
-import { StripeError, StripeErrorType } from '@stripe/stripe-js';
+import {StripeError, StripeErrorType} from '@stripe/stripe-js';
 import {mockStripe as baseMockStripe} from '../../test/mocks';
 
 const apiError: StripeErrorType = 'api_error';
 
-const mockStripeJs = (htmlElement: HTMLElement | undefined = document.createElement('div'), error: StripeError | undefined = undefined) => {
+const mockStripeJs = (
+  htmlElement: HTMLElement | undefined = document.createElement('div'),
+  error: StripeError | undefined = undefined
+) => {
   return {
     ...baseMockStripe(),
     createFinancialAccountDisclosure: jest.fn(() =>
@@ -29,13 +32,15 @@ describe('FinancialAccountDisclosure', () => {
     jest.restoreAllMocks();
   });
 
-
   it('should render', () => {
     render(<FinancialAccountDisclosure stripe={mockStripe} />);
   });
 
   it('should render when there is an error', () => {
-    const error: StripeError = {type: apiError, message: 'This is a test error'};
+    const error: StripeError = {
+      type: apiError,
+      message: 'This is a test error',
+    };
     mockStripe = mockStripeJs(undefined, error);
     render(<FinancialAccountDisclosure stripe={mockStripe} />);
   });
@@ -48,11 +53,18 @@ describe('FinancialAccountDisclosure', () => {
 
   it('should render with an onError callback', () => {
     const onError = jest.fn();
-    render(<FinancialAccountDisclosure stripe={mockStripe} onError={onError} />);
+    render(
+      <FinancialAccountDisclosure stripe={mockStripe} onError={onError} />
+    );
   });
 
   it('should render with options', () => {
-    const options = {businessName: 'Test Business', learnMoreLink: 'https://test.com'};
-    render(<FinancialAccountDisclosure stripe={mockStripe} options={options} />);
+    const options = {
+      businessName: 'Test Business',
+      learnMoreLink: 'https://test.com',
+    };
+    render(
+      <FinancialAccountDisclosure stripe={mockStripe} options={options} />
+    );
   });
 });
