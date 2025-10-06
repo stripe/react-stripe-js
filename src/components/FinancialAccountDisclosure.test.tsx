@@ -1,21 +1,31 @@
 import React from 'react';
 import {render} from '@testing-library/react';
 import FinancialAccountDisclosure from './FinancialAccountDisclosure';
-import {StripeError, StripeErrorType} from '@stripe/stripe-js';
+import {StripeErrorType} from '@stripe/stripe-js';
 import {mockStripe as baseMockStripe} from '../../test/mocks';
 
 const apiError: StripeErrorType = 'api_error';
 
-const mockStripeJs = (
-  htmlElement: HTMLElement | undefined = document.createElement('div'),
-  error: StripeError | undefined = undefined
-) => {
+const mockSuccessfulStripeJsCall = () => {
   return {
     ...baseMockStripe(),
     createFinancialAccountDisclosure: jest.fn(() =>
       Promise.resolve({
-        htmlElement,
-        error,
+        htmlElement: document.createElement('div'),
+      })
+    ),
+  };
+};
+
+const mockStripeJsWithError = () => {
+  return {
+    ...baseMockStripe(),
+    createFinancialAccountDisclosure: jest.fn(() =>
+      Promise.resolve({
+        error: {
+          type: apiError,
+          message: 'This is a test error',
+        },
       })
     ),
   };
@@ -25,7 +35,7 @@ describe('FinancialAccountDisclosure', () => {
   let mockStripe: any;
 
   beforeEach(() => {
-    mockStripe = mockStripeJs();
+    mockStripe = mockSuccessfulStripeJsCall();
   });
 
   afterEach(() => {
@@ -36,12 +46,18 @@ describe('FinancialAccountDisclosure', () => {
     render(<FinancialAccountDisclosure stripe={mockStripe} />);
   });
 
-  it('should render when there is an error', () => {
-    const error: StripeError = {
-      type: apiError,
-      message: 'This is a test error',
+  it('should render with options', () => {
+    const options = {
+      businessName: 'Test Business',
+      learnMoreLink: 'https://test.com',
     };
-    mockStripe = mockStripeJs(undefined, error);
+    render(
+      <FinancialAccountDisclosure stripe={mockStripe} options={options} />
+    );
+  });
+
+  it('should render when there is an error', () => {
+    mockStripe = mockStripeJsWithError();
     render(<FinancialAccountDisclosure stripe={mockStripe} />);
   });
 
@@ -52,20 +68,30 @@ describe('FinancialAccountDisclosure', () => {
     expect(onLoad).toHaveBeenCalled();
   });
 
-  it('should render with an onError callback', () => {
+  it('should not call onLoad if there is an error', async () => {
+    const onLoad = jest.fn();
+    mockStripe = mockStripeJsWithError();
+    render(<FinancialAccountDisclosure stripe={mockStripe} onLoad={onLoad} />);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onLoad).not.toHaveBeenCalled();
+  });
+
+  it('should render with an onError callback', async () => {
+    const onError = jest.fn();
+    mockStripe = mockStripeJsWithError();
+    render(
+      <FinancialAccountDisclosure stripe={mockStripe} onError={onError} />
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onError).toHaveBeenCalled();
+  });
+
+  it('should not call onError if there is no error', async () => {
     const onError = jest.fn();
     render(
       <FinancialAccountDisclosure stripe={mockStripe} onError={onError} />
     );
-  });
-
-  it('should render with options', () => {
-    const options = {
-      businessName: 'Test Business',
-      learnMoreLink: 'https://test.com',
-    };
-    render(
-      <FinancialAccountDisclosure stripe={mockStripe} options={options} />
-    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onError).not.toHaveBeenCalled();
   });
 });
