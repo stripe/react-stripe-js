@@ -45,9 +45,10 @@ describe('FinancialAccountDisclosure', () => {
     render(<FinancialAccountDisclosure stripe={mockStripe} />);
   });
 
-  it('should render with an onLoad callback', () => {
+  it('should render with an onLoad callback', async () => {
     const onLoad = jest.fn();
     render(<FinancialAccountDisclosure stripe={mockStripe} onLoad={onLoad} />);
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(onLoad).toHaveBeenCalled();
   });
 

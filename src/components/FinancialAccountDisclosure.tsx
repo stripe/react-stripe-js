@@ -44,6 +44,8 @@ const FinancialAccountDisclosure = ({
   onError,
   options,
 }: FinancialAccountDisclosureProps) => {
+  const businessName = options?.businessName;
+  const learnMoreLink = options?.learnMoreLink;
   const containerRef = React.useRef<HTMLDivElement>(null);
   const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
     rawStripeProp,
@@ -91,15 +93,13 @@ const FinancialAccountDisclosure = ({
         return;
       }
 
-      const disclosurePromise = (stripeState as any).createFinancialAccountDisclosure(
-        options
-      );
-
-      if (onLoad) {
-        onLoad();
-      }
-
-      const {htmlElement: disclosureContent, error} = await disclosurePromise;
+      const {
+        htmlElement: disclosureContent,
+        error,
+      } = await (stripeState as any).createFinancialAccountDisclosure({
+        businessName,
+        learnMoreLink,
+      });
 
       if (error && onError) {
         onError(error);
@@ -107,11 +107,14 @@ const FinancialAccountDisclosure = ({
         const container = containerRef.current;
         container.innerHTML = '';
         container.appendChild(disclosureContent);
+        if (onLoad) {
+          onLoad();
+        }
       }
     };
 
     createDisclosure();
-  }, [stripeState, options, onLoad, onError]);
+  }, [stripeState, businessName, learnMoreLink, onLoad, onError]);
 
   return React.createElement('div', {ref: containerRef});
 };
