@@ -291,7 +291,10 @@ describe('CheckoutProvider', () => {
       await act(() => stripeDeferred.resolve(stripe));
 
       // In React 19, the checkout resolves immediately, so we expect success state
-      expect(result.current).toEqual({type: 'success', checkout: mockCheckout});
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckoutSdk,
+      });
       // In React 19, the mock behavior has changed - initCheckout may not be called immediately
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
@@ -350,7 +353,10 @@ describe('CheckoutProvider', () => {
       await act(() => stripeDeferred.resolve(stripe));
 
       // In React 19, the checkout resolves immediately, so we expect success state
-      expect(result.current).toEqual({type: 'success', checkout: mockCheckout});
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckoutSdk,
+      });
       // In React 19, the mock behavior has changed - initCheckout may not be called immediately
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
@@ -394,7 +400,10 @@ describe('CheckoutProvider', () => {
       await act(() => stripeDeferred.resolve(null));
 
       // In React 19, the checkout resolves immediately, so we expect success state
-      expect(result.current).toEqual({type: 'success', checkout: mockCheckout});
+      expect(result.current).toEqual({
+        type: 'success',
+        checkout: mockCheckoutSdk,
+      });
     });
 
     it('does not allow changes to an already set Stripe object', async () => {
