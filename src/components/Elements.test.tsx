@@ -137,10 +137,7 @@ describe('Elements', () => {
       <Elements stripe={stripeProp}>{children}</Elements>
     );
 
-    const {result, rerender} = renderHook(
-      () => useElements(),
-      {wrapper}
-    );
+    const {result, rerender} = renderHook(() => useElements(), {wrapper});
     expect(result.current).toBe(null);
 
     stripeProp = mockStripePromise;

@@ -42,7 +42,7 @@ describe('createElementComponent', () => {
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement);
-    
+
     // Note: In React 19, useLayoutEffect is read-only and cannot be spied on
     // The original test was verifying that server-side components don't call useLayoutEffect
     // This is still true - server components use useEffect instead of useLayoutEffect
