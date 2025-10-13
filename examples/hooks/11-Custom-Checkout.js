@@ -64,12 +64,15 @@ const CheckoutForm = () => {
 
     try {
       setLoading(true);
-      await checkoutState.checkout.confirm({
-        email,
-        phoneNumber,
-        returnUrl: window.location.href,
-      });
-      setLoading(false);
+      const loadActionsResult = await checkoutState.checkout.loadActions();
+      if (loadActionsResult.type === 'success') {
+        await loadActionsResult.actions.confirm({
+          email,
+          phoneNumber,
+          returnUrl: window.location.href,
+        });
+        setLoading(false);
+      }
     } catch (err) {
       console.error(err);
       setStatus(err.message);
@@ -162,7 +165,7 @@ const App = () => {
         <CheckoutProvider
           stripe={stripePromise}
           options={{
-            fetchClientSecret: async () => clientSecret,
+            clientSecret: clientSecret,
             elementsOptions: {appearance: {theme}},
           }}
         >
