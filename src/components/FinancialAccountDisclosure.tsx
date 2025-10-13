@@ -13,11 +13,10 @@ interface FinancialAccountDisclosureProps {
    *
    * You can also pass in `null` or a `Promise` resolving to `null` if you are performing an initial server-side render or when generating a static site.
    */
-
   stripe: PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null;
 
   /**
-   * Callback function called when the disclosure content is loading.
+   * Callback function called after the disclosure content loads.
    */
   onLoad?: () => void;
 
@@ -46,6 +45,7 @@ const FinancialAccountDisclosure = ({
 }: FinancialAccountDisclosureProps) => {
   const businessName = options?.businessName;
   const learnMoreLink = options?.learnMoreLink;
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
     rawStripeProp,
