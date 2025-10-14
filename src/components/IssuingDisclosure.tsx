@@ -118,7 +118,14 @@ const IssuingDisclosure = ({
     };
 
     createDisclosure();
-  }, [stripeState, issuingProgramID, publicCardProgramName, learnMoreLink, onLoad, onError]);
+  }, [
+    stripeState,
+    issuingProgramID,
+    publicCardProgramName,
+    learnMoreLink,
+    onLoad,
+    onError,
+  ]);
 
   return React.createElement('div', {ref: containerRef});
 };

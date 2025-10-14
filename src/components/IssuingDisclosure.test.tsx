@@ -52,9 +52,7 @@ describe('IssuingDisclosure', () => {
       publicCardProgramName: 'My Cool Card Program',
       learnMoreLink: 'https://test.com',
     };
-    render(
-      <IssuingDisclosure stripe={mockStripe} options={options} />
-    );
+    render(<IssuingDisclosure stripe={mockStripe} options={options} />);
   });
 
   it('should render when there is an error', () => {
@@ -80,18 +78,14 @@ describe('IssuingDisclosure', () => {
   it('should render with an onError callback', async () => {
     const onError = jest.fn();
     mockStripe = mockStripeJsWithError();
-    render(
-      <IssuingDisclosure stripe={mockStripe} onError={onError} />
-    );
+    render(<IssuingDisclosure stripe={mockStripe} onError={onError} />);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(onError).toHaveBeenCalled();
   });
 
   it('should not call onError if there is no error', async () => {
     const onError = jest.fn();
-    render(
-      <IssuingDisclosure stripe={mockStripe} onError={onError} />
-    );
+    render(<IssuingDisclosure stripe={mockStripe} onError={onError} />);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(onError).not.toHaveBeenCalled();
   });
