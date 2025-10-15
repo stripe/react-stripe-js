@@ -162,7 +162,7 @@ const App = () => {
         <CheckoutProvider
           stripe={stripePromise}
           options={{
-            fetchClientSecret: async () => clientSecret,
+            clientSecret,
             elementsOptions: {appearance: {theme}},
           }}
         >
