@@ -39,6 +39,7 @@ export type CurrencySelectorElementComponent = FunctionComponent<
 
 export interface BillingAddressElementProps extends ElementProps {
   options?: stripeJs.StripeCheckoutAddressElementOptions;
+  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
   onReady?: (element: stripeJs.StripeAddressElement) => any;
   onEscape?: () => any;
   onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
@@ -51,6 +52,7 @@ export type BillingAddressElementComponent = FunctionComponent<
 
 export interface ShippingAddressElementProps extends ElementProps {
   options?: stripeJs.StripeCheckoutAddressElementOptions;
+  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
   onReady?: (element: stripeJs.StripeAddressElement) => any;
   onEscape?: () => any;
   onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
