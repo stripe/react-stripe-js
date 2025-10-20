@@ -5,6 +5,7 @@ import {
   ElementProps,
   PaymentElementProps as RootPaymentElementProps,
   ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
+  AddressElementProps as RootAddressElementProps,
 } from '../../types';
 
 export interface CurrencySelectorElementProps extends ElementProps {
@@ -37,27 +38,23 @@ export type CurrencySelectorElementComponent = FunctionComponent<
   CurrencySelectorElementProps
 >;
 
-export interface BillingAddressElementProps extends ElementProps {
+export type BillingAddressElementProps = Omit<
+  RootAddressElementProps,
+  'options'
+> & {
   options?: stripeJs.StripeCheckoutAddressElementOptions;
-  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
-  onReady?: (element: stripeJs.StripeAddressElement) => any;
-  onEscape?: () => any;
-  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
-  onLoaderStart?: (event: {elementType: 'address'}) => any;
-}
+};
 
 export type BillingAddressElementComponent = FunctionComponent<
   BillingAddressElementProps
 >;
 
-export interface ShippingAddressElementProps extends ElementProps {
+export type ShippingAddressElementProps = Omit<
+  RootAddressElementProps,
+  'options'
+> & {
   options?: stripeJs.StripeCheckoutAddressElementOptions;
-  onChange?: (event: stripeJs.StripeAddressElementChangeEvent) => any;
-  onReady?: (element: stripeJs.StripeAddressElement) => any;
-  onEscape?: () => any;
-  onLoadError?: (event: {elementType: 'address'; error: StripeError}) => any;
-  onLoaderStart?: (event: {elementType: 'address'}) => any;
-}
+};
 
 export type ShippingAddressElementComponent = FunctionComponent<
   ShippingAddressElementProps
