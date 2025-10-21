@@ -5,7 +5,7 @@ import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {StripeError} from '@stripe/stripe-js';
 import {usePrevious} from '../utils/usePrevious';
 
-interface FinancialAccountDisclosureProps {
+interface IssuingDisclosureProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise` resolving to a `Stripe` object.
    * The easiest way to initialize a `Stripe` object is with the the [Stripe.js wrapper module](https://github.com/stripe/stripe-js/blob/master/README.md#readme).
@@ -26,24 +26,27 @@ interface FinancialAccountDisclosureProps {
   onError?: (error: StripeError) => void;
 
   /**
-   * Optional Financial Account Disclosure configuration options.
+   * Optional Issuing Disclosure configuration options.
    *
-   * businessName: The name of your business as you would like it to appear in the disclosure. If not provided, the business name will be inferred from the Stripe account.
-   * learnMoreLink: A supplemental link to for your users to learn more about Financial Accounts for platforms or any other relevant information included in the disclosure.
+   * issuingProgramID: The ID of the issuing program you want to display the disclosure for.
+   * publicCardProgramName: The public name of the Issuing card program you want to display the disclosure for.
+   * learnMoreLink: A supplemental link to for your users to learn more about Issuing or any other relevant information included in the disclosure.
    */
   options?: {
-    businessName?: string;
+    issuingProgramID?: string;
+    publicCardProgramName?: string;
     learnMoreLink?: string;
   };
 }
 
-const FinancialAccountDisclosure = ({
+const IssuingDisclosure = ({
   stripe: rawStripeProp,
   onLoad,
   onError,
   options,
-}: FinancialAccountDisclosureProps) => {
-  const businessName = options?.businessName;
+}: IssuingDisclosureProps) => {
+  const issuingProgramID = options?.issuingProgramID;
+  const publicCardProgramName = options?.publicCardProgramName;
   const learnMoreLink = options?.learnMoreLink;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -77,7 +80,7 @@ const FinancialAccountDisclosure = ({
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on FinancialAccountDisclosure: You cannot change the `stripe` prop after setting it.'
+        'Unsupported prop change on IssuingDisclosure: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);
@@ -96,8 +99,9 @@ const FinancialAccountDisclosure = ({
       const {
         htmlElement: disclosureContent,
         error,
-      } = await (stripeState as any).createFinancialAccountDisclosure({
-        businessName,
+      } = await (stripeState as any).createIssuingDisclosure({
+        issuingProgramID,
+        publicCardProgramName,
         learnMoreLink,
       });
 
@@ -114,9 +118,16 @@ const FinancialAccountDisclosure = ({
     };
 
     createDisclosure();
-  }, [stripeState, businessName, learnMoreLink, onLoad, onError]);
+  }, [
+    stripeState,
+    issuingProgramID,
+    publicCardProgramName,
+    learnMoreLink,
+    onLoad,
+    onError,
+  ]);
 
   return React.createElement('div', {ref: containerRef});
 };
 
-export default FinancialAccountDisclosure;
+export default IssuingDisclosure;
