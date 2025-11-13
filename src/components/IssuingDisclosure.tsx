@@ -1,5 +1,5 @@
 import * as stripeJs from '@stripe/stripe-js';
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {StripeError} from '@stripe/stripe-js';
@@ -39,12 +39,12 @@ interface IssuingDisclosureProps {
   };
 }
 
-const IssuingDisclosure = ({
+export const IssuingDisclosure: FunctionComponent<IssuingDisclosureProps> = ({
   stripe: rawStripeProp,
   onLoad,
   onError,
   options,
-}: IssuingDisclosureProps) => {
+}) => {
   const issuingProgramID = options?.issuingProgramID;
   const publicCardProgramName = options?.publicCardProgramName;
   const learnMoreLink = options?.learnMoreLink;
@@ -129,5 +129,3 @@ const IssuingDisclosure = ({
 
   return React.createElement('div', {ref: containerRef});
 };
-
-export default IssuingDisclosure;
