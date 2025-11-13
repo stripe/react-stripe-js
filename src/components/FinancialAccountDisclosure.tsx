@@ -1,5 +1,5 @@
 import * as stripeJs from '@stripe/stripe-js';
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {StripeError} from '@stripe/stripe-js';
@@ -37,12 +37,12 @@ interface FinancialAccountDisclosureProps {
   };
 }
 
-const FinancialAccountDisclosure = ({
+export const FinancialAccountDisclosure: FunctionComponent<FinancialAccountDisclosureProps> = ({
   stripe: rawStripeProp,
   onLoad,
   onError,
   options,
-}: FinancialAccountDisclosureProps) => {
+}) => {
   const businessName = options?.businessName;
   const learnMoreLink = options?.learnMoreLink;
 
@@ -118,5 +118,3 @@ const FinancialAccountDisclosure = ({
 
   return React.createElement('div', {ref: containerRef});
 };
-
-export default FinancialAccountDisclosure;

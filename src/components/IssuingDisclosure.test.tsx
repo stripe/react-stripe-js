@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from '@testing-library/react';
-import IssuingDisclosure from './IssuingDisclosure';
+import {IssuingDisclosure} from './IssuingDisclosure';
 import {StripeErrorType} from '@stripe/stripe-js';
 import {mockStripe as baseMockStripe} from '../../test/mocks';
 

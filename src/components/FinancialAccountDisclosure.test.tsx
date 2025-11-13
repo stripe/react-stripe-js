@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from '@testing-library/react';
-import FinancialAccountDisclosure from './FinancialAccountDisclosure';
+import {FinancialAccountDisclosure} from './FinancialAccountDisclosure';
 import {StripeErrorType} from '@stripe/stripe-js';
 import {mockStripe as baseMockStripe} from '../../test/mocks';
 
