@@ -17,10 +17,6 @@ import {
   TaxIdElementComponent,
 } from './types';
 
-/**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- */
 export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
   'currencySelector',
   isServer
