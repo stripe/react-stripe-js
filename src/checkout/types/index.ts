@@ -66,6 +66,8 @@ export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
+export type PaymentFormElementComponent = FunctionComponent<{}>;
+
 export type ExpressCheckoutElementProps = Omit<
   RootExpressCheckoutElementProps,
   | 'options'

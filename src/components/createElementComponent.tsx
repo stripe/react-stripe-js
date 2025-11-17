@@ -131,6 +131,11 @@ const createElementComponent = (
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
           switch (type) {
+            // @ts-expect-error - `paymentForm` Element is not part of the SDK types yet
+            case 'paymentForm':
+              // @ts-expect-error - `createPaymentFormElement` method is not part of the SDK types yet
+              newElement = checkoutSdk.createPaymentFormElement();
+              break;
             case 'payment':
               newElement = checkoutSdk.createPaymentElement(options);
               break;
