@@ -38,6 +38,7 @@ describe('createElementComponent', () => {
     mockElements.create.mockReturnValue(mockElement);
     mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk);
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement);
+    mockCheckoutSdk.createPaymentFormElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement);
@@ -162,6 +163,12 @@ describe('createElementComponent', () => {
 
     const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
       'expressCheckout',
+      false
+    );
+
+    const PaymentFormElement = createElementComponent(
+      // @ts-expect-error - `paymentForm` Element type is not defined yet.
+      'paymentForm',
       false
     );
 
@@ -427,6 +434,28 @@ describe('createElementComponent', () => {
       rerender(
         <Elements stripe={mockStripe}>
           <CardElement onReady={mockHandler2} />
+        </Elements>
+      );
+
+      const mockEvent = Symbol('ready');
+      simulateEvent('ready', mockEvent);
+      expect(mockHandler2).toHaveBeenCalledWith(mockElement);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Payment Form Element`s ready event to the current onReady prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          {/* @ts-expect-error - `onReady` is not a valid prop for the Payment Form Element */}
+          <PaymentFormElement onReady={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          {/* @ts-expect-error - `onReady` is not a valid prop for the Payment Form Element */}
+          <PaymentFormElement onReady={mockHandler2} />
         </Elements>
       );
 

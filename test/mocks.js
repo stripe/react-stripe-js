@@ -62,6 +62,10 @@ export const mockCheckoutSdk = () => {
       elements.payment = mockElement();
       return elements.payment;
     }),
+    createPaymentFormElement: jest.fn(() => {
+      elements.paymentForm = mockElement();
+      return elements.paymentForm;
+    }),
     createBillingAddressElement: jest.fn(() => {
       elements.billingAddress = mockElement();
       return elements.billingAddress;
@@ -76,6 +80,9 @@ export const mockCheckoutSdk = () => {
     }),
     getPaymentElement: jest.fn(() => {
       return elements.payment || null;
+    }),
+    getPaymentFormElement: jest.fn(() => {
+      return elements.paymentForm || null;
     }),
     getBillingAddressElement: jest.fn(() => {
       return elements.billingAddress || null;
