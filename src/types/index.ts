@@ -251,6 +251,14 @@ export type LinkAuthenticationElementComponent = FunctionComponent<
   LinkAuthenticationElementProps
 >;
 
+export interface PaymentFormElementProps extends ElementProps {
+  onReady?: (element: stripeJs.StripePaymentFormElement) => any;
+}
+
+export type PaymentFormElementComponent = FunctionComponent<
+  PaymentFormElementProps
+>;
+
 export interface PaymentElementProps extends ElementProps {
   /**
    * An object containing Element configuration options.

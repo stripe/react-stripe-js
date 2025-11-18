@@ -11,6 +11,7 @@ import {
   PaymentRequestButtonElementComponent,
   ExpressCheckoutElementComponent,
   AddressElementComponent,
+  PaymentFormElementComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -38,6 +39,7 @@ describe('createElementComponent', () => {
     mockElements.create.mockReturnValue(mockElement);
     mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk);
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement);
+    mockCheckoutSdk.createPaymentFormElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement);
@@ -164,6 +166,11 @@ describe('createElementComponent', () => {
       'expressCheckout',
       false
     );
+
+    const PaymentFormElement = createElementComponent(
+      'paymentForm',
+      false
+    ) as PaymentFormElementComponent;
 
     it('Can remove and add CardElement at the same time', () => {
       let cardMounted = false;
@@ -427,6 +434,26 @@ describe('createElementComponent', () => {
       rerender(
         <Elements stripe={mockStripe}>
           <CardElement onReady={mockHandler2} />
+        </Elements>
+      );
+
+      const mockEvent = Symbol('ready');
+      simulateEvent('ready', mockEvent);
+      expect(mockHandler2).toHaveBeenCalledWith(mockElement);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Payment Form Element`s ready event to the current onReady prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onReady={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onReady={mockHandler2} />
         </Elements>
       );
 

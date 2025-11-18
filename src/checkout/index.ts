@@ -13,6 +13,7 @@ import {
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
   PaymentElementComponent,
+  PaymentFormElementComponent,
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
 } from './types';
@@ -24,6 +25,11 @@ export const CurrencySelectorElement: CurrencySelectorElementComponent = createE
 
 export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
+  isServer
+);
+
+export const PaymentFormElement: PaymentFormElementComponent = createElementComponent(
+  'paymentForm',
   isServer
 );
 

@@ -131,6 +131,9 @@ const createElementComponent = (
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
           switch (type) {
+            case 'paymentForm':
+              newElement = checkoutSdk.createPaymentFormElement();
+              break;
             case 'payment':
               newElement = checkoutSdk.createPaymentElement(options);
               break;
