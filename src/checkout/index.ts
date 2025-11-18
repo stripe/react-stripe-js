@@ -33,7 +33,7 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
 );
 
 export const PaymentFormElement: PaymentFormElementComponent = createElementComponent(
-  // @ts-expect-error - `paymentForm` Element type is not defined yet.
+  // @ts-expect-error - `paymentForm` Element type is not part of stripeJs.StripeElement yet.
   'paymentForm',
   isServer
 );

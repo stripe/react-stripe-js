@@ -11,6 +11,7 @@ import {
   PaymentRequestButtonElementComponent,
   ExpressCheckoutElementComponent,
   AddressElementComponent,
+  PaymentFormElementComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -167,10 +168,10 @@ describe('createElementComponent', () => {
     );
 
     const PaymentFormElement = createElementComponent(
-      // @ts-expect-error - `paymentForm` Element type is not defined yet.
+      // @ts-expect-error - `paymentForm` Element type is not part of stripeJs.StripeElementType yet
       'paymentForm',
       false
-    );
+    ) as PaymentFormElementComponent;
 
     it('Can remove and add CardElement at the same time', () => {
       let cardMounted = false;
@@ -448,13 +449,11 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          {/* @ts-expect-error - `onReady` is not a valid prop for the Payment Form Element */}
           <PaymentFormElement onReady={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          {/* @ts-expect-error - `onReady` is not a valid prop for the Payment Form Element */}
           <PaymentFormElement onReady={mockHandler2} />
         </Elements>
       );
