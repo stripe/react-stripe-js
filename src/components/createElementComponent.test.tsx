@@ -168,7 +168,6 @@ describe('createElementComponent', () => {
     );
 
     const PaymentFormElement = createElementComponent(
-      // @ts-expect-error - `paymentForm` Element type is not part of stripeJs.StripeElementType yet
       'paymentForm',
       false
     ) as PaymentFormElementComponent;
