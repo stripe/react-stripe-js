@@ -651,3 +651,183 @@ export interface TaxIdElementProps extends ElementProps {
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
+
+// Issuing Elements types
+
+/**
+ * Options for Issuing Card Display Elements.
+ * These options are required to display sensitive card data in a PCI-compliant way.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export interface StripeIssuingCardDisplayElementOptions {
+  /**
+   * The ID of your issued card (e.g., ic_abc123)
+   */
+  issuingCard: string;
+
+  /**
+   * Your ephemeral key nonce
+   */
+  nonce: string;
+
+  /**
+   * The secret component of your ephemeral key
+   */
+  ephemeralKeySecret: string;
+
+  /**
+   * Customize the appearance of this element using CSS properties.
+   */
+  style?: stripeJs.StripeElementStyle;
+}
+
+/**
+ * Options for Issuing Card Copy Button Element.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export interface StripeIssuingCardCopyButtonElementOptions {
+  /**
+   * The attribute of the card that's copied to the clipboard.
+   */
+  toCopy: 'number' | 'cvc' | 'expiry' | 'pin';
+
+  /**
+   * Customize the appearance of this element using CSS properties.
+   */
+  style?: stripeJs.StripeElementStyle;
+}
+
+export interface IssuingCardNumberDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   * @docs https://stripe.com/docs/issuing/elements
+   */
+  options: StripeIssuingCardDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying Element instance.
+   */
+  onReady?: (element: any) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'issuingCardNumberDisplay';
+    error: StripeError;
+  }) => any;
+}
+
+export type IssuingCardNumberDisplayElementComponent = FunctionComponent<
+  IssuingCardNumberDisplayElementProps
+>;
+
+export interface IssuingCardCvcDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   * @docs https://stripe.com/docs/issuing/elements
+   */
+  options: StripeIssuingCardDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying Element instance.
+   */
+  onReady?: (element: any) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'issuingCardCvcDisplay';
+    error: StripeError;
+  }) => any;
+}
+
+export type IssuingCardCvcDisplayElementComponent = FunctionComponent<
+  IssuingCardCvcDisplayElementProps
+>;
+
+export interface IssuingCardExpiryDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   * @docs https://stripe.com/docs/issuing/elements
+   */
+  options: StripeIssuingCardDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying Element instance.
+   */
+  onReady?: (element: any) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'issuingCardExpiryDisplay';
+    error: StripeError;
+  }) => any;
+}
+
+export type IssuingCardExpiryDisplayElementComponent = FunctionComponent<
+  IssuingCardExpiryDisplayElementProps
+>;
+
+export interface IssuingCardPinDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   * @docs https://stripe.com/docs/issuing/elements
+   */
+  options: StripeIssuingCardDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying Element instance.
+   */
+  onReady?: (element: any) => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'issuingCardPinDisplay';
+    error: StripeError;
+  }) => any;
+}
+
+export type IssuingCardPinDisplayElementComponent = FunctionComponent<
+  IssuingCardPinDisplayElementProps
+>;
+
+export interface IssuingCardCopyButtonElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   * @docs https://stripe.com/docs/issuing/elements
+   */
+  options: StripeIssuingCardCopyButtonElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying Element instance.
+   */
+  onReady?: (element: any) => any;
+
+  /**
+   * Triggered when the copy button is clicked.
+   */
+  onClick?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'issuingCardCopyButton';
+    error: StripeError;
+  }) => any;
+}
+
+export type IssuingCardCopyButtonElementComponent = FunctionComponent<
+  IssuingCardCopyButtonElementProps
+>;
