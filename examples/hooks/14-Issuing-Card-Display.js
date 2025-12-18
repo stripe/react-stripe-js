@@ -90,18 +90,20 @@ const IssuingCardDisplay = () => {
   return (
     <div style={{padding: '20px', maxWidth: '400px'}}>
       <h2>Your Virtual Card</h2>
-      
+
       <div style={{marginBottom: '20px'}}>
         <label style={{display: 'block', marginBottom: '5px', color: '#666'}}>
           Card Number
         </label>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: '#0a2540',
-          padding: '10px',
-          borderRadius: '4px',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#0a2540',
+            padding: '10px',
+            borderRadius: '4px',
+          }}
+        >
           <div style={{flex: 1}}>
             <IssuingCardNumberDisplayElement options={elementOptions} />
           </div>
@@ -127,13 +129,15 @@ const IssuingCardDisplay = () => {
           <label style={{display: 'block', marginBottom: '5px', color: '#666'}}>
             Expiry Date
           </label>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#0a2540',
-            padding: '10px',
-            borderRadius: '4px',
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#0a2540',
+              padding: '10px',
+              borderRadius: '4px',
+            }}
+          >
             <div style={{flex: 1}}>
               <IssuingCardExpiryDisplayElement options={elementOptions} />
             </div>
@@ -158,13 +162,15 @@ const IssuingCardDisplay = () => {
           <label style={{display: 'block', marginBottom: '5px', color: '#666'}}>
             CVC
           </label>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#0a2540',
-            padding: '10px',
-            borderRadius: '4px',
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#0a2540',
+              padding: '10px',
+              borderRadius: '4px',
+            }}
+          >
             <div style={{flex: 1}}>
               <IssuingCardCvcDisplayElement options={elementOptions} />
             </div>
