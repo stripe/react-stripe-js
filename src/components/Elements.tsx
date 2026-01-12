@@ -10,13 +10,13 @@ import * as stripeJs from '@stripe/stripe-js';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {usePrevious} from '../utils/usePrevious';
+import { usePrevious } from '../utils/usePrevious';
 import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {parseStripeProp} from '../utils/parseStripeProp';
-import {registerWithStripeJs} from '../utils/registerWithStripeJs';
+import { parseStripeProp } from '../utils/parseStripeProp';
+import { registerWithStripeJs } from '../utils/registerWithStripeJs';
 
 export interface ElementsContextValue {
   elements: stripeJs.StripeElements | null;
@@ -41,6 +41,10 @@ export const parseElementsContext = (
   return ctx;
 };
 
+type ElementsOptions = stripeJs.StripeElementsOptions & {
+  paymentMethodCreation?: 'manual';
+};
+
 interface ElementsProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise` resolving to a `Stripe` object.
@@ -55,7 +59,7 @@ interface ElementsProps {
    * Optional [Elements configuration options](https://stripe.com/docs/js/elements_object/create).
    * Once the stripe prop has been set, these options cannot be changed.
    */
-  options?: stripeJs.StripeElementsOptions;
+  options?: ElementsOptions;
 }
 
 interface PrivateElementsProps {
@@ -86,7 +90,7 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   // For a sync stripe instance, initialize into context
   const [ctx, setContext] = React.useState<ElementsContextValue>(() => ({
     stripe: parsed.tag === 'sync' ? parsed.stripe : null,
-    elements: parsed.tag === 'sync' ? parsed.stripe.elements(options) : null,
+    elements: parsed.tag === 'sync' ? parsed.stripe.elements(options as any) : null,
   }));
 
   React.useEffect(() => {
@@ -98,7 +102,7 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
         if (ctx.stripe) return ctx;
         return {
           stripe,
-          elements: stripe.elements(options),
+          elements: stripe.elements(options as any),
         };
       });
     };
@@ -176,7 +180,7 @@ export const useElementsContextWithUseCase = (
  * @docs https://stripe.com/docs/stripe-js/react#useelements-hook
  */
 export const useElements = (): stripeJs.StripeElements | null => {
-  const {elements} = useElementsContextWithUseCase('calls useElements()');
+  const { elements } = useElementsContextWithUseCase('calls useElements()');
   return elements;
 };
 
