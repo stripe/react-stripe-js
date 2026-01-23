@@ -4,6 +4,7 @@ import {StripeError} from '@stripe/stripe-js';
 import {
   ElementProps,
   PaymentElementProps as RootPaymentElementProps,
+  PaymentFormElementProps as RootPaymentFormElementProps,
   ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
   AddressElementProps as RootAddressElementProps,
 } from '../../types';
@@ -66,7 +67,11 @@ export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
 
-export type PaymentFormElementComponent = FunctionComponent<{}>;
+export type PaymentFormElementProps = RootPaymentFormElementProps;
+
+export type PaymentFormElementComponent = FunctionComponent<
+  PaymentFormElementProps
+>;
 
 export type ExpressCheckoutElementProps = Omit<
   RootExpressCheckoutElementProps,

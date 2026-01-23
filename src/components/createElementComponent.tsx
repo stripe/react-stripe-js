@@ -132,7 +132,7 @@ const createElementComponent = (
         if (checkoutSdk) {
           switch (type) {
             case 'paymentForm':
-              newElement = checkoutSdk.createPaymentFormElement();
+              newElement = checkoutSdk.createPaymentFormElement(options);
               break;
             case 'payment':
               newElement = checkoutSdk.createPaymentElement(options);
