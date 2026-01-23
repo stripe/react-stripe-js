@@ -252,7 +252,47 @@ export type LinkAuthenticationElementComponent = FunctionComponent<
 >;
 
 export interface PaymentFormElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   *
+   * Requires beta access:
+   * Contact [Stripe support](https://support.stripe.com/) for more information.
+   */
+  options?: stripeJs.StripeCheckoutPaymentFormElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed.
+   */
+  onChange?: (event: stripeJs.StripePaymentFormElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
   onReady?: (element: stripeJs.StripePaymentFormElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'paymentForm';
+    error: StripeError;
+  }) => any;
+
+  /**
+   * Triggered when a buyer authorizes a payment within a supported payment method.
+   */
+  onConfirm?: (event: stripeJs.StripePaymentFormElementConfirmEvent) => any;
+
+  /**
+   * Triggered when a payment interface is dismissed (e.g., a buyer closes the payment interface).
+   */
+  onCancel?: (event: {elementType: 'paymentForm'}) => any;
 }
 
 export type PaymentFormElementComponent = FunctionComponent<
@@ -575,6 +615,17 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentElementComponent
     ): stripeJs.StripeElement | null;
+
+    /**
+     * Requires beta access:
+     * Contact [Stripe support](https://support.stripe.com/) for more information.
+     *
+     * Returns the underlying [element instance] for the `PaymentFormElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `PaymentFormElement` is rendered in the current `Elements` provider tree.
+     */
+    getElement(
+      component: PaymentFormElementComponent
+    ): stripeJs.StripePaymentFormElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_express_checkout_element) for the `ExpressCheckoutElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.

@@ -8,7 +8,7 @@ import {
 
 import '../styles/common.css';
 
-const CheckoutPaymentForm = () => {
+const CheckoutPaymentForm = ({layout}) => {
   const checkoutState = useCheckout();
 
   const handleSubmit = async (event) => {
@@ -23,14 +23,37 @@ const CheckoutPaymentForm = () => {
     }
   };
 
+  const handleChange = (event) => {
+    console.log('PaymentFormElement change:', event);
+  };
+
+  const handleConfirm = (event) => {
+    console.log('PaymentFormElement confirm:', event);
+  };
+
+  const handleCancel = (event) => {
+    console.log('PaymentFormElement cancel:', event);
+  };
+
+  const handleReady = (element) => {
+    console.log('PaymentFormElement ready:', element);
+  };
+
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentFormElement />
+      <PaymentFormElement
+        options={{layout}}
+        onChange={handleChange}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        onReady={handleReady}
+      />
     </form>
   );
 };
 
 const THEMES = ['stripe', 'flat', 'night'];
+const LAYOUTS = ['expanded', 'compact'];
 
 const App = () => {
   const [pk, setPK] = React.useState(
@@ -44,6 +67,7 @@ const App = () => {
 
   const [stripePromise, setStripePromise] = React.useState();
   const [theme, setTheme] = React.useState('stripe');
+  const [layout, setLayout] = React.useState('expanded');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,6 +80,10 @@ const App = () => {
 
   const handleThemeChange = (e) => {
     setTheme(e.target.value);
+  };
+
+  const handleLayoutChange = (e) => {
+    setLayout(e.target.value);
   };
 
   const handleUnload = () => {
@@ -95,6 +123,16 @@ const App = () => {
             ))}
           </select>
         </label>
+        <label>
+          Layout
+          <select onChange={handleLayoutChange} value={layout}>
+            {LAYOUTS.map((val) => (
+              <option key={val} value={val}>
+                {val}
+              </option>
+            ))}
+          </select>
+        </label>
       </form>
       {stripePromise && clientSecret && (
         <CheckoutProvider
@@ -104,7 +142,7 @@ const App = () => {
             elementsOptions: {appearance: {theme}},
           }}
         >
-          <CheckoutPaymentForm />
+          <CheckoutPaymentForm layout={layout} />
         </CheckoutProvider>
       )}
     </>

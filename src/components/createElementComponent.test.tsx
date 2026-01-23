@@ -463,6 +463,77 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
+    it('propagates the Payment Form Element`s change event to the current onChange prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onChange={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onChange={mockHandler2} />
+        </Elements>
+      );
+
+      const changeEventMock = Symbol('change');
+      simulateEvent('change', changeEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(changeEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Payment Form Element`s confirm event to the current onConfirm prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onConfirm={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onConfirm={mockHandler2} />
+        </Elements>
+      );
+
+      const confirmEventMock = Symbol('confirm');
+      simulateEvent('confirm', confirmEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Payment Form Element`s cancel event to the current onCancel prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onCancel={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement onCancel={mockHandler2} />
+        </Elements>
+      );
+
+      const cancelEventMock = Symbol('cancel');
+      simulateEvent('cancel', cancelEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(cancelEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('creates the Payment Form Element with options', () => {
+      const options: any = {layout: 'expanded'};
+      render(
+        <Elements stripe={mockStripe}>
+          <PaymentFormElement options={options} />
+        </Elements>
+      );
+
+      expect(mockElements.create).toHaveBeenCalledWith('paymentForm', options);
+    });
+
     it('propagates the Express Checkout Element`s ready event to the current onReady prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
