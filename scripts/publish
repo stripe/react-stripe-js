@@ -46,6 +46,14 @@ verify_prerequisites() {
     echo "Error! GITHUB_TOKEN environment variable is not set."
     exit 1
   fi
+
+  # Check GitHub authorization before tagging so we don't leave behind extra tags on failure.
+  if ! hub api user &> /dev/null; then
+    echo "Error! GitHub authorization failed for hub."
+    echo "This is usually an expired/invalid GITHUB_TOKEN (hub error: Unauthorized/Bad credentials)."
+    echo "Please refresh your GitHub token and try again."
+    exit 1
+  fi
   
   # Check git signing configuration
   if [ "$(git config --get gpg.format)" != "ssh" ]; then
