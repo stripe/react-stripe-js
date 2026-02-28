@@ -1,0 +1,131 @@
+partnerupload.google.com
+Settings
+Customer emails
+Customer emails
+Default language
+
+
+English
+Payments
+
+Successful payments
+
+
+Refunds
+To manage emails about invoices, failed payments, and more, visit 
+Billing settings
+Debit
+
+Send Canada PAD mandate, debit initiation, and microdeposit verification emails
+
+
+Send BECS Australia mandate and debit initiation emails
+
+
+Send Bacs mandate and debit initiation emails
+
+
+Send SEPA debit initiation emails
+
+
+Send ACH Direct Debit mandate and microdeposit verification emails
+
+Bank Transfers
+
+Send payment instruction emails
+
+Support email
+Email replies will go to info@samtraderssmcpvtltd.business.site based on your 
+Public details settings
+Your custom email domains
+Add domain
+Domain
+Added
+rizqshops.com
+Verifying
+18 Nov, 10:10
+stripe.com
+Sending
+​
+Skip to content
+Search
+Developers
+Test mode
+
+
+Sam Traders Smc Pvt Ltd
+Home
+Payments
+Balances
+Customers
+Billing
+Connect
+More
+Pinned
+Atlas
+Payment links
+Identity verification
+Recent
+Terminal readers
+
+
+
+Add your favourite business tools to Stripe
+Explore apps
+FEATURED APPS
+
+Puzzle
+Accounting software built native to Stripe, designed for founders
+
+MailerBuddy for ConvertKit
+Sync new customers from Stripe to ConvertKit
+
+Churnkey
+Track and fix every type of churn, with everything next to your Stripe data
+
+Taxually for Digital Services
+Automate your VAT for Digital Services with a few clicks.
+
+Rewardful
+Turn your biggest fans into your best marketers
+Have an app idea of your own?
+Get started
+Connect your domain
+Add these DNS records to your domain provider or edit your existing DNS records to verify that you own this domain. Find directions for your provider
+Type
+Name
+Value
+TXT
+Enter @ or leave it blank
+stripe-verification=30805c95131a514216192a4a76dfa319ee9745ce3541291fd045831b7847c62c
+​
+CNAME
+g4zg42gdlxc6z7fzqfk5k2qbtvusqw4n._domainkey
+g4zg42gdlxc6z7fzqfk5k2qbtvusqw4n.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+dcexwm4s33c6vtcrjxqez5gciph46yhi._domainkey
+dcexwm4s33c6vtcrjxqez5gciph46yhi.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+ycjydwu4cs2synp6vxlme5olh3ystlq4._domainkey
+ycjydwu4cs2synp6vxlme5olh3ystlq4.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+qwzlzoe7lnczdfnryalcjahsbfgz2eff._domainkey
+qwzlzoe7lnczdfnryalcjahsbfgz2eff.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+krihxmxd6aid2ggm5td55zbpvtobgdyi._domainkey
+krihxmxd6aid2ggm5td55zbpvtobgdyi.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+ijtxm2jw5jjzsqmi6b4hfyiqwpfkxe6r._domainkey
+ijtxm2jw5jjzsqmi6b4hfyiqwpfkxe6r.dkim.custom-email-domain.stripe.com.
+​
+CNAME
+bounce
+custom-email-domain.stripe.com.
+​
+Verification may take up to 72 hours while your record changes propagate – we'll email you afterwards to finish setting up.
+Close
