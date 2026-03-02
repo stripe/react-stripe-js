@@ -1,6 +1,5 @@
 import React, {StrictMode} from 'react';
-import {render, act, waitFor} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import {act, render, renderHook, waitFor} from '@testing-library/react';
 
 import {CheckoutFormProvider} from './CheckoutFormProvider';
 import {
@@ -188,11 +187,11 @@ describe('CheckoutFormProvider', () => {
         </CheckoutFormProvider>
       );
 
-      const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
+      const {result} = renderHook(() => useCheckout(), {
         wrapper,
       });
 
-      await waitForNextUpdate();
+      await act(async () => {});
 
       if (result.current.type !== 'success') {
         throw new Error(
@@ -245,11 +244,11 @@ describe('CheckoutFormProvider', () => {
         </CheckoutFormProvider>
       );
 
-      const {result, waitForNextUpdate} = renderHook(() => useCheckoutForm(), {
+      const {result} = renderHook(() => useCheckoutForm(), {
         wrapper,
       });
 
-      await waitForNextUpdate();
+      await act(async () => {});
 
       if (result.current.type !== 'success') {
         throw new Error(
@@ -285,15 +284,22 @@ describe('CheckoutFormProvider', () => {
         </CheckoutFormProvider>
       );
 
-      const {result, waitForNextUpdate} = renderHook(
-        () => useCheckoutElements(),
-        {wrapper}
+      const {result} = renderHook(
+        () => {
+          try {
+            return {value: useCheckoutElements(), error: undefined};
+          } catch (e) {
+            return {value: undefined, error: e as Error};
+          }
+        },
+        {
+          wrapper: ({children}) => wrapper({stripe: mockStripe, children}),
+        }
       );
 
-      await waitForNextUpdate();
+      await act(async () => {});
 
-      expect(result.error).toBeDefined();
-      expect(result.error?.message).toMatch(
+      expect(result.current.error?.message).toMatch(
         /useCheckoutElements\(\) must be used inside <CheckoutElementsProvider>/
       );
     });
