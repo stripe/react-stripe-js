@@ -1,6 +1,5 @@
 import React, {StrictMode} from 'react';
-import {render, act, waitFor} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import {render, renderHook, act, waitFor} from '@testing-library/react';
 
 import {CheckoutProvider, useCheckout} from './CheckoutProvider';
 import {Elements} from '../../components/Elements';
@@ -53,40 +52,34 @@ describe('CheckoutProvider', () => {
 
   describe('interaction with useStripe()', () => {
     it('works with a Stripe instance', async () => {
-      const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
-        wrapper,
-        initialProps: {stripe: mockStripe},
+      const {result} = renderHook(() => useStripe(), {
+        wrapper: ({children}) => wrapper({stripe: mockStripe, children}),
       });
-
-      expect(result.current).toBe(mockStripe);
-
-      await waitForNextUpdate();
 
       expect(result.current).toBe(mockStripe);
     });
 
     it('works when updating null to a Stripe instance', async () => {
-      const {result, rerender, waitForNextUpdate} = renderHook(
-        () => useStripe(),
-        {
-          wrapper,
-          initialProps: {stripe: null},
-        }
-      );
+      let stripeValue: any = null;
+      const {result, rerender} = renderHook(() => useStripe(), {
+        wrapper: ({children}) => wrapper({stripe: stripeValue, children}),
+      });
 
       expect(result.current).toBe(null);
 
-      rerender({stripe: mockStripe});
-      await waitForNextUpdate();
+      stripeValue = mockStripe;
+      rerender();
 
-      expect(result.current).toBe(mockStripe);
+      await waitFor(() => {
+        expect(result.current).toBe(mockStripe);
+      });
     });
 
     it('works with a Promise', async () => {
       const deferred = makeDeferred();
       const {result} = renderHook(() => useStripe(), {
-        wrapper,
-        initialProps: {stripe: deferred.promise},
+        wrapper: ({children}) =>
+          wrapper({stripe: deferred.promise, children}),
       });
 
       expect(result.current).toBe(null);
@@ -109,8 +102,7 @@ describe('CheckoutProvider', () => {
       stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe},
+        wrapper: ({children}) => wrapper({stripe, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});
@@ -150,8 +142,7 @@ describe('CheckoutProvider', () => {
       stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe},
+        wrapper: ({children}) => wrapper({stripe, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});
@@ -727,23 +718,33 @@ describe('CheckoutProvider', () => {
   });
 
   describe('providers <> hooks', () => {
-    it('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
-      const {result} = renderHook(() => useCheckout());
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
 
-      expect(result.error && result.error.message).toBe(
+    it('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      expect(() => {
+        renderHook(() => useCheckout());
+      }).toThrow(
         'Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in a <CheckoutProvider> provider.'
       );
     });
 
     it('throws when trying to call useStripe outside of CheckoutProvider context', () => {
-      const {result} = renderHook(() => useStripe());
+      jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      expect(result.error && result.error.message).toBe(
+      expect(() => {
+        renderHook(() => useStripe());
+      }).toThrow(
         'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
       );
     });
 
     it('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
       const wrapper = ({children}: any) => (
         <Elements stripe={mockStripe}>
           <CheckoutProvider
@@ -755,16 +756,18 @@ describe('CheckoutProvider', () => {
         </Elements>
       );
 
-      const {result} = renderHook(() => useStripe(), {
-        wrapper,
-      });
-
-      expect(result.error && result.error.message).toBe(
+      expect(() => {
+        renderHook(() => useStripe(), {
+          wrapper,
+        });
+      }).toThrow(
         'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
       );
     });
 
     it('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
       const wrapper = ({children}: any) => (
         <CheckoutProvider
           stripe={mockStripe}
@@ -774,10 +777,11 @@ describe('CheckoutProvider', () => {
         </CheckoutProvider>
       );
 
-      const {result} = renderHook(() => useStripe(), {
-        wrapper,
-      });
-      expect(result.error && result.error.message).toBe(
+      expect(() => {
+        renderHook(() => useStripe(), {
+          wrapper,
+        });
+      }).toThrow(
         'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.'
       );
     });

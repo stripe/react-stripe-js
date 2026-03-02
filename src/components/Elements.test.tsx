@@ -1,6 +1,5 @@
 import React, {StrictMode} from 'react';
-import {render, act} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import {render, renderHook, act, waitFor} from '@testing-library/react';
 
 import {Elements, useElements, ElementsConsumer} from './Elements';
 import * as mocks from '../../test/mocks';
@@ -120,15 +119,15 @@ describe('Elements', () => {
       <Elements stripe={mockStripePromise}>{children}</Elements>
     );
 
-    const {result, waitForNextUpdate} = renderHook(() => useElements(), {
+    const {result} = renderHook(() => useElements(), {
       wrapper,
     });
 
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
-
-    expect(result.current).toBe(mockElements);
+    await waitFor(() => {
+      expect(result.current).toBe(mockElements);
+    });
   });
 
   test('allows a transition from null to a valid Promise', async () => {
@@ -137,19 +136,16 @@ describe('Elements', () => {
       <Elements stripe={stripeProp}>{children}</Elements>
     );
 
-    const {result, rerender, waitForNextUpdate} = renderHook(
-      () => useElements(),
-      {wrapper}
-    );
+    const {result, rerender} = renderHook(() => useElements(), {wrapper});
     expect(result.current).toBe(null);
 
     stripeProp = mockStripePromise;
     rerender();
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
-
-    expect(result.current).toBe(mockElements);
+    await waitFor(() => {
+      expect(result.current).toBe(mockElements);
+    });
   });
 
   test('does not set context if Promise resolves after Elements is unmounted', async () => {
@@ -266,17 +262,21 @@ describe('Elements', () => {
   });
 
   test('throws when trying to call useElements outside of Elements context', () => {
-    const {result} = renderHook(() => useElements());
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useElements());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
     );
   });
 
   test('throws when trying to call useStripe outside of Elements context', () => {
-    const {result} = renderHook(() => useStripe());
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useStripe());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
   });
