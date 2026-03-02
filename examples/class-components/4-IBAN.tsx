@@ -2,7 +2,7 @@
 // Learn how to accept a SEPA Debit payment using the official Stripe docs.
 // https://stripe.com/docs/payments/sepa-debit/accept-a-payment
 
-import type {FormEventHandler} from 'react';
+import type {SubmitEventHandler} from 'react';
 import {Component} from 'react';
 import {
   loadStripe,
@@ -50,7 +50,7 @@ class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
     this.state = {name: '', email: '', errorMessage: null, paymentMethod: null};
   }
 
-  handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     const {stripe, elements} = this.props;

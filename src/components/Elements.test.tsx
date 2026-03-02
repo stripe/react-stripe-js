@@ -1,6 +1,5 @@
 import React, {StrictMode} from 'react';
-import {render, act} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import {render, renderHook, act} from '@testing-library/react';
 
 import {Elements, useElements, ElementsConsumer} from './Elements';
 import * as mocks from '../../test/mocks';
@@ -120,13 +119,13 @@ describe('Elements', () => {
       <Elements stripe={mockStripePromise}>{children}</Elements>
     );
 
-    const {result, waitForNextUpdate} = renderHook(() => useElements(), {
+    const {result} = renderHook(() => useElements(), {
       wrapper,
     });
 
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
+    await act(async () => {});
 
     expect(result.current).toBe(mockElements);
   });
@@ -137,17 +136,14 @@ describe('Elements', () => {
       <Elements stripe={stripeProp}>{children}</Elements>
     );
 
-    const {result, rerender, waitForNextUpdate} = renderHook(
-      () => useElements(),
-      {wrapper}
-    );
+    const {result, rerender} = renderHook(() => useElements(), {wrapper});
     expect(result.current).toBe(null);
 
     stripeProp = mockStripePromise;
     rerender();
     expect(result.current).toBe(null);
 
-    await waitForNextUpdate();
+    await act(async () => {});
 
     expect(result.current).toBe(mockElements);
   });
@@ -266,17 +262,21 @@ describe('Elements', () => {
   });
 
   test('throws when trying to call useElements outside of Elements context', () => {
-    const {result} = renderHook(() => useElements());
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useElements());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.'
     );
   });
 
   test('throws when trying to call useStripe outside of Elements context', () => {
-    const {result} = renderHook(() => useStripe());
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(result.error && result.error.message).toBe(
+    expect(() => {
+      renderHook(() => useStripe());
+    }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.'
     );
   });
@@ -431,6 +431,72 @@ describe('Elements', () => {
         appearance: {theme: 'flat'},
       });
       expect(mockStripe.elements).toHaveBeenCalledTimes(1);
+    });
+
+    test('initializes elements after unmount and remount with a new Stripe promise in StrictMode', async () => {
+      // This test validates that resetting elementsInitializedRef in the
+      // effect cleanup does not prevent elements from being created on a
+      // subsequent mount. Without the reset a remounted <Elements> would
+      // see the stale ref (true) and skip initialization entirely.
+
+      let stripePromiseResolve1: any = () => {};
+      const stripePromise1 = new Promise<any>((resolve) => {
+        stripePromiseResolve1 = resolve;
+      });
+
+      const mockStripe2: any = mocks.mockStripe();
+      const mockElements2 = mocks.mockElements();
+      mockStripe2.elements.mockReturnValue(mockElements2);
+
+      let stripePromiseResolve2: any = () => {};
+      const stripePromise2 = new Promise<any>((resolve) => {
+        stripePromiseResolve2 = resolve;
+      });
+
+      // First mount — elements should initialize from stripePromise1
+      const {unmount} = render(
+        <StrictMode>
+          <Elements stripe={stripePromise1} />
+        </StrictMode>
+      );
+
+      // Resolve the first Stripe promise
+      await act(async () => {
+        stripePromiseResolve1(mockStripe);
+        await stripePromise1;
+      });
+
+      expect(mockStripe.elements).toHaveBeenCalledTimes(1);
+
+      // Unmount the first instance
+      unmount();
+
+      // Remount with a different Stripe promise — elements should
+      // initialize again because the ref was reset during cleanup.
+      const TestHook = () => {
+        const elements = useElements();
+        return <div data-testid="elements">{elements ? 'ready' : 'null'}</div>;
+      };
+
+      const {getByTestId} = render(
+        <StrictMode>
+          <Elements stripe={stripePromise2}>
+            <TestHook />
+          </Elements>
+        </StrictMode>
+      );
+
+      // Elements should not be ready yet
+      expect(getByTestId('elements').textContent).toBe('null');
+
+      // Resolve the second Stripe promise
+      await act(async () => {
+        stripePromiseResolve2(mockStripe2);
+        await stripePromise2;
+      });
+
+      expect(mockStripe2.elements).toHaveBeenCalledTimes(1);
+      expect(getByTestId('elements').textContent).toBe('ready');
     });
   });
 });
