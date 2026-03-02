@@ -195,6 +195,11 @@ export const useCheckoutElements = (): StripeUseCheckoutElementsResult => {
     ctx,
     'calls useCheckoutElements()'
   );
+
+  const checkoutElementsResult = React.useMemo(() => {
+    return mapStateToCheckoutResult<StripeCheckoutElementsValue>(checkoutState);
+  }, [checkoutState]);
+
   if (
     checkoutState.type === 'success' &&
     checkoutState.sdkKind !== 'elements'
@@ -203,10 +208,7 @@ export const useCheckoutElements = (): StripeUseCheckoutElementsResult => {
       'useCheckoutElements() must be used inside <CheckoutElementsProvider>. Inside <CheckoutFormProvider>, use useCheckoutForm() instead.'
     );
   }
-  return React.useMemo(
-    () => mapStateToCheckoutResult<StripeCheckoutElementsValue>(checkoutState),
-    [checkoutState]
-  );
+  return checkoutElementsResult;
 };
 
 export const useCheckoutForm = (): StripeUseCheckoutFormResult => {
@@ -215,13 +217,15 @@ export const useCheckoutForm = (): StripeUseCheckoutFormResult => {
     ctx,
     'calls useCheckoutForm()'
   );
+
+  const checkoutFormResult = React.useMemo(() => {
+    return mapStateToCheckoutResult<StripeCheckoutFormValue>(checkoutState);
+  }, [checkoutState]);
+
   if (checkoutState.type === 'success' && checkoutState.sdkKind !== 'form') {
     throw new Error(
       'useCheckoutForm() must be used inside <CheckoutFormProvider>. Inside <CheckoutElementsProvider>, use useCheckoutElements() instead.'
     );
   }
-  return React.useMemo(
-    () => mapStateToCheckoutResult<StripeCheckoutFormValue>(checkoutState),
-    [checkoutState]
-  );
+  return checkoutFormResult;
 };

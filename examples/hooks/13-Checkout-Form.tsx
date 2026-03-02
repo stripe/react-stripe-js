@@ -1,4 +1,4 @@
-import type {ChangeEventHandler, FormEventHandler} from 'react';
+import type {ChangeEventHandler, SubmitEventHandler} from 'react';
 import {useEffect, useState} from 'react';
 import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
 import {
@@ -50,7 +50,7 @@ const App = () => {
   const [theme, setTheme] = useState<Appearance['theme']>('stripe');
   const [layout, setLayout] = useState<CheckoutFormLayout>('expanded');
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(
       loadStripe(pk, {
