@@ -14,40 +14,46 @@ import {
 } from '../../components/Elements';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 
-type State =
+// TODO: Update to stripeJs.StripeCheckoutElements | stripeJs.StripeCheckoutForm
+// when @stripe/stripe-js v9 types are available
+type CheckoutSdk = stripeJs.StripeCheckout;
+
+export type CheckoutState =
   | {
       type: 'loading';
-      sdk: stripeJs.StripeCheckout | null;
+      sdk: CheckoutSdk | null;
     }
   | {
       type: 'success';
-      sdk: stripeJs.StripeCheckout;
+      sdk: CheckoutSdk;
       checkoutActions: stripeJs.LoadActionsSuccess;
       session: stripeJs.StripeCheckoutSession;
     }
   | {type: 'error'; error: {message: string}};
 
-type CheckoutContextValue = {
+export type CheckoutContextValue = {
   stripe: stripeJs.Stripe | null;
-  checkoutState: State;
+  checkoutState: CheckoutState;
 };
 
-const CheckoutContext = React.createContext<CheckoutContextValue | null>(null);
+export const CheckoutContext = React.createContext<CheckoutContextValue | null>(
+  null
+);
 CheckoutContext.displayName = 'CheckoutContext';
 
-const validateCheckoutContext = (
+export const validateCheckoutContext = (
   ctx: CheckoutContextValue | null,
   useCase: string
 ): CheckoutContextValue => {
   if (!ctx) {
     throw new Error(
-      `Could not find CheckoutProvider context; You need to wrap the part of your app that ${useCase} in a <CheckoutProvider> provider.`
+      `Could not find checkout context; You need to wrap the part of your app that ${useCase} in a <CheckoutElementsProvider> or <CheckoutFormProvider> provider.`
     );
   }
   return ctx;
 };
 
-interface CheckoutProviderProps {
+interface CheckoutElementsProviderProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise` resolving to a `Stripe` object.
    * The easiest way to initialize a `Stripe` object is with the the [Stripe.js wrapper module](https://github.com/stripe/stripe-js/blob/master/README.md#readme).
@@ -59,15 +65,15 @@ interface CheckoutProviderProps {
   options: stripeJs.StripeCheckoutOptions;
 }
 
-interface PrivateCheckoutProviderProps {
+interface PrivateCheckoutElementsProviderProps {
   stripe: unknown;
   options: stripeJs.StripeCheckoutOptions;
   children?: ReactNode;
 }
 const INVALID_STRIPE_ERROR =
-  'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
+  'Invalid prop `stripe` supplied to `CheckoutElementsProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
-const maybeSdk = (state: State): stripeJs.StripeCheckout | null => {
+const maybeSdk = (state: CheckoutState): CheckoutSdk | null => {
   if (state.type === 'success' || state.type === 'loading') {
     return state.sdk;
   } else {
@@ -75,39 +81,40 @@ const maybeSdk = (state: State): stripeJs.StripeCheckout | null => {
   }
 };
 
-export const CheckoutProvider: FunctionComponent<PropsWithChildren<
-  CheckoutProviderProps
+export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
+  CheckoutElementsProviderProps
 >> = (({
   stripe: rawStripeProp,
   options,
   children,
-}: PrivateCheckoutProviderProps) => {
+}: PrivateCheckoutElementsProviderProps) => {
   const parsed = React.useMemo(
     () => parseStripeProp(rawStripeProp, INVALID_STRIPE_ERROR),
     [rawStripeProp]
   );
 
-  const [state, setState] = React.useState<State>({type: 'loading', sdk: null});
+  const [state, setState] = React.useState<CheckoutState>({type: 'loading', sdk: null});
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
-  // Ref used to avoid calling initCheckout multiple times when options changes
-  const initCheckoutCalledRef = React.useRef(false);
+  const initCalledRef = React.useRef(false);
 
   React.useEffect(() => {
     let isMounted = true;
 
     const init = ({stripe}: {stripe: stripeJs.Stripe}) => {
-      if (stripe && isMounted && !initCheckoutCalledRef.current) {
+      if (stripe && isMounted && !initCalledRef.current) {
         // Only update context if the component is still mounted
         // and stripe is not null. We allow stripe to be null to make
         // handling SSR easier.
-        initCheckoutCalledRef.current = true;
-        const sdk = stripe.initCheckout(options);
+        initCalledRef.current = true;
+        // TODO: Update to stripe.initCheckoutElements(options) when
+        // @stripe/stripe-js v9 types are available
+        const sdk = (stripe as any).initCheckoutElements(options);
         setState({type: 'loading', sdk});
 
         sdk
           .loadActions()
-          .then((result) => {
+          .then((result: any) => {
             if (result.type === 'success') {
               const {actions} = result;
               setState({
@@ -117,7 +124,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
                 session: actions.getSession(),
               });
 
-              sdk.on('change', (session) => {
+              sdk.on('change', (session: stripeJs.StripeCheckoutSession) => {
                 setState((prevState) => {
                   if (prevState.type === 'success') {
                     return {
@@ -135,7 +142,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
               setState({type: 'error', error: result.error});
             }
           })
-          .catch((error) => {
+          .catch((error: any) => {
             setState({type: 'error', error});
           });
       }
@@ -167,7 +174,7 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.'
+        'Unsupported prop change on CheckoutElementsProvider: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);
@@ -176,12 +183,10 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
   const sdk = maybeSdk(state);
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
-    // Ignore changes while checkout sdk is not initialized.
     if (!sdk) {
       return;
     }
 
-    // Handle appearance changes
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
     const currentAppearance = options?.elementsOptions?.appearance;
     const hasAppearanceChanged = !isEqual(
@@ -192,7 +197,6 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
       sdk.changeAppearance(currentAppearance);
     }
 
-    // Handle fonts changes
     const previousFonts = prevOptions?.elementsOptions?.fonts;
     const currentFonts = options?.elementsOptions?.fonts;
     const hasFontsChanged = !isEqual(previousFonts, currentFonts);
@@ -207,8 +211,6 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
     registerWithStripeJs(stripe);
   }, [stripe]);
 
-  // Use useMemo to prevent unnecessary re-renders of child components
-  // when the context value object reference changes but the actual values haven't
   const contextValue = React.useMemo(
     () => ({
       stripe,
@@ -222,9 +224,9 @@ export const CheckoutProvider: FunctionComponent<PropsWithChildren<
       {children}
     </CheckoutContext.Provider>
   );
-}) as FunctionComponent<PropsWithChildren<CheckoutProviderProps>>;
+}) as FunctionComponent<PropsWithChildren<CheckoutElementsProviderProps>>;
 
-CheckoutProvider.propTypes = {
+CheckoutElementsProvider.propTypes = {
   stripe: PropTypes.any,
   options: PropTypes.shape({
     clientSecret: PropTypes.oneOfType([
@@ -233,7 +235,7 @@ CheckoutProvider.propTypes = {
     ]).isRequired,
     elementsOptions: PropTypes.object,
   }).isRequired,
-} as PropTypes.ValidationMap<CheckoutProviderProps>;
+} as PropTypes.ValidationMap<CheckoutElementsProviderProps>;
 
 export const useElementsOrCheckoutContextWithUseCase = (
   useCaseString: string
@@ -244,7 +246,7 @@ export const useElementsOrCheckoutContextWithUseCase = (
   if (checkout) {
     if (elements) {
       throw new Error(
-        `You cannot wrap the part of your app that ${useCaseString} in both <CheckoutProvider> and <Elements> providers.`
+        `You cannot wrap the part of your app that ${useCaseString} in both a checkout provider and <Elements> provider.`
       );
     } else {
       return checkout;
@@ -254,6 +256,8 @@ export const useElementsOrCheckoutContextWithUseCase = (
   }
 };
 
+// TODO: Update Omit<stripeJs.StripeCheckout, ...> to use the v9 union type
+// when @stripe/stripe-js v9 types are available
 type StripeCheckoutActions = Omit<
   stripeJs.StripeCheckout,
   'on' | 'loadActions'
@@ -272,7 +276,7 @@ export type StripeUseCheckoutResult =
   | {type: 'error'; error: {message: string}};
 
 const mapStateToUseCheckoutResult = (
-  checkoutState: State
+  checkoutState: CheckoutState
 ): StripeUseCheckoutResult => {
   if (checkoutState.type === 'success') {
     const {sdk, session, checkoutActions} = checkoutState;
