@@ -2,7 +2,7 @@ import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentFormElement,
-  CheckoutProvider,
+  CheckoutFormProvider,
   useCheckout,
 } from '../../src/checkout';
 
@@ -135,15 +135,15 @@ const App = () => {
         </label>
       </form>
       {stripePromise && clientSecret && (
-        <CheckoutProvider
+        <CheckoutFormProvider
           stripe={stripePromise}
           options={{
             clientSecret,
-            elementsOptions: {appearance: {theme}},
+            appearance: {theme},
           }}
         >
           <CheckoutPaymentForm layout={layout} />
-        </CheckoutProvider>
+        </CheckoutFormProvider>
       )}
     </>
   );
