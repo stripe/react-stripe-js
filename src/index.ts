@@ -14,6 +14,11 @@ import {
   AddressElementComponent,
   PaymentMethodMessagingElementComponent,
   TaxIdElementComponent,
+  IssuingCardNumberDisplayElementComponent,
+  IssuingCardCvcDisplayElementComponent,
+  IssuingCardExpiryDisplayElementComponent,
+  IssuingCardPinDisplayElementComponent,
+  IssuingCardCopyButtonElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
@@ -140,5 +145,55 @@ export const PaymentMethodMessagingElement: PaymentMethodMessagingElementCompone
  */
 export const TaxIdElement: TaxIdElementComponent = createElementComponent(
   'taxId',
+  isServer
+);
+
+/**
+ * Display the card number (PAN) for virtual Issuing cards.
+ * Requires ephemeral key authentication.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
+  'issuingCardNumberDisplay' as any,
+  isServer
+);
+
+/**
+ * Display the CVC for virtual Issuing cards.
+ * Requires ephemeral key authentication.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
+  'issuingCardCvcDisplay' as any,
+  isServer
+);
+
+/**
+ * Display the expiry date for Issuing cards.
+ * Requires ephemeral key authentication.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
+  'issuingCardExpiryDisplay' as any,
+  isServer
+);
+
+/**
+ * Display the PIN for Issuing cards.
+ * Requires ephemeral key authentication and two-factor authentication.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
+  'issuingCardPinDisplay' as any,
+  isServer
+);
+
+/**
+ * A transparent copy-to-clipboard button for Issuing card data.
+ * Can copy card number, CVC, expiry, or PIN to clipboard.
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
+  'issuingCardCopyButton' as any,
   isServer
 );
