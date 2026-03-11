@@ -237,6 +237,20 @@ describe('Elements', () => {
     );
   });
 
+  test('handles the promise returned by elements.update in Dahlia+', () => {
+    const thenSpy = jest.fn();
+    mockElements.update.mockReturnValue({then: thenSpy});
+
+    const {rerender} = render(
+      <Elements stripe={mockStripe} options={{foo: 'foo'} as any} />
+    );
+
+    rerender(<Elements stripe={mockStripe} options={{bar: 'bar'} as any} />);
+
+    expect(mockElements.update).toHaveBeenCalledWith({bar: 'bar'});
+    expect(thenSpy).toHaveBeenCalled();
+  });
+
   test('allows changes to options via elements.update after setting the Stripe object', () => {
     const {rerender} = render(
       <Elements stripe={mockStripe} options={{foo: 'foo'} as any} />
