@@ -2,15 +2,26 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React, {useState} from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {
+  ChangeEvent,
+  ChangeEventHandler,
+  ReactNode,
+  FormEventHandler,
+} from 'react';
+import {useState} from 'react';
+import {
+  loadStripe,
+  PaymentMethod,
+  StripeCardElementChangeEvent,
+  StripeError,
+} from '@stripe/stripe-js';
 import {CardElement, Elements, useElements, useStripe} from '../../src';
 
 import '../styles/common.css';
 import '../styles/2-Card-Detailed.css';
 
 const CARD_OPTIONS = {
-  iconStyle: 'solid',
+  iconStyle: 'solid' as const,
   style: {
     base: {
       iconColor: '#c4f0ff',
@@ -33,7 +44,11 @@ const CARD_OPTIONS = {
   },
 };
 
-const CardField = ({onChange}) => (
+const CardField = ({
+  onChange,
+}: {
+  onChange: (event: StripeCardElementChangeEvent) => void;
+}) => (
   <div className="FormRow">
     <CardElement options={CARD_OPTIONS} onChange={onChange} />
   </div>
@@ -48,6 +63,15 @@ const Field = ({
   autoComplete,
   value,
   onChange,
+}: {
+  label: string;
+  id: string;
+  type: string;
+  placeholder: string;
+  required?: boolean;
+  autoComplete?: string;
+  value: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
 }) => (
   <div className="FormRow">
     <label htmlFor={id} className="FormRowLabel">
@@ -66,7 +90,17 @@ const Field = ({
   </div>
 );
 
-const SubmitButton = ({processing, error, children, disabled}) => (
+const SubmitButton = ({
+  processing,
+  error,
+  children,
+  disabled,
+}: {
+  processing: boolean;
+  error: StripeError | StripeCardElementChangeEvent['error'] | null;
+  children: ReactNode;
+  disabled?: boolean;
+}) => (
   <button
     className={`SubmitButton ${error ? 'SubmitButton--error' : ''}`}
     type="submit"
@@ -76,7 +110,7 @@ const SubmitButton = ({processing, error, children, disabled}) => (
   </button>
 );
 
-const ErrorMessage = ({children}) => (
+const ErrorMessage = ({children}: {children: ReactNode}) => (
   <div className="ErrorMessage" role="alert">
     <svg width="16" height="16" viewBox="0 0 17 17">
       <path
@@ -92,7 +126,7 @@ const ErrorMessage = ({children}) => (
   </div>
 );
 
-const ResetButton = ({onClick}) => (
+const ResetButton = ({onClick}: {onClick: () => void}) => (
   <button type="button" className="ResetButton" onClick={onClick}>
     <svg width="32px" height="32px" viewBox="0 0 32 32">
       <path
@@ -106,17 +140,21 @@ const ResetButton = ({onClick}) => (
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<
+    StripeError | StripeCardElementChangeEvent['error'] | null
+  >(null);
   const [cardComplete, setCardComplete] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
+    null
+  );
   const [billingDetails, setBillingDetails] = useState({
     email: '',
     phone: '',
     name: '',
   });
 
-  const handleSubmit = async (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     if (!stripe || !elements) {
@@ -188,7 +226,7 @@ const CheckoutForm = () => {
           required
           autoComplete="name"
           value={billingDetails.name}
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setBillingDetails({...billingDetails, name: e.target.value});
           }}
         />
@@ -200,7 +238,7 @@ const CheckoutForm = () => {
           required
           autoComplete="email"
           value={billingDetails.email}
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setBillingDetails({...billingDetails, email: e.target.value});
           }}
         />
@@ -212,7 +250,7 @@ const CheckoutForm = () => {
           required
           autoComplete="tel"
           value={billingDetails.phone}
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setBillingDetails({...billingDetails, phone: e.target.value});
           }}
         />
@@ -220,7 +258,7 @@ const CheckoutForm = () => {
       <fieldset className="FormGroup">
         <CardField
           onChange={(e) => {
-            setError(e.error);
+            setError(e.error ?? null);
             setCardComplete(e.complete);
           }}
         />

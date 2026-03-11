@@ -1,21 +1,29 @@
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {ChangeEventHandler, FormEventHandler} from 'react';
+import {useEffect, useState} from 'react';
+import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
 import {
   CheckoutForm,
+  CheckoutFormProps,
   CheckoutFormProvider,
   useCheckoutForm,
 } from '../../src/checkout';
 
 import '../styles/common.css';
 
-const CheckoutFormExample = ({layout}) => {
+type CheckoutFormLayout = NonNullable<CheckoutFormProps['options']>['layout'];
+
+type CheckoutFormExampleProps = {
+  layout: CheckoutFormLayout;
+};
+
+const CheckoutFormExample = ({layout}: CheckoutFormExampleProps) => {
   const checkoutState = useCheckoutForm();
 
   if (checkoutState.type === 'error') {
     return <div>Error: {checkoutState.error.message}</div>;
   }
 
-  const onConfirm = (event) => {
+  const onConfirm: CheckoutFormProps['onConfirm'] = (event) => {
     if (checkoutState.type === 'success') {
       checkoutState.checkout.confirm({formConfirmEvent: event});
     }
@@ -28,20 +36,21 @@ const THEMES = ['stripe', 'flat', 'night'];
 const LAYOUTS = ['expanded', 'compact'];
 
 const App = () => {
-  const [pk, setPK] = React.useState(
+  const [pk, setPK] = useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [clientSecret, setClientSecret] = React.useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
 
-  const [stripePromise, setStripePromise] = React.useState();
-  const [theme, setTheme] = React.useState('stripe');
-  const [layout, setLayout] = React.useState('expanded');
+  const [stripePromise, setStripePromise] =
+    useState<Promise<Stripe | null> | null>();
+  const [theme, setTheme] = useState<Appearance['theme']>('stripe');
+  const [layout, setLayout] = useState<CheckoutFormLayout>('expanded');
 
-  const handleSubmit = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(
       loadStripe(pk, {
@@ -50,12 +59,12 @@ const App = () => {
     );
   };
 
-  const handleThemeChange = (e) => {
-    setTheme(e.target.value);
+  const handleThemeChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setTheme(e.target.value as any);
   };
 
-  const handleLayoutChange = (e) => {
-    setLayout(e.target.value);
+  const handleLayoutChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setLayout(e.target.value as any);
   };
 
   const handleUnload = () => {
@@ -71,7 +80,7 @@ const App = () => {
         <label>
           CheckoutSession client_secret
           <input
-            value={clientSecret}
+            value={clientSecret || ''}
             onChange={(e) => setClientSecret(e.target.value)}
           />
         </label>

@@ -2,19 +2,20 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {ChangeEventHandler, FormEventHandler} from 'react';
+import {useEffect, useState} from 'react';
+import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
 import {PaymentElement, Elements, useElements, useStripe} from '../../src';
 
 import '../styles/common.css';
 
 const CheckoutForm = () => {
-  const [status, setStatus] = React.useState();
-  const [loading, setLoading] = React.useState(false);
+  const [status, setStatus] = useState<string>();
+  const [loading, setLoading] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     // Block native form submission.
     event.preventDefault();
 
@@ -57,25 +58,26 @@ const CheckoutForm = () => {
 const THEMES = ['stripe', 'flat', 'none'];
 
 const App = () => {
-  const [pk, setPK] = React.useState(
+  const [pk, setPK] = useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [clientSecret, setClientSecret] = React.useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
 
-  const [stripePromise, setStripePromise] = React.useState();
-  const [theme, setTheme] = React.useState('stripe');
+  const [stripePromise, setStripePromise] =
+    useState<Promise<Stripe | null> | null>();
+  const [theme, setTheme] = useState<Appearance['theme']>('stripe');
 
-  const handleSubmit = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(loadStripe(pk));
   };
 
-  const handleThemeChange = (e) => {
-    setTheme(e.target.value);
+  const handleThemeChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setTheme(e.target.value as any);
   };
 
   const handleUnload = () => {
@@ -89,7 +91,7 @@ const App = () => {
         <label>
           Intent client_secret
           <input
-            value={clientSecret}
+            value={clientSecret || ''}
             onChange={(e) => setClientSecret(e.target.value)}
           />
         </label>

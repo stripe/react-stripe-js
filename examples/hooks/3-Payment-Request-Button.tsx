@@ -2,8 +2,8 @@
 // Learn how to accept a payment with the PaymentRequestButton using the official Stripe docs.
 // https://stripe.com/docs/stripe-js/elements/payment-request-button#react
 
-import React, {useState, useEffect} from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import {useState, useEffect} from 'react';
+import {loadStripe, PaymentMethod, PaymentRequest} from '@stripe/stripe-js';
 import {PaymentRequestButtonElement, Elements, useStripe} from '../../src';
 
 import {Result, ErrorResult} from '../util';
@@ -29,18 +29,22 @@ const NotAvailableResult = () => (
 const ELEMENT_OPTIONS = {
   style: {
     paymentRequestButton: {
-      type: 'buy',
-      theme: 'dark',
+      type: 'buy' as const,
+      theme: 'dark' as const,
     },
   },
 };
 
 const CheckoutForm = () => {
   const stripe = useStripe();
-  const [paymentRequest, setPaymentRequest] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(
+    null
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [notAvailable, setNotAvailable] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
+    null
+  );
 
   useEffect(() => {
     if (!stripe) {
