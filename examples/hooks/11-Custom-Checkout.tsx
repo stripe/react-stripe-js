@@ -1,5 +1,11 @@
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {
+  ChangeEventHandler,
+  Dispatch,
+  FormEventHandler,
+  SetStateAction,
+} from 'react';
+import {useEffect, useState} from 'react';
+import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
   CheckoutElementsProvider,
@@ -9,12 +15,24 @@ import {
 
 import '../styles/common.css';
 
-const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
-  const handlePhoneNumberChange = (event) => {
+const CustomerDetails = ({
+  phoneNumber,
+  setPhoneNumber,
+  email,
+  setEmail,
+}: {
+  phoneNumber: string;
+  setPhoneNumber: Dispatch<SetStateAction<string>>;
+  email: string;
+  setEmail: Dispatch<SetStateAction<string>>;
+}) => {
+  const handlePhoneNumberChange: ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
     setPhoneNumber(event.target.value);
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     setEmail(event.target.value);
   };
 
@@ -45,12 +63,12 @@ const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
 
 const CheckoutForm = () => {
   const checkoutState = useCheckoutElements();
-  const [status, setStatus] = React.useState();
-  const [loading, setLoading] = React.useState(false);
-  const [phoneNumber, setPhoneNumber] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const [status, setStatus] = useState<string>();
+  const [loading, setLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleSubmit = async (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setStatus(undefined);
 
@@ -72,7 +90,7 @@ const CheckoutForm = () => {
       setLoading(false);
     } catch (err) {
       console.error(err);
-      setStatus(err.message);
+      setStatus(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -101,25 +119,26 @@ const CheckoutForm = () => {
 const THEMES = ['stripe', 'flat', 'night'];
 
 const App = () => {
-  const [pk, setPK] = React.useState(
+  const [pk, setPK] = useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [clientSecret, setClientSecret] = React.useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
 
-  const [stripePromise, setStripePromise] = React.useState();
-  const [theme, setTheme] = React.useState('stripe');
+  const [stripePromise, setStripePromise] =
+    useState<Promise<Stripe | null> | null>();
+  const [theme, setTheme] = useState<Appearance['theme']>('stripe');
 
-  const handleSubmit = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(loadStripe(pk));
   };
 
-  const handleThemeChange = (e) => {
-    setTheme(e.target.value);
+  const handleThemeChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setTheme(e.target.value as any);
   };
 
   const handleUnload = () => {
@@ -133,7 +152,7 @@ const App = () => {
         <label>
           CheckoutSession client_secret
           <input
-            value={clientSecret}
+            value={clientSecret || ''}
             onChange={(e) => setClientSecret(e.target.value)}
           />
         </label>
