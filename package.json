@@ -43,7 +43,7 @@
     "prettier:fix": "prettier './**/*.js' './**/*.ts' './**/*.tsx' './**/*.css' './**/*.md' --write",
     "prepublishOnly": "echo \"\nPlease use ./scripts/publish instead\n\" && exit 1",
     "doctoc": "doctoc README.md",
-    "storybook": "start-storybook -p 6006 "
+    "storybook": "storybook dev -p 6006"
   },
   "keywords": [
     "React",
@@ -85,14 +85,18 @@
     "@arethetypeswrong/cli": "^0.15.3",
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
+    "@babel/plugin-transform-runtime": "^7.24.0",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
+    "@babel/preset-typescript": "^7.24.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@storybook/react": "^6.5.0-beta.8",
+    "@storybook/react": "^10.2.3",
+    "@storybook/react-webpack5": "^10.2.3",
+    "storybook": "^10.2.3",
     "@stripe/stripe-js": "8.7.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^5.16.4",

@@ -1,4 +1,4 @@
 ---
-extends: '../.eslintrc.yml'
+extends: ["../.eslintrc.yml", "plugin:react/jsx-runtime"]
 rules:
   import/no-extraneous-dependencies: 0

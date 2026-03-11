@@ -2,8 +2,13 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import {Component} from 'react';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  PaymentMethod,
+} from '@stripe/stripe-js';
 import {
   CardNumberElement,
   CardCvcElement,
@@ -31,8 +36,20 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-class CheckoutForm extends React.Component {
-  constructor(props) {
+interface CheckoutFormProps {
+  stripe: Stripe | null;
+  elements: StripeElements | null;
+}
+
+interface CheckoutFormState {
+  name: string;
+  postal: string;
+  errorMessage: string | null | undefined;
+  paymentMethod: PaymentMethod | null;
+}
+
+class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
+  constructor(props: CheckoutFormProps) {
     super(props);
     this.state = {
       name: '',
@@ -42,7 +59,7 @@ class CheckoutForm extends React.Component {
     };
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const {stripe, elements} = this.props;
     const {name, postal} = this.state;

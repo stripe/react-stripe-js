@@ -1,18 +1,20 @@
 /* eslint-disable no-console */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, ReactNode} from 'react';
 
-export const logEvent = (name) => (event) => {
+export const logEvent = (name: string) => (event: unknown) => {
   console.log(`[${name}]`, event);
 };
 
-export const Result = ({children}) => <div className="result">{children}</div>;
+export const Result = ({children}: {children: ReactNode}) => (
+  <div className="result">{children}</div>
+);
 
-export const ErrorResult = ({children}) => (
+export const ErrorResult = ({children}: {children: ReactNode}) => (
   <div className="error">{children}</div>
 );
 
 // Demo hook to dynamically change font size based on window size.
-export const useDynamicFontSize = () => {
+export const useDynamicFontSize = (): string => {
   const [fontSize, setFontSize] = useState(
     window.innerWidth < 450 ? '14px' : '18px'
   );

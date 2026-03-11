@@ -1,14 +1,18 @@
 // This example shows you how to set up React Stripe.js and use Elements.
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
-
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import {Component} from 'react';
+import {loadStripe, Stripe, StripeElements} from '@stripe/stripe-js';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
 import '../styles/common.css';
 
-class CheckoutForm extends React.Component {
-  handleSubmit = async (event) => {
+interface CheckoutFormProps {
+  stripe: Stripe | null;
+  elements: StripeElements | null;
+}
+
+class CheckoutForm extends Component<CheckoutFormProps> {
+  handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     // Block native form submission.
     event.preventDefault();
 
@@ -79,7 +83,7 @@ const InjectedCheckoutForm = () => {
   );
 };
 
-// Make sure to call `loadStripe` outside of a component’s render to avoid
+// Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
 

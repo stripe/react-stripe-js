@@ -2,15 +2,22 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import {Component} from 'react';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  PaymentMethod,
+  StripeError,
+  StripeCardElementChangeEvent,
+} from '@stripe/stripe-js';
 import {CardElement, Elements, ElementsConsumer} from '../../src';
 
 import '../styles/common.css';
 import '../styles/2-Card-Detailed.css';
 
 const CARD_OPTIONS = {
-  iconStyle: 'solid',
+  iconStyle: 'solid' as const,
   style: {
     base: {
       iconColor: '#c4f0ff',
@@ -33,11 +40,26 @@ const CARD_OPTIONS = {
   },
 };
 
-const CardField = ({onChange}) => (
+interface CardFieldProps {
+  onChange: (event: StripeCardElementChangeEvent) => void;
+}
+
+const CardField = ({onChange}: CardFieldProps) => (
   <div className="FormRow">
     <CardElement options={CARD_OPTIONS} onChange={onChange} />
   </div>
 );
+
+interface FieldProps {
+  label: string;
+  id: string;
+  type: string;
+  placeholder: string;
+  required: boolean;
+  autoComplete: string;
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
 const Field = ({
   label,
@@ -48,7 +70,7 @@ const Field = ({
   autoComplete,
   value,
   onChange,
-}) => (
+}: FieldProps) => (
   <div className="FormRow">
     <label htmlFor={id} className="FormRowLabel">
       {label}
@@ -66,7 +88,19 @@ const Field = ({
   </div>
 );
 
-const SubmitButton = ({processing, error, children, disabled}) => (
+interface SubmitButtonProps {
+  processing: boolean;
+  error: StripeError | null | undefined;
+  children: React.ReactNode;
+  disabled: boolean;
+}
+
+const SubmitButton = ({
+  processing,
+  error,
+  children,
+  disabled,
+}: SubmitButtonProps) => (
   <button
     className={`SubmitButton ${error ? 'SubmitButton--error' : ''}`}
     type="submit"
@@ -76,7 +110,11 @@ const SubmitButton = ({processing, error, children, disabled}) => (
   </button>
 );
 
-const ErrorMessage = ({children}) => (
+interface ErrorMessageProps {
+  children: React.ReactNode;
+}
+
+const ErrorMessage = ({children}: ErrorMessageProps) => (
   <div className="ErrorMessage" role="alert">
     <svg width="16" height="16" viewBox="0 0 17 17">
       <path
@@ -92,7 +130,11 @@ const ErrorMessage = ({children}) => (
   </div>
 );
 
-const ResetButton = ({onClick}) => (
+interface ResetButtonProps {
+  onClick: () => void;
+}
+
+const ResetButton = ({onClick}: ResetButtonProps) => (
   <button type="button" className="ResetButton" onClick={onClick}>
     <svg width="32px" height="32px" viewBox="0 0 32 32">
       <path
@@ -103,7 +145,22 @@ const ResetButton = ({onClick}) => (
   </button>
 );
 
-const DEFAULT_STATE = {
+interface CheckoutFormProps {
+  stripe: Stripe | null;
+  elements: StripeElements | null;
+}
+
+interface CheckoutFormState {
+  error: StripeError | null | undefined;
+  cardComplete: boolean;
+  processing: boolean;
+  paymentMethod: PaymentMethod | null;
+  email: string;
+  phone: string;
+  name: string;
+}
+
+const DEFAULT_STATE: CheckoutFormState = {
   error: null,
   cardComplete: false,
   processing: false,
@@ -113,13 +170,13 @@ const DEFAULT_STATE = {
   name: '',
 };
 
-class CheckoutForm extends React.Component {
-  constructor(props) {
+class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
+  constructor(props: CheckoutFormProps) {
     super(props);
     this.state = DEFAULT_STATE;
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const {stripe, elements} = this.props;
