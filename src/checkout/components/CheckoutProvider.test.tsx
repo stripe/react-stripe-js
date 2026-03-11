@@ -52,11 +52,13 @@ describe('CheckoutProvider', () => {
 
   describe('interaction with useStripe()', () => {
     it('works with a Stripe instance', async () => {
-      const {result} = renderHook(() => useStripe(), {
+      const {result, unmount} = renderHook(() => useStripe(), {
         wrapper: ({children}) => wrapper({stripe: mockStripe, children}),
       });
 
       expect(result.current).toBe(mockStripe);
+
+      unmount();
     });
 
     it('works when updating null to a Stripe instance', async () => {
@@ -78,8 +80,7 @@ describe('CheckoutProvider', () => {
     it('works with a Promise', async () => {
       const deferred = makeDeferred();
       const {result} = renderHook(() => useStripe(), {
-        wrapper: ({children}) =>
-          wrapper({stripe: deferred.promise, children}),
+        wrapper: ({children}) => wrapper({stripe: deferred.promise, children}),
       });
 
       expect(result.current).toBe(null);
@@ -214,15 +215,16 @@ describe('CheckoutProvider', () => {
       mockSdk.loadActions.mockReturnValue(deferred.promise);
       stripe.initCheckout.mockReturnValue(mockSdk);
 
+      let stripeValue: any = null;
       const {result, rerender} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe: null},
+        wrapper: ({children}) => wrapper({stripe: stripeValue, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
-      rerender({stripe});
+      stripeValue = stripe;
+      rerender();
 
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(1);
@@ -265,8 +267,8 @@ describe('CheckoutProvider', () => {
       stripe.initCheckout.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe: stripeDeferred.promise},
+        wrapper: ({children}) =>
+          wrapper({stripe: stripeDeferred.promise, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});
@@ -314,15 +316,16 @@ describe('CheckoutProvider', () => {
       mockSdk.loadActions.mockReturnValue(deferred.promise);
       stripe.initCheckout.mockReturnValue(mockSdk);
 
+      let stripeValue: any = null;
       const {result, rerender} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe: null},
+        wrapper: ({children}) => wrapper({stripe: stripeValue, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
 
-      rerender({stripe: stripeDeferred.promise as any});
+      stripeValue = stripeDeferred.promise;
+      rerender();
 
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckout).toHaveBeenCalledTimes(0);
@@ -362,8 +365,8 @@ describe('CheckoutProvider', () => {
       const stripeDeferred = makeDeferred<any>();
 
       const {result} = renderHook(() => useCheckout(), {
-        wrapper,
-        initialProps: {stripe: stripeDeferred.promise},
+        wrapper: ({children}) =>
+          wrapper({stripe: stripeDeferred.promise, children}),
       });
 
       expect(result.current).toEqual({type: 'loading'});

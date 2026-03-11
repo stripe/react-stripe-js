@@ -89,6 +89,9 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
     elements: parsed.tag === 'sync' ? parsed.stripe.elements(options) : null,
   }));
 
+  // Ref to ensure we only create one elements instance, even in React 19 StrictMode
+  const elementsInitializedRef = React.useRef(false);
+
   React.useEffect(() => {
     let isMounted = true;
 
@@ -96,6 +99,11 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
       setContext((ctx) => {
         // no-op if we already have a stripe instance (https://github.com/stripe/react-stripe-js/issues/296)
         if (ctx.stripe) return ctx;
+
+        // add ref check to ensure we only create one elements instance compatible with React 19 StrictMode
+        if (elementsInitializedRef.current) return ctx;
+        elementsInitializedRef.current = true;
+
         return {
           stripe,
           elements: stripe.elements(options),
