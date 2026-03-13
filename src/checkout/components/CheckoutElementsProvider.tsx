@@ -14,8 +14,8 @@ import {
 } from '../../components/Elements';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 
-// TODO: Update to stripeJs.StripeCheckoutElements | stripeJs.StripeCheckoutForm
-// when @stripe/stripe-js v9 types are available
+// TODO: Update to stripeJs.StripeCheckoutElementsSdk when
+// @stripe/stripe-js v9 types are available
 type CheckoutSdk = stripeJs.StripeCheckout;
 
 export type CheckoutState =
@@ -107,9 +107,9 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
         // and stripe is not null. We allow stripe to be null to make
         // handling SSR easier.
         initCalledRef.current = true;
-        // TODO: Update to stripe.initCheckoutElements(options) when
-        // @stripe/stripe-js v9 types are available
-        const sdk = (stripe as any).initCheckoutElements(options);
+        // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
+        // add initCheckoutElementsSdk to the Stripe interface
+        const sdk = (stripe as any).initCheckoutElementsSdk(options);
         setState({type: 'loading', sdk});
 
         sdk

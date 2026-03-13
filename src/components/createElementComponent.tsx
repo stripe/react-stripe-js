@@ -42,9 +42,10 @@ const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
   type: stripeJs.StripeElementType,
-  isServer: boolean
+  isServer: boolean,
+  customDisplayName?: string
 ): FunctionComponent<ElementProps> => {
-  const displayName = `${capitalized(type)}Element`;
+  const displayName = customDisplayName || `${capitalized(type)}Element`;
 
   const ClientElement: FunctionComponent<PrivateElementProps> = ({
     id,
@@ -132,8 +133,9 @@ const createElementComponent = (
         if (checkoutSdk) {
           switch (type) {
             case 'paymentForm':
-              // TODO: Remove cast when @stripe/stripe-js v9 types are available
-              newElement = (checkoutSdk as any).createPaymentForm(options);
+              // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
+              // add createForm to the StripeCheckoutFormSdk interface
+              newElement = (checkoutSdk as any).createForm(options);
               break;
             case 'payment':
               newElement = checkoutSdk.createPaymentElement(options);

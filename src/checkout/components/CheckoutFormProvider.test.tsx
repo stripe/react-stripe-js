@@ -23,7 +23,7 @@ describe('CheckoutFormProvider', () => {
     });
 
     mockStripe = mocks.mockStripe();
-    mockStripe.initCheckoutForm.mockReturnValue(mockCheckoutSdk);
+    mockStripe.initCheckoutFormSdk.mockReturnValue(mockCheckoutSdk);
     mockStripePromise = Promise.resolve(mockStripe);
 
     jest.spyOn(console, 'error');
@@ -38,8 +38,8 @@ describe('CheckoutFormProvider', () => {
 
   const fakeClientSecret = 'cs_123';
 
-  describe('calls initCheckoutForm (not initCheckoutElements)', () => {
-    it('calls initCheckoutForm with the provided options', async () => {
+  describe('calls initCheckoutFormSdk (not initCheckoutElementsSdk)', () => {
+    it('calls initCheckoutFormSdk with the provided options', async () => {
       render(
         <CheckoutFormProvider
           stripe={mockStripe}
@@ -50,15 +50,15 @@ describe('CheckoutFormProvider', () => {
       );
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
         });
-        expect(mockStripe.initCheckoutElements).not.toHaveBeenCalled();
+        expect(mockStripe.initCheckoutElementsSdk).not.toHaveBeenCalled();
       });
     });
 
-    it('calls initCheckoutForm once in StrictMode', async () => {
+    it('calls initCheckoutFormSdk once in StrictMode', async () => {
       const TestComponent = () => {
         useCheckout();
         return <div />;
@@ -78,11 +78,11 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1)
       );
     });
 
-    it('calls initCheckoutForm once with stripePromise in StrictMode', async () => {
+    it('calls initCheckoutFormSdk once with stripePromise in StrictMode', async () => {
       const TestComponent = () => {
         useCheckout();
         return <div />;
@@ -102,7 +102,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1)
       );
     });
   });
@@ -116,7 +116,7 @@ describe('CheckoutFormProvider', () => {
       const testMockSession = mocks.mockCheckoutSession();
 
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutForm.mockReturnValue(mockSdk);
+      stripe.initCheckoutFormSdk.mockReturnValue(mockSdk);
 
       const wrapper = ({children}: any) => (
         <CheckoutFormProvider
@@ -130,7 +130,7 @@ describe('CheckoutFormProvider', () => {
       const {result} = renderHook(() => useCheckout(), {wrapper});
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutForm).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
 
       await act(() =>
         deferred.resolve({
@@ -157,7 +157,7 @@ describe('CheckoutFormProvider', () => {
   });
 
   describe('top-level appearance option (not nested under elementsOptions)', () => {
-    it('passes top-level appearance to initCheckoutForm and calls changeAppearance on update', async () => {
+    it('passes top-level appearance to initCheckoutFormSdk and calls changeAppearance on update', async () => {
       const result = render(
         <CheckoutFormProvider
           stripe={mockStripe}
@@ -169,7 +169,7 @@ describe('CheckoutFormProvider', () => {
       );
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
           appearance: {theme: 'stripe'},
         });
@@ -188,7 +188,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
         expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
         expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
           theme: 'night',
@@ -213,8 +213,8 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
           appearance: {theme: 'stripe'},
         });
@@ -256,7 +256,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
         })
       );
@@ -274,7 +274,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
         expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
         expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledWith([
           {cssSrc: 'https://example.com/font.css'},
@@ -297,7 +297,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
           fonts: [{cssSrc: 'https://example.com/font.css'}],
         })
@@ -328,7 +328,7 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
         expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(0);
       });
     });
@@ -383,8 +383,8 @@ describe('CheckoutFormProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
-        expect(mockStripe2.initCheckoutForm).toHaveBeenCalledTimes(0);
+        expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
+        expect(mockStripe2.initCheckoutFormSdk).toHaveBeenCalledTimes(0);
         expect(consoleWarn).toHaveBeenCalledWith(
           'Unsupported prop change on CheckoutFormProvider: You cannot change the `stripe` prop after setting it.'
         );
@@ -404,7 +404,7 @@ describe('CheckoutFormProvider', () => {
     );
 
     await waitFor(() =>
-      expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(0)
+      expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(0)
     );
 
     act(() => {
@@ -421,8 +421,8 @@ describe('CheckoutFormProvider', () => {
 
     await waitFor(() => {
       expect(console.warn).not.toHaveBeenCalled();
-      expect(mockStripe.initCheckoutForm).toHaveBeenCalledTimes(1);
-      expect(mockStripe.initCheckoutForm).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledWith({
         clientSecret: fakeClientSecret,
         appearance: {theme: 'stripe'},
       });

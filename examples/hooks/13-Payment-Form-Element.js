@@ -1,7 +1,7 @@
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
-  PaymentFormElement,
+  CheckoutForm,
   CheckoutFormProvider,
   useCheckout,
 } from '../../src/checkout';
@@ -24,24 +24,24 @@ const CheckoutPaymentForm = ({layout}) => {
   };
 
   const handleChange = (event) => {
-    console.log('PaymentFormElement change:', event);
+    console.log('CheckoutForm change:', event);
   };
 
   const handleConfirm = (event) => {
-    console.log('PaymentFormElement confirm:', event);
+    console.log('CheckoutForm confirm:', event);
   };
 
   const handleCancel = (event) => {
-    console.log('PaymentFormElement cancel:', event);
+    console.log('CheckoutForm cancel:', event);
   };
 
   const handleReady = (element) => {
-    console.log('PaymentFormElement ready:', element);
+    console.log('CheckoutForm ready:', element);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentFormElement
+      <CheckoutForm
         options={{layout}}
         onChange={handleChange}
         onConfirm={handleConfirm}

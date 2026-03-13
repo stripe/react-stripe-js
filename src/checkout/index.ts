@@ -14,7 +14,7 @@ import {
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
   PaymentElementComponent,
-  PaymentFormElementComponent,
+  CheckoutFormComponent,
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
 } from './types';
@@ -29,9 +29,10 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
   isServer
 );
 
-export const PaymentFormElement: PaymentFormElementComponent = createElementComponent(
+export const CheckoutForm: CheckoutFormComponent = createElementComponent(
   'paymentForm',
-  isServer
+  isServer,
+  'CheckoutForm'
 );
 
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(

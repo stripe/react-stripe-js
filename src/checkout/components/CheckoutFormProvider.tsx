@@ -10,14 +10,14 @@ import {isEqual} from '../../utils/isEqual';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
 import {CheckoutContext, CheckoutState} from './CheckoutElementsProvider';
 
-// TODO: Replace with stripeJs.StripeCheckoutFormOptions when
+// TODO: Replace with stripeJs.StripeCheckoutFormSdkOptions when
 // @stripe/stripe-js v9 types are available
 // TODO: Replace with stripeJs.ContactAddress when v9 types are available
 type ContactAddress = Record<string, unknown>;
 
 interface CheckoutFormProviderOptions {
   clientSecret: string | Promise<string>;
-  appearance?: stripeJs.Appearance;
+  appearance?: Omit<stripeJs.Appearance, 'rules'>;
   loader?: 'auto' | 'always' | 'never';
   fonts?: (stripeJs.CssFontSource | stripeJs.CustomFontSource)[];
   savedPaymentMethod?: {
@@ -76,9 +76,9 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
     const init = ({stripe}: {stripe: stripeJs.Stripe}) => {
       if (stripe && isMounted && !initCalledRef.current) {
         initCalledRef.current = true;
-        // TODO: Update to stripe.initCheckoutForm(options) when
-        // @stripe/stripe-js v9 types are available
-        const sdk = (stripe as any).initCheckoutForm(options);
+        // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
+        // add initCheckoutFormSdk to the Stripe interface
+        const sdk = (stripe as any).initCheckoutFormSdk(options);
         setState({type: 'loading', sdk});
 
         sdk
