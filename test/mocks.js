@@ -62,7 +62,7 @@ export const mockCheckoutSdk = () => {
       elements.payment = mockElement();
       return elements.payment;
     }),
-    createPaymentForm: jest.fn(() => {
+    createForm: jest.fn(() => {
       elements.paymentForm = mockElement();
       return elements.paymentForm;
     }),
@@ -81,7 +81,7 @@ export const mockCheckoutSdk = () => {
     getPaymentElement: jest.fn(() => {
       return elements.payment || null;
     }),
-    getPaymentForm: jest.fn(() => {
+    getForm: jest.fn(() => {
       return elements.paymentForm || null;
     }),
     getBillingAddressElement: jest.fn(() => {
@@ -140,8 +140,8 @@ export const mockStripe = () => {
     paymentRequest: jest.fn(),
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
-    initCheckoutElements: jest.fn(() => checkoutSdk),
-    initCheckoutForm: jest.fn(() => checkoutSdk),
+    initCheckoutElementsSdk: jest.fn(() => checkoutSdk),
+    initCheckoutFormSdk: jest.fn(() => checkoutSdk),
     createEmbeddedCheckoutPage: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),

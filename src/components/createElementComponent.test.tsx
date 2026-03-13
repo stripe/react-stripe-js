@@ -11,7 +11,7 @@ import {
   PaymentRequestButtonElementComponent,
   ExpressCheckoutElementComponent,
   AddressElementComponent,
-  PaymentFormElementComponent,
+  CheckoutFormComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -37,9 +37,9 @@ describe('createElementComponent', () => {
     mockElement = mocks.mockElement();
     mockStripe.elements.mockReturnValue(mockElements);
     mockElements.create.mockReturnValue(mockElement);
-    mockStripe.initCheckoutElements.mockReturnValue(mockCheckoutSdk);
+    mockStripe.initCheckoutElementsSdk.mockReturnValue(mockCheckoutSdk);
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement);
-    mockCheckoutSdk.createPaymentForm.mockReturnValue(mockElement);
+    mockCheckoutSdk.createForm.mockReturnValue(mockElement);
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement);
@@ -167,10 +167,11 @@ describe('createElementComponent', () => {
       false
     );
 
-    const PaymentFormElement = createElementComponent(
+    const CheckoutForm = createElementComponent(
       'paymentForm',
-      false
-    ) as PaymentFormElementComponent;
+      false,
+      'CheckoutForm'
+    ) as CheckoutFormComponent;
 
     it('Can remove and add CardElement at the same time', () => {
       let cardMounted = false;
@@ -448,12 +449,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onReady={mockHandler} />
+          <CheckoutForm onReady={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onReady={mockHandler2} />
+          <CheckoutForm onReady={mockHandler2} />
         </Elements>
       );
 
@@ -468,12 +469,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onChange={mockHandler} />
+          <CheckoutForm onChange={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onChange={mockHandler2} />
+          <CheckoutForm onChange={mockHandler2} />
         </Elements>
       );
 
@@ -488,12 +489,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onConfirm={mockHandler} />
+          <CheckoutForm onConfirm={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onConfirm={mockHandler2} />
+          <CheckoutForm onConfirm={mockHandler2} />
         </Elements>
       );
 
@@ -508,12 +509,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onCancel={mockHandler} />
+          <CheckoutForm onCancel={mockHandler} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement onCancel={mockHandler2} />
+          <CheckoutForm onCancel={mockHandler2} />
         </Elements>
       );
 
@@ -527,7 +528,7 @@ describe('createElementComponent', () => {
       const options: any = {layout: 'expanded'};
       render(
         <Elements stripe={mockStripe}>
-          <PaymentFormElement options={options} />
+          <CheckoutForm options={options} />
         </Elements>
       );
 

@@ -28,7 +28,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     mockStripe = mocks.mockStripe();
-    mockStripe.initCheckoutElements.mockReturnValue(mockCheckoutSdk);
+    mockStripe.initCheckoutElementsSdk.mockReturnValue(mockCheckoutSdk);
     mockStripePromise = Promise.resolve(mockStripe);
 
     jest.spyOn(console, 'error');
@@ -109,7 +109,7 @@ describe('CheckoutElementsProvider', () => {
       const testMockSession = mocks.mockCheckoutSession();
 
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutElements.mockReturnValue(mockSdk);
+      stripe.initCheckoutElementsSdk.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -117,7 +117,7 @@ describe('CheckoutElementsProvider', () => {
       });
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
       await act(() =>
         deferred.resolve({
@@ -142,7 +142,7 @@ describe('CheckoutElementsProvider', () => {
         type: 'success',
         checkout: expectedCheckout,
       });
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
     });
 
     it('works when loadActions rejects', async () => {
@@ -150,7 +150,7 @@ describe('CheckoutElementsProvider', () => {
       const deferred = makeDeferred();
       const mockSdk = mocks.mockCheckoutSdk();
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutElements.mockReturnValue(mockSdk);
+      stripe.initCheckoutElementsSdk.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -158,15 +158,15 @@ describe('CheckoutElementsProvider', () => {
       });
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.reject(new Error('initCheckoutElements error')));
+      await act(() => deferred.reject(new Error('initCheckoutElementsSdk error')));
 
       expect(result.current).toEqual({
         type: 'error',
-        error: new Error('initCheckoutElements error'),
+        error: new Error('initCheckoutElementsSdk error'),
       });
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
     });
 
     it('does not set context if Promise resolves after CheckoutElementsProvider is unmounted', async () => {
@@ -223,7 +223,7 @@ describe('CheckoutElementsProvider', () => {
       const testMockSession = mocks.mockCheckoutSession();
 
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutElements.mockReturnValue(mockSdk);
+      stripe.initCheckoutElementsSdk.mockReturnValue(mockSdk);
 
       const {result, rerender} = renderHook(() => useCheckout(), {
         wrapper,
@@ -231,12 +231,12 @@ describe('CheckoutElementsProvider', () => {
       });
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(0);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(0);
 
       rerender({stripe});
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
       await act(() =>
         deferred.resolve({
@@ -261,7 +261,7 @@ describe('CheckoutElementsProvider', () => {
         type: 'success',
         checkout: expectedCheckout,
       });
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
     });
 
     it('when the stripe prop is a Promise', async () => {
@@ -273,7 +273,7 @@ describe('CheckoutElementsProvider', () => {
       const testMockSession = mocks.mockCheckoutSession();
 
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutElements.mockReturnValue(mockSdk);
+      stripe.initCheckoutElementsSdk.mockReturnValue(mockSdk);
 
       const {result} = renderHook(() => useCheckout(), {
         wrapper,
@@ -281,12 +281,12 @@ describe('CheckoutElementsProvider', () => {
       });
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(0);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(0);
 
       await act(() => stripeDeferred.resolve(stripe));
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
       await act(() =>
         deferred.resolve({
@@ -311,7 +311,7 @@ describe('CheckoutElementsProvider', () => {
         type: 'success',
         checkout: expectedCheckout,
       });
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
     });
 
     it('when the stripe prop changes from null to a Promise', async () => {
@@ -323,7 +323,7 @@ describe('CheckoutElementsProvider', () => {
       const testMockSession = mocks.mockCheckoutSession();
 
       mockSdk.loadActions.mockReturnValue(deferred.promise);
-      stripe.initCheckoutElements.mockReturnValue(mockSdk);
+      stripe.initCheckoutElementsSdk.mockReturnValue(mockSdk);
 
       const {result, rerender} = renderHook(() => useCheckout(), {
         wrapper,
@@ -331,17 +331,17 @@ describe('CheckoutElementsProvider', () => {
       });
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(0);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(0);
 
       rerender({stripe: stripeDeferred.promise as any});
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(0);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(0);
 
       await act(() => stripeDeferred.resolve(stripe));
 
       expect(result.current).toEqual({type: 'loading'});
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
       await act(() =>
         deferred.resolve({
@@ -366,7 +366,7 @@ describe('CheckoutElementsProvider', () => {
         type: 'success',
         checkout: expectedCheckout,
       });
-      expect(stripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
     });
 
     it('when the stripe prop is a Promise(null)', async () => {
@@ -407,8 +407,8 @@ describe('CheckoutElementsProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
-        expect(mockStripe2.initCheckoutElements).toHaveBeenCalledTimes(0);
+        expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
+        expect(mockStripe2.initCheckoutElementsSdk).toHaveBeenCalledTimes(0);
         expect(consoleWarn).toHaveBeenCalledWith(
           'Unsupported prop change on CheckoutElementsProvider: You cannot change the `stripe` prop after setting it.'
         );
@@ -416,7 +416,7 @@ describe('CheckoutElementsProvider', () => {
     });
   });
 
-  it('only calls initCheckoutElements once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
+  it('only calls initCheckoutElementsSdk once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
     const result = render(
       <CheckoutElementsProvider
         stripe={mockStripe}
@@ -430,7 +430,7 @@ describe('CheckoutElementsProvider', () => {
     );
 
     await waitFor(() => {
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
         clientSecret: fakeClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
@@ -451,7 +451,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     await waitFor(() => {
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
       expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledTimes(1);
       expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
         theme: 'night',
@@ -480,7 +480,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     await waitFor(() =>
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
         clientSecret: fakeClientSecret,
         elementsOptions: {
           fonts: [
@@ -529,7 +529,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     await waitFor(() => {
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
       expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(0);
     });
   });
@@ -549,7 +549,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     await waitFor(() =>
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
         clientSecret: fakeClientSecret,
         elementsOptions: {},
       })
@@ -574,7 +574,7 @@ describe('CheckoutElementsProvider', () => {
     });
 
     await waitFor(() => {
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
       expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1);
       expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledWith([
         {
@@ -598,7 +598,7 @@ describe('CheckoutElementsProvider', () => {
     );
 
     await waitFor(() =>
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(0)
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(0)
     );
 
     act(() => {
@@ -615,8 +615,8 @@ describe('CheckoutElementsProvider', () => {
 
     await waitFor(() => {
       expect(console.warn).not.toHaveBeenCalled();
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
-      expect(mockStripe.initCheckoutElements).toHaveBeenCalledWith({
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
         clientSecret: fakeClientSecret,
         elementsOptions: {
           appearance: {theme: 'stripe'},
@@ -626,7 +626,7 @@ describe('CheckoutElementsProvider', () => {
   });
 
   describe('React.StrictMode', () => {
-    test('initCheckoutElements once in StrictMode', async () => {
+    test('initCheckoutElementsSdk once in StrictMode', async () => {
       const TestComponent = () => {
         useCheckout();
         return <div />;
@@ -646,11 +646,11 @@ describe('CheckoutElementsProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
       );
     });
 
-    test('initCheckoutElements once with stripePromise in StrictMode', async () => {
+    test('initCheckoutElementsSdk once with stripePromise in StrictMode', async () => {
       const TestComponent = () => {
         useCheckout();
         return <div />;
@@ -670,7 +670,7 @@ describe('CheckoutElementsProvider', () => {
       });
 
       await waitFor(() =>
-        expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1)
+        expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
       );
     });
 
@@ -693,8 +693,8 @@ describe('CheckoutElementsProvider', () => {
       });
 
       await waitFor(() => {
-        expect(mockStripe.initCheckoutElements).toHaveBeenCalledTimes(1);
-        expect(mockStripe.initCheckoutElements).toHaveBeenCalledWith({
+        expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
+        expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
           clientSecret: fakeClientSecret,
           elementsOptions: {
             appearance: {theme: 'stripe'},
