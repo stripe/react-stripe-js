@@ -96,7 +96,10 @@ describe('createElementComponent', () => {
 
     it('does not render anything', () => {
       const {container} = render(
-        <CheckoutElementsProvider stripe={null} options={{clientSecret: 'cs_123'}}>
+        <CheckoutElementsProvider
+          stripe={null}
+          options={{clientSecret: 'cs_123'}}
+        >
           <CardElement id="foo" />
         </CheckoutElementsProvider>
       );
@@ -108,7 +111,11 @@ describe('createElementComponent', () => {
 
   describe.each([
     ['Elements', Elements, {clientSecret: 'pi_123'}],
-    ['CheckoutElementsProvider', CheckoutElementsProvider, {clientSecret: 'cs_123'} as any],
+    [
+      'CheckoutElementsProvider',
+      CheckoutElementsProvider,
+      {clientSecret: 'cs_123'} as any,
+    ],
   ])(
     'on the server with Provider - %s',
     (_providerName, Provider, providerOptions) => {
@@ -1159,7 +1166,10 @@ describe('createElementComponent', () => {
       it('does not create and mount until CheckoutSdk has been instantiated', async () => {
         act(() => {
           result = render(
-            <CheckoutElementsProvider stripe={null} options={{clientSecret: 'cs_123'}}>
+            <CheckoutElementsProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
               <PaymentElement />
             </CheckoutElementsProvider>
           );
@@ -1212,7 +1222,10 @@ describe('createElementComponent', () => {
         // This won't create the element, since checkoutSdk is undefined on this render
         act(() => {
           result = render(
-            <CheckoutElementsProvider stripe={null} options={{clientSecret: 'cs_123'}}>
+            <CheckoutElementsProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
               <PaymentElement onChange={mockHandler} />
             </CheckoutElementsProvider>
           );
@@ -1674,7 +1687,10 @@ describe('createElementComponent', () => {
       it('destroys an existing Element when the component unmounts', async () => {
         act(() => {
           result = render(
-            <CheckoutElementsProvider stripe={null} options={{clientSecret: 'cs_123'}}>
+            <CheckoutElementsProvider
+              stripe={null}
+              options={{clientSecret: 'cs_123'}}
+            >
               <PaymentElement />
             </CheckoutElementsProvider>
           );

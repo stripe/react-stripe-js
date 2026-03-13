@@ -93,7 +93,10 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
     [rawStripeProp]
   );
 
-  const [state, setState] = React.useState<CheckoutState>({type: 'loading', sdk: null});
+  const [state, setState] = React.useState<CheckoutState>({
+    type: 'loading',
+    sdk: null,
+  });
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
   // Ref used to avoid calling initCheckoutElementsSdk multiple times when options changes
