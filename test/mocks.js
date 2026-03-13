@@ -127,7 +127,7 @@ export const mockStripe = () => {
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
     initCheckout: jest.fn(() => checkoutSdk),
-    initEmbeddedCheckout: jest.fn(() =>
+    createEmbeddedCheckout: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),
   };
