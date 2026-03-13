@@ -68,6 +68,7 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
   const [state, setState] = React.useState<CheckoutState>({type: 'loading', sdk: null});
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
+  // Ref used to avoid calling initCheckoutFormSdk multiple times when options changes
   const initCalledRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -75,6 +76,9 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
 
     const init = ({stripe}: {stripe: stripeJs.Stripe}) => {
       if (stripe && isMounted && !initCalledRef.current) {
+        // Only update context if the component is still mounted
+        // and stripe is not null. We allow stripe to be null to make
+        // handling SSR easier.
         initCalledRef.current = true;
         // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
         // add initCheckoutFormSdk to the Stripe interface
@@ -125,6 +129,10 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
         setStripe(stripe);
         if (stripe) {
           init({stripe});
+        } else {
+          // Only update context if the component is still mounted
+          // and stripe is not null. We allow stripe to be null to make
+          // handling SSR easier.
         }
       });
     } else if (parsed.tag === 'sync') {
@@ -152,10 +160,12 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
   const sdk = state.type === 'success' || state.type === 'loading' ? state.sdk : null;
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
+    // Ignore changes while checkout sdk is not initialized.
     if (!sdk) {
       return;
     }
 
+    // Handle appearance changes
     const previousAppearance = prevOptions?.appearance;
     const currentAppearance = options?.appearance;
     const hasAppearanceChanged = !isEqual(
@@ -166,6 +176,7 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
       sdk.changeAppearance(currentAppearance);
     }
 
+    // Handle fonts changes
     const previousFonts = prevOptions?.fonts;
     const currentFonts = options?.fonts;
     const hasFontsChanged = !isEqual(previousFonts, currentFonts);
@@ -180,6 +191,8 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
     registerWithStripeJs(stripe);
   }, [stripe]);
 
+  // Use useMemo to prevent unnecessary re-renders of child components
+  // when the context value object reference changes but the actual values haven't
   const contextValue = React.useMemo(
     () => ({
       stripe,
