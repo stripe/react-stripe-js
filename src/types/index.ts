@@ -251,13 +251,16 @@ export type LinkAuthenticationElementComponent = FunctionComponent<
   LinkAuthenticationElementProps
 >;
 
-export interface PaymentFormElementProps extends ElementProps {
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export interface CheckoutFormProps extends ElementProps {
   /**
-   * An object containing Element configuration options.
-   *
-   * Requires beta access:
-   * Contact [Stripe support](https://support.stripe.com/) for more information.
+   * An object containing Checkout form configuration options.
    */
+  // TODO: Rename to stripeJs.StripeCheckoutFormOptions when
+  // @stripe/stripe-js v9 types are available
   options?: stripeJs.StripeCheckoutPaymentFormElementOptions;
 
   /**
@@ -295,9 +298,7 @@ export interface PaymentFormElementProps extends ElementProps {
   onCancel?: (event: {elementType: 'paymentForm'}) => any;
 }
 
-export type PaymentFormElementComponent = FunctionComponent<
-  PaymentFormElementProps
->;
+export type CheckoutFormComponent = FunctionComponent<CheckoutFormProps>;
 
 export interface PaymentElementProps extends ElementProps {
   /**
@@ -620,11 +621,13 @@ declare module '@stripe/stripe-js' {
      * Requires beta access:
      * Contact [Stripe support](https://support.stripe.com/) for more information.
      *
-     * Returns the underlying [element instance] for the `PaymentFormElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `PaymentFormElement` is rendered in the current `Elements` provider tree.
+     * Returns the underlying [element instance] for the `CheckoutForm` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
+     * Returns `null` if no `CheckoutForm` is rendered in the current `Elements` provider tree.
      */
+    // TODO: Rename to stripeJs.StripeCheckoutForm when
+    // @stripe/stripe-js v9 types are available
     getElement(
-      component: PaymentFormElementComponent
+      component: CheckoutFormComponent
     ): stripeJs.StripePaymentFormElement | null;
 
     /**

@@ -2,7 +2,7 @@ import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
-  CheckoutProvider,
+  CheckoutElementsProvider,
   useCheckout,
   BillingAddressElement,
 } from '../../src/checkout';
@@ -159,7 +159,7 @@ const App = () => {
         </label>
       </form>
       {stripePromise && clientSecret && (
-        <CheckoutProvider
+        <CheckoutElementsProvider
           stripe={stripePromise}
           options={{
             clientSecret,
@@ -167,7 +167,7 @@ const App = () => {
           }}
         >
           <CheckoutForm />
-        </CheckoutProvider>
+        </CheckoutElementsProvider>
       )}
     </>
   );

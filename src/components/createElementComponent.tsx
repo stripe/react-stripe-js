@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutProvider';
+import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutElementsProvider';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -42,9 +42,10 @@ const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
   type: stripeJs.StripeElementType,
-  isServer: boolean
+  isServer: boolean,
+  customDisplayName?: string
 ): FunctionComponent<ElementProps> => {
-  const displayName = `${capitalized(type)}Element`;
+  const displayName = customDisplayName || `${capitalized(type)}Element`;
 
   const ClientElement: FunctionComponent<PrivateElementProps> = ({
     id,
@@ -132,7 +133,9 @@ const createElementComponent = (
         if (checkoutSdk) {
           switch (type) {
             case 'paymentForm':
-              newElement = checkoutSdk.createPaymentFormElement(options);
+              // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
+              // add createForm to the StripeCheckoutFormSdk interface
+              newElement = (checkoutSdk as any).createForm(options);
               break;
             case 'payment':
               newElement = checkoutSdk.createPaymentElement(options);
@@ -172,7 +175,7 @@ const createElementComponent = (
               break;
             default:
               throw new Error(
-                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`
+                `<${displayName}> is not supported inside a checkout provider. Use an <Elements> provider instead.`
               );
           }
         } else if (elements) {
