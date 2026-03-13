@@ -65,7 +65,10 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
     [rawStripeProp]
   );
 
-  const [state, setState] = React.useState<CheckoutState>({type: 'loading', sdk: null});
+  const [state, setState] = React.useState<CheckoutState>({
+    type: 'loading',
+    sdk: null,
+  });
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
   // Ref used to avoid calling initCheckoutFormSdk multiple times when options changes
@@ -97,23 +100,20 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
                 session: actions.getSession(),
               });
 
-              sdk.on(
-                'change',
-                (session: stripeJs.StripeCheckoutSession) => {
-                  setState((prevState) => {
-                    if (prevState.type === 'success') {
-                      return {
-                        type: 'success',
-                        sdk: prevState.sdk,
-                        checkoutActions: prevState.checkoutActions,
-                        session,
-                      };
-                    } else {
-                      return prevState;
-                    }
-                  });
-                }
-              );
+              sdk.on('change', (session: stripeJs.StripeCheckoutSession) => {
+                setState((prevState) => {
+                  if (prevState.type === 'success') {
+                    return {
+                      type: 'success',
+                      sdk: prevState.sdk,
+                      checkoutActions: prevState.checkoutActions,
+                      session,
+                    };
+                  } else {
+                    return prevState;
+                  }
+                });
+              });
             } else {
               setState({type: 'error', error: result.error});
             }
@@ -157,7 +157,8 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
 
   // Apply updates when options prop has relevant changes.
   // Unlike CheckoutElementsProvider, appearance/fonts are top-level options.
-  const sdk = state.type === 'success' || state.type === 'loading' ? state.sdk : null;
+  const sdk =
+    state.type === 'success' || state.type === 'loading' ? state.sdk : null;
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
     // Ignore changes while checkout sdk is not initialized.

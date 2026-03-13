@@ -160,7 +160,9 @@ describe('CheckoutElementsProvider', () => {
       expect(result.current).toEqual({type: 'loading'});
       expect(stripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1);
 
-      await act(() => deferred.reject(new Error('initCheckoutElementsSdk error')));
+      await act(() =>
+        deferred.reject(new Error('initCheckoutElementsSdk error'))
+      );
 
       expect(result.current).toEqual({
         type: 'error',
