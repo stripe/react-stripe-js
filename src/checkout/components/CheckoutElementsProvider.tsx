@@ -96,6 +96,7 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
   const [state, setState] = React.useState<CheckoutState>({type: 'loading', sdk: null});
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
+  // Ref used to avoid calling initCheckoutElementsSdk multiple times when options changes
   const initCalledRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -183,10 +184,12 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
   const sdk = maybeSdk(state);
   const prevOptions = usePrevious(options);
   React.useEffect(() => {
+    // Ignore changes while checkout sdk is not initialized.
     if (!sdk) {
       return;
     }
 
+    // Handle appearance changes
     const previousAppearance = prevOptions?.elementsOptions?.appearance;
     const currentAppearance = options?.elementsOptions?.appearance;
     const hasAppearanceChanged = !isEqual(
@@ -197,6 +200,7 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
       sdk.changeAppearance(currentAppearance);
     }
 
+    // Handle fonts changes
     const previousFonts = prevOptions?.elementsOptions?.fonts;
     const currentFonts = options?.elementsOptions?.fonts;
     const hasFontsChanged = !isEqual(previousFonts, currentFonts);
@@ -211,6 +215,8 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
     registerWithStripeJs(stripe);
   }, [stripe]);
 
+  // Use useMemo to prevent unnecessary re-renders of child components
+  // when the context value object reference changes but the actual values haven't
   const contextValue = React.useMemo(
     () => ({
       stripe,
