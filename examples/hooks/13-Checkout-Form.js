@@ -8,48 +8,20 @@ import {
 
 import '../styles/common.css';
 
-const CheckoutPaymentForm = ({layout}) => {
+const CheckoutFormExample = ({layout}) => {
   const checkoutState = useCheckout();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  if (checkoutState.type === 'error') {
+    return <div>Error: {checkoutState.error.message}</div>;
+  }
 
-    try {
-      await checkoutState.checkout.confirm({
-        returnUrl: window.location.href,
-      });
-    } catch (err) {
-      console.error(err);
+  const onConfirm = (event) => {
+    if (checkoutState.type === 'success') {
+      checkoutState.checkout.confirm({paymentFormConfirmEvent: event});
     }
   };
 
-  const handleChange = (event) => {
-    console.log('CheckoutForm change:', event);
-  };
-
-  const handleConfirm = (event) => {
-    console.log('CheckoutForm confirm:', event);
-  };
-
-  const handleCancel = (event) => {
-    console.log('CheckoutForm cancel:', event);
-  };
-
-  const handleReady = (element) => {
-    console.log('CheckoutForm ready:', element);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <CheckoutForm
-        options={{layout}}
-        onChange={handleChange}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        onReady={handleReady}
-      />
-    </form>
-  );
+  return <CheckoutForm options={{layout}} onConfirm={onConfirm} />;
 };
 
 const THEMES = ['stripe', 'flat', 'night'];
@@ -142,7 +114,7 @@ const App = () => {
             appearance: {theme},
           }}
         >
-          <CheckoutPaymentForm layout={layout} />
+          <CheckoutFormExample layout={layout} />
         </CheckoutFormProvider>
       )}
     </>

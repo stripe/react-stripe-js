@@ -216,5 +216,10 @@ CheckoutFormProvider.propTypes = {
       PropTypes.string,
       PropTypes.instanceOf(Promise),
     ]).isRequired,
+    appearance: PropTypes.object,
+    loader: PropTypes.string,
+    fonts: PropTypes.array,
+    savedPaymentMethod: PropTypes.object,
+    defaultValues: PropTypes.object,
   }).isRequired,
 } as PropTypes.ValidationMap<CheckoutFormProviderProps>;
