@@ -24,7 +24,7 @@ describe('EmbeddedCheckoutProvider', () => {
     mockStripePromise = Promise.resolve(mockStripe);
     mockEmbeddedCheckout = mocks.mockEmbeddedCheckout();
     mockEmbeddedCheckoutPromise = Promise.resolve(mockEmbeddedCheckout);
-    mockStripe.initEmbeddedCheckout.mockReturnValue(
+    mockStripe.createEmbeddedCheckoutPage.mockReturnValue(
       mockEmbeddedCheckoutPromise
     );
 
