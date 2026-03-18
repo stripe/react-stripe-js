@@ -146,9 +146,12 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
     ]);
 
     if (updates) {
-      // Await the update to suppress Dahlia console warnings about
-      // pending updates at confirm time.
-      ctx.elements.update(updates).then(() => {});
+      const applyUpdate = async () => {
+        // Await the update to suppress Dahlia console warnings about
+        // pending updates at confirm time.
+        await ctx.elements?.update(updates);
+      };
+      applyUpdate();
     }
   }, [options, prevOptions, ctx.elements]);
 
