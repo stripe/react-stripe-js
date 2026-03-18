@@ -24,7 +24,7 @@ describe('EmbeddedCheckoutProvider', () => {
     mockStripePromise = Promise.resolve(mockStripe);
     mockEmbeddedCheckout = mocks.mockEmbeddedCheckout();
     mockEmbeddedCheckoutPromise = Promise.resolve(mockEmbeddedCheckout);
-    mockStripe.initEmbeddedCheckout.mockReturnValue(
+    mockStripe.createEmbeddedCheckoutPage.mockReturnValue(
       mockEmbeddedCheckoutPromise
     );
 
@@ -66,7 +66,7 @@ describe('EmbeddedCheckoutProvider', () => {
 
     await act(() => mockEmbeddedCheckoutPromise);
 
-    expect(mockStripe.initEmbeddedCheckout).toHaveBeenCalledTimes(1);
+    expect(mockStripe.createEmbeddedCheckoutPage).toHaveBeenCalledTimes(1);
   });
 
   it('allows a transition from null to a valid Stripe object', async () => {
@@ -221,8 +221,8 @@ describe('EmbeddedCheckoutProvider', () => {
       ></EmbeddedCheckoutProvider>
     );
 
-    expect(mockStripe.initEmbeddedCheckout.mock.calls).toHaveLength(1);
-    expect(mockStripe2.initEmbeddedCheckout.mock.calls).toHaveLength(0);
+    expect(mockStripe.createEmbeddedCheckoutPage.mock.calls).toHaveLength(1);
+    expect(mockStripe2.createEmbeddedCheckoutPage.mock.calls).toHaveLength(0);
     expect(consoleWarn).toHaveBeenCalledWith(
       'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.'
     );

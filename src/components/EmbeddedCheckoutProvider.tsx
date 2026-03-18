@@ -100,8 +100,8 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
 
       loadedStripe.current = stripe;
       embeddedCheckoutPromise.current = loadedStripe.current
-        .initEmbeddedCheckout(options as any)
-        .then((embeddedCheckout) => {
+        .createEmbeddedCheckoutPage(options as any)
+        .then((embeddedCheckout: stripeJs.StripeEmbeddedCheckout) => {
           setContext({embeddedCheckout});
         });
     };
