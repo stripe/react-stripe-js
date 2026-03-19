@@ -8,29 +8,9 @@ import {parseStripeProp} from '../../utils/parseStripeProp';
 import {usePrevious} from '../../utils/usePrevious';
 import {isEqual} from '../../utils/isEqual';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
-import {CheckoutContext, CheckoutState} from './CheckoutElementsProvider';
+import {CheckoutContext, CheckoutState} from './CheckoutContext';
 
-// TODO: Replace with stripeJs.StripeCheckoutFormSdkOptions when
-// @stripe/stripe-js v9 types are available
-// TODO: Replace with stripeJs.ContactAddress when v9 types are available
-type ContactAddress = Record<string, unknown>;
-
-interface CheckoutFormProviderOptions {
-  clientSecret: string | Promise<string>;
-  appearance?: Omit<stripeJs.Appearance, 'rules'>;
-  loader?: 'auto' | 'always' | 'never';
-  fonts?: (stripeJs.CssFontSource | stripeJs.CustomFontSource)[];
-  savedPaymentMethod?: {
-    enableSave?: 'auto' | 'never';
-    enableRedisplay?: 'auto' | 'never';
-  };
-  defaultValues?: {
-    billingAddress?: ContactAddress;
-    shippingAddress?: ContactAddress;
-    email?: string;
-    phoneNumber?: string;
-  };
-}
+type CheckoutFormProviderOptions = stripeJs.StripeCheckoutFormSdkOptions;
 
 interface CheckoutFormProviderProps {
   /**
@@ -83,14 +63,12 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
         // and stripe is not null. We allow stripe to be null to make
         // handling SSR easier.
         initCalledRef.current = true;
-        // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
-        // add initCheckoutFormSdk to the Stripe interface
-        const sdk = (stripe as any).initCheckoutFormSdk(options);
+        const sdk = stripe.initCheckoutFormSdk(options);
         setState({type: 'loading', sdk});
 
         sdk
           .loadActions()
-          .then((result: any) => {
+          .then((result) => {
             if (result.type === 'success') {
               const {actions} = result;
               setState({

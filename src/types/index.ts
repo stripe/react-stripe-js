@@ -259,20 +259,18 @@ export interface CheckoutFormProps extends ElementProps {
   /**
    * An object containing Checkout form configuration options.
    */
-  // TODO: Rename to stripeJs.StripeCheckoutFormOptions when
-  // @stripe/stripe-js v9 types are available
-  options?: stripeJs.StripeCheckoutPaymentFormElementOptions;
+  options?: stripeJs.StripeCheckoutFormOptions;
 
   /**
    * Triggered when data exposed by this Element is changed.
    */
-  onChange?: (event: stripeJs.StripePaymentFormElementChangeEvent) => any;
+  onChange?: (event: stripeJs.StripeCheckoutFormChangeEvent) => any;
 
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
    * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
    */
-  onReady?: (element: stripeJs.StripePaymentFormElement) => any;
+  onReady?: (element: stripeJs.StripeCheckoutForm) => any;
 
   /**
    * Triggered when the escape key is pressed within the Element.
@@ -283,19 +281,19 @@ export interface CheckoutFormProps extends ElementProps {
    * Triggered when the Element fails to load.
    */
   onLoadError?: (event: {
-    elementType: 'paymentForm';
+    elementType: 'checkoutForm';
     error: StripeError;
   }) => any;
 
   /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
-  onConfirm?: (event: stripeJs.StripePaymentFormElementConfirmEvent) => any;
+  onConfirm?: (event: stripeJs.StripeCheckoutFormConfirmEvent) => any;
 
   /**
    * Triggered when a payment interface is dismissed (e.g., a buyer closes the payment interface).
    */
-  onCancel?: (event: {elementType: 'paymentForm'}) => any;
+  onCancel?: (event: {elementType: 'checkoutForm'}) => any;
 }
 
 export type CheckoutFormComponent = FunctionComponent<CheckoutFormProps>;
@@ -624,11 +622,9 @@ declare module '@stripe/stripe-js' {
      * Returns the underlying [element instance] for the `CheckoutForm` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `CheckoutForm` is rendered in the current `Elements` provider tree.
      */
-    // TODO: Rename to stripeJs.StripeCheckoutForm when
-    // @stripe/stripe-js v9 types are available
     getElement(
       component: CheckoutFormComponent
-    ): stripeJs.StripePaymentFormElement | null;
+    ): stripeJs.StripeCheckoutForm | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_express_checkout_element) for the `ExpressCheckoutElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.

@@ -1,9 +1,9 @@
+export {CheckoutElementsProvider} from './components/CheckoutElementsProvider';
 export {
   useCheckout,
-  CheckoutElementsProvider,
   StripeUseCheckoutResult,
   StripeCheckoutValue,
-} from './components/CheckoutElementsProvider';
+} from './components/CheckoutContext';
 export {CheckoutFormProvider} from './components/CheckoutFormProvider';
 export * from './types';
 import React from 'react';

@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutElementsProvider';
+import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutContext';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -131,24 +131,25 @@ const createElementComponent = (
       ) {
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
+          const elementsSdk =
+            checkoutSdk as stripeJs.StripeCheckoutElementsSdk;
+          const formSdk = checkoutSdk as stripeJs.StripeCheckoutFormSdk;
           switch (type) {
             case 'paymentForm':
-              // TODO: Remove `as any` cast when @stripe/stripe-js v9 types
-              // add createForm to the StripeCheckoutFormSdk interface
-              newElement = (checkoutSdk as any).createForm(options);
+              newElement = formSdk.createForm(options);
               break;
             case 'payment':
-              newElement = checkoutSdk.createPaymentElement(options);
+              newElement = elementsSdk.createPaymentElement(options);
               break;
             case 'address':
               if ('mode' in options) {
                 const {mode, ...restOptions} = options;
                 if (mode === 'shipping') {
-                  newElement = checkoutSdk.createShippingAddressElement(
+                  newElement = elementsSdk.createShippingAddressElement(
                     restOptions
                   );
                 } else if (mode === 'billing') {
-                  newElement = checkoutSdk.createBillingAddressElement(
+                  newElement = elementsSdk.createBillingAddressElement(
                     restOptions
                   );
                 } else {
@@ -163,15 +164,15 @@ const createElementComponent = (
               }
               break;
             case 'expressCheckout':
-              newElement = checkoutSdk.createExpressCheckoutElement(
-                options as any
-              ) as stripeJs.StripeExpressCheckoutElement;
+              newElement = elementsSdk.createExpressCheckoutElement(
+                options as stripeJs.StripeCheckoutExpressCheckoutElementOptions
+              ) as unknown as stripeJs.StripeExpressCheckoutElement;
               break;
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();
               break;
             case 'taxId':
-              newElement = checkoutSdk.createTaxIdElement(options);
+              newElement = elementsSdk.createTaxIdElement(options);
               break;
             default:
               throw new Error(

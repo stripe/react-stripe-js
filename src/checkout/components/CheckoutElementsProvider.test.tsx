@@ -2,10 +2,8 @@ import React, {StrictMode} from 'react';
 import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
-import {
-  CheckoutElementsProvider,
-  useCheckout,
-} from './CheckoutElementsProvider';
+import {CheckoutElementsProvider} from './CheckoutElementsProvider';
+import {useCheckout} from './CheckoutContext';
 import {Elements} from '../../components/Elements';
 import {useStripe} from '../../components/useStripe';
 import * as mocks from '../../../test/mocks';

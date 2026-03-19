@@ -3,7 +3,7 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CheckoutFormProvider} from './CheckoutFormProvider';
-import {useCheckout} from './CheckoutElementsProvider';
+import {useCheckout} from './CheckoutContext';
 import * as mocks from '../../../test/mocks';
 import makeDeferred from '../../../test/makeDeferred';
 

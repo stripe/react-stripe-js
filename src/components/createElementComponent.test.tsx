@@ -2,7 +2,8 @@ import React, {StrictMode} from 'react';
 import {render, act, waitFor} from '@testing-library/react';
 
 import * as ElementsModule from './Elements';
-import * as CheckoutModule from '../checkout/components/CheckoutElementsProvider';
+import * as CheckoutContextModule from '../checkout/components/CheckoutContext';
+import {CheckoutElementsProvider} from '../checkout/components/CheckoutElementsProvider';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
 import {
@@ -15,7 +16,7 @@ import {
 } from '../types';
 
 const {Elements} = ElementsModule;
-const {CheckoutElementsProvider, useCheckout} = CheckoutModule;
+const {useCheckout} = CheckoutContextModule;
 
 describe('createElementComponent', () => {
   let mockStripe: any;
@@ -337,7 +338,7 @@ describe('createElementComponent', () => {
 
     it('attaches event listeners once the element is created', () => {
       jest
-        .spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase')
+        .spyOn(CheckoutContextModule, 'useElementsOrCheckoutContextWithUseCase')
         .mockReturnValueOnce({elements: null, stripe: null})
         .mockReturnValue({elements: mockElements, stripe: mockStripe});
 
