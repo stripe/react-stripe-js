@@ -131,8 +131,7 @@ const createElementComponent = (
       ) {
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
-          const elementsSdk =
-            checkoutSdk as stripeJs.StripeCheckoutElementsSdk;
+          const elementsSdk = checkoutSdk as stripeJs.StripeCheckoutElementsSdk;
           const formSdk = checkoutSdk as stripeJs.StripeCheckoutFormSdk;
           switch (type) {
             case 'paymentForm':
@@ -164,9 +163,9 @@ const createElementComponent = (
               }
               break;
             case 'expressCheckout':
-              newElement = elementsSdk.createExpressCheckoutElement(
+              newElement = (elementsSdk.createExpressCheckoutElement(
                 options as stripeJs.StripeCheckoutExpressCheckoutElementOptions
-              ) as unknown as stripeJs.StripeExpressCheckoutElement;
+              ) as unknown) as stripeJs.StripeExpressCheckoutElement;
               break;
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();

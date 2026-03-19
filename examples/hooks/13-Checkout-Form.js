@@ -17,7 +17,7 @@ const CheckoutFormExample = ({layout}) => {
 
   const onConfirm = (event) => {
     if (checkoutState.type === 'success') {
-      checkoutState.checkout.confirm({paymentFormConfirmEvent: event});
+      checkoutState.checkout.confirm({formConfirmEvent: event});
     }
   };
 
