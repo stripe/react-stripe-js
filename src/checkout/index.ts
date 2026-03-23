@@ -1,9 +1,10 @@
+export {CheckoutElementsProvider} from './components/CheckoutElementsProvider';
 export {
   useCheckout,
-  CheckoutProvider,
   StripeUseCheckoutResult,
   StripeCheckoutValue,
-} from './components/CheckoutProvider';
+} from './components/CheckoutContext';
+export {CheckoutFormProvider} from './components/CheckoutFormProvider';
 export * from './types';
 import React from 'react';
 import createElementComponent from '../components/createElementComponent';
@@ -13,7 +14,7 @@ import {
   BillingAddressElementComponent,
   ShippingAddressElementComponent,
   PaymentElementComponent,
-  PaymentFormElementComponent,
+  CheckoutFormComponent,
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
 } from './types';
@@ -28,9 +29,10 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
   isServer
 );
 
-export const PaymentFormElement: PaymentFormElementComponent = createElementComponent(
+export const CheckoutForm: CheckoutFormComponent = createElementComponent(
   'paymentForm',
-  isServer
+  isServer,
+  'CheckoutForm'
 );
 
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(

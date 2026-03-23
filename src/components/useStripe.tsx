@@ -1,5 +1,5 @@
 import * as stripeJs from '@stripe/stripe-js';
-import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutProvider';
+import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutContext';
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook

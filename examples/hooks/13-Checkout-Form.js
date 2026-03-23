@@ -1,55 +1,27 @@
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
-  PaymentFormElement,
-  CheckoutProvider,
+  CheckoutForm,
+  CheckoutFormProvider,
   useCheckout,
 } from '../../src/checkout';
 
 import '../styles/common.css';
 
-const CheckoutPaymentForm = ({layout}) => {
+const CheckoutFormExample = ({layout}) => {
   const checkoutState = useCheckout();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  if (checkoutState.type === 'error') {
+    return <div>Error: {checkoutState.error.message}</div>;
+  }
 
-    try {
-      await checkoutState.checkout.confirm({
-        returnUrl: window.location.href,
-      });
-    } catch (err) {
-      console.error(err);
+  const onConfirm = (event) => {
+    if (checkoutState.type === 'success') {
+      checkoutState.checkout.confirm({formConfirmEvent: event});
     }
   };
 
-  const handleChange = (event) => {
-    console.log('PaymentFormElement change:', event);
-  };
-
-  const handleConfirm = (event) => {
-    console.log('PaymentFormElement confirm:', event);
-  };
-
-  const handleCancel = (event) => {
-    console.log('PaymentFormElement cancel:', event);
-  };
-
-  const handleReady = (element) => {
-    console.log('PaymentFormElement ready:', element);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <PaymentFormElement
-        options={{layout}}
-        onChange={handleChange}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        onReady={handleReady}
-      />
-    </form>
-  );
+  return <CheckoutForm options={{layout}} onConfirm={onConfirm} />;
 };
 
 const THEMES = ['stripe', 'flat', 'night'];
@@ -135,15 +107,15 @@ const App = () => {
         </label>
       </form>
       {stripePromise && clientSecret && (
-        <CheckoutProvider
+        <CheckoutFormProvider
           stripe={stripePromise}
           options={{
             clientSecret,
-            elementsOptions: {appearance: {theme}},
+            appearance: {theme},
           }}
         >
-          <CheckoutPaymentForm layout={layout} />
-        </CheckoutProvider>
+          <CheckoutFormExample layout={layout} />
+        </CheckoutFormProvider>
       )}
     </>
   );

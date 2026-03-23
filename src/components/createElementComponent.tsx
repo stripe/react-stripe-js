@@ -13,7 +13,7 @@ import {
   extractAllowedOptionsUpdates,
   UnknownOptions,
 } from '../utils/extractAllowedOptionsUpdates';
-import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutProvider';
+import {useElementsOrCheckoutContextWithUseCase} from '../checkout/components/CheckoutContext';
 
 type UnknownCallback = (...args: unknown[]) => any;
 
@@ -42,9 +42,10 @@ const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const createElementComponent = (
   type: stripeJs.StripeElementType,
-  isServer: boolean
+  isServer: boolean,
+  customDisplayName?: string
 ): FunctionComponent<ElementProps> => {
-  const displayName = `${capitalized(type)}Element`;
+  const displayName = customDisplayName || `${capitalized(type)}Element`;
 
   const ClientElement: FunctionComponent<PrivateElementProps> = ({
     id,
@@ -130,22 +131,24 @@ const createElementComponent = (
       ) {
         let newElement: stripeJs.StripeElement | null = null;
         if (checkoutSdk) {
+          const elementsSdk = checkoutSdk as stripeJs.StripeCheckoutElementsSdk;
+          const formSdk = checkoutSdk as stripeJs.StripeCheckoutFormSdk;
           switch (type) {
             case 'paymentForm':
-              newElement = checkoutSdk.createPaymentFormElement(options);
+              newElement = formSdk.createForm(options);
               break;
             case 'payment':
-              newElement = checkoutSdk.createPaymentElement(options);
+              newElement = elementsSdk.createPaymentElement(options);
               break;
             case 'address':
               if ('mode' in options) {
                 const {mode, ...restOptions} = options;
                 if (mode === 'shipping') {
-                  newElement = checkoutSdk.createShippingAddressElement(
+                  newElement = elementsSdk.createShippingAddressElement(
                     restOptions
                   );
                 } else if (mode === 'billing') {
-                  newElement = checkoutSdk.createBillingAddressElement(
+                  newElement = elementsSdk.createBillingAddressElement(
                     restOptions
                   );
                 } else {
@@ -160,19 +163,19 @@ const createElementComponent = (
               }
               break;
             case 'expressCheckout':
-              newElement = checkoutSdk.createExpressCheckoutElement(
-                options as any
-              ) as stripeJs.StripeExpressCheckoutElement;
+              newElement = (elementsSdk.createExpressCheckoutElement(
+                options as stripeJs.StripeCheckoutExpressCheckoutElementOptions
+              ) as unknown) as stripeJs.StripeExpressCheckoutElement;
               break;
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();
               break;
             case 'taxId':
-              newElement = checkoutSdk.createTaxIdElement(options);
+              newElement = elementsSdk.createTaxIdElement(options);
               break;
             default:
               throw new Error(
-                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`
+                `<${displayName}> is not supported inside a checkout provider. Use an <Elements> provider instead.`
               );
           }
         } else if (elements) {

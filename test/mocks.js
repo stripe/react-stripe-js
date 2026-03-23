@@ -62,7 +62,7 @@ export const mockCheckoutSdk = () => {
       elements.payment = mockElement();
       return elements.payment;
     }),
-    createPaymentFormElement: jest.fn(() => {
+    createForm: jest.fn(() => {
       elements.paymentForm = mockElement();
       return elements.paymentForm;
     }),
@@ -81,7 +81,7 @@ export const mockCheckoutSdk = () => {
     getPaymentElement: jest.fn(() => {
       return elements.payment || null;
     }),
-    getPaymentFormElement: jest.fn(() => {
+    getForm: jest.fn(() => {
       return elements.paymentForm || null;
     }),
     getBillingAddressElement: jest.fn(() => {
@@ -92,6 +92,20 @@ export const mockCheckoutSdk = () => {
     }),
     getExpressCheckoutElement: jest.fn(() => {
       return elements.expressCheckout || null;
+    }),
+    createCurrencySelectorElement: jest.fn(() => {
+      elements.currencySelector = mockElement();
+      return elements.currencySelector;
+    }),
+    getCurrencySelectorElement: jest.fn(() => {
+      return elements.currencySelector || null;
+    }),
+    createTaxIdElement: jest.fn(() => {
+      elements.taxId = mockElement();
+      return elements.taxId;
+    }),
+    getTaxIdElement: jest.fn(() => {
+      return elements.taxId || null;
     }),
 
     on: jest.fn((event, callback) => {
@@ -126,7 +140,8 @@ export const mockStripe = () => {
     paymentRequest: jest.fn(),
     registerAppInfo: jest.fn(),
     _registerWrapper: jest.fn(),
-    initCheckout: jest.fn(() => checkoutSdk),
+    initCheckoutElementsSdk: jest.fn(() => checkoutSdk),
+    initCheckoutFormSdk: jest.fn(() => checkoutSdk),
     createEmbeddedCheckoutPage: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),
