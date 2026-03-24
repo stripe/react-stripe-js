@@ -701,3 +701,85 @@ export interface TaxIdElementProps extends ElementProps {
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
+
+// ---------------------------------------------------------------------------
+// Issuing Elements
+// ---------------------------------------------------------------------------
+
+/**
+ * Options shared by all Issuing display elements (number, CVC, expiry, PIN).
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export interface IssuingCardDisplayElementOptions {
+  /** The ID of the issued card (e.g. `ic_abc123`). */
+  issuingCard: string;
+  /** Ephemeral key nonce created via `stripe.createEphemeralKeyNonce`. */
+  nonce: string;
+  /** The secret component of the ephemeral key returned by your server. */
+  ephemeralKeySecret: string;
+  /** Optional style overrides. */
+  style?: stripeJs.StripeElementStyle;
+}
+
+/** Options for the copy button element. */
+export interface IssuingCardCopyButtonElementOptions {
+  /** The element type whose value should be copied (e.g. `'issuingCardNumberDisplay'`). */
+  toCopy: string;
+  /** Optional style overrides. */
+  style?: stripeJs.StripeElementStyle;
+}
+
+export interface IssuingCardNumberDisplayElementProps extends ElementProps {
+  /** Configuration options for the element. */
+  options: IssuingCardDisplayElementOptions;
+  /** Triggered when the element is fully rendered. */
+  onReady?: (element: stripeJs.StripeElement) => any;
+}
+
+export type IssuingCardNumberDisplayElementComponent = FunctionComponent<
+  IssuingCardNumberDisplayElementProps
+>;
+
+export interface IssuingCardCvcDisplayElementProps extends ElementProps {
+  /** Configuration options for the element. */
+  options: IssuingCardDisplayElementOptions;
+  /** Triggered when the element is fully rendered. */
+  onReady?: (element: stripeJs.StripeElement) => any;
+}
+
+export type IssuingCardCvcDisplayElementComponent = FunctionComponent<
+  IssuingCardCvcDisplayElementProps
+>;
+
+export interface IssuingCardExpiryDisplayElementProps extends ElementProps {
+  /** Configuration options for the element. */
+  options: IssuingCardDisplayElementOptions;
+  /** Triggered when the element is fully rendered. */
+  onReady?: (element: stripeJs.StripeElement) => any;
+}
+
+export type IssuingCardExpiryDisplayElementComponent = FunctionComponent<
+  IssuingCardExpiryDisplayElementProps
+>;
+
+export interface IssuingCardPinDisplayElementProps extends ElementProps {
+  /** Configuration options for the element. */
+  options: IssuingCardDisplayElementOptions;
+  /** Triggered when the element is fully rendered. */
+  onReady?: (element: stripeJs.StripeElement) => any;
+}
+
+export type IssuingCardPinDisplayElementComponent = FunctionComponent<
+  IssuingCardPinDisplayElementProps
+>;
+
+export interface IssuingCardCopyButtonElementProps extends ElementProps {
+  /** Configuration options for the copy button element. */
+  options: IssuingCardCopyButtonElementOptions;
+  /** Triggered when the element is fully rendered. */
+  onReady?: (element: stripeJs.StripeElement) => any;
+}
+
+export type IssuingCardCopyButtonElementComponent = FunctionComponent<
+  IssuingCardCopyButtonElementProps
+>;
