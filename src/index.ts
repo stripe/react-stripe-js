@@ -152,7 +152,7 @@ export const TaxIdElement: TaxIdElementComponent = createElementComponent(
  * @docs https://stripe.com/docs/issuing/elements
  */
 export const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
-  'issuingCardNumberDisplay' as any,
+  'issuingCardNumberDisplay',
   isServer
 );
 
@@ -160,7 +160,7 @@ export const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementCom
  * @docs https://stripe.com/docs/issuing/elements
  */
 export const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
-  'issuingCardCvcDisplay' as any,
+  'issuingCardCvcDisplay',
   isServer
 );
 
@@ -168,7 +168,7 @@ export const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent
  * @docs https://stripe.com/docs/issuing/elements
  */
 export const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
-  'issuingCardExpiryDisplay' as any,
+  'issuingCardExpiryDisplay',
   isServer
 );
 
@@ -176,7 +176,7 @@ export const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementCom
  * @docs https://stripe.com/docs/issuing/elements
  */
 export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
-  'issuingCardPinDisplay' as any,
+  'issuingCardPinDisplay',
   isServer
 );
 
@@ -184,6 +184,6 @@ export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent
  * @docs https://stripe.com/docs/issuing/elements
  */
 export const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
-  'issuingCardCopyButton' as any,
+  'issuingCardCopyButton',
   isServer
 );

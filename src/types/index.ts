@@ -665,6 +665,61 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentMethodMessagingElementComponent
     ): stripeJs.StripePaymentMethodMessagingElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardNumberDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardNumberDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardNumberDisplayElementComponent
+    ): stripeJs.StripeIssuingCardNumberDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardCvcDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardCvcDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardCvcDisplayElementComponent
+    ): stripeJs.StripeIssuingCardCvcDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardExpiryDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardExpiryDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardExpiryDisplayElementComponent
+    ): stripeJs.StripeIssuingCardExpiryDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardPinDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardPinDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardPinDisplayElementComponent
+    ): stripeJs.StripeIssuingCardPinDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardCopyButtonElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardCopyButtonElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardCopyButtonElementComponent
+    ): stripeJs.StripeIssuingCardCopyButtonElement | null;
   }
 }
 
@@ -701,20 +756,6 @@ export interface TaxIdElementProps extends ElementProps {
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
-
-/**
- * Options shared by Issuing card display Elements.
- *
- * @docs https://stripe.com/docs/issuing/elements
- */
-export type IssuingCardDisplayElementOptions = stripeJs.StripeIssuingCardNumberDisplayElementOptions;
-
-/**
- * Options for the Issuing card copy button Element.
- *
- * @docs https://stripe.com/docs/issuing/elements
- */
-export type IssuingCardCopyButtonElementOptions = stripeJs.StripeIssuingCardCopyButtonElementOptions;
 
 export interface IssuingCardNumberDisplayElementProps extends ElementProps {
   /**
@@ -805,62 +846,3 @@ export interface IssuingCardCopyButtonElementProps extends ElementProps {
 export type IssuingCardCopyButtonElementComponent = FunctionComponent<
   IssuingCardCopyButtonElementProps
 >;
-
-declare module '@stripe/stripe-js' {
-  interface StripeElements {
-    /**
-     * Returns the underlying element instance for the
-     * `IssuingCardNumberDisplayElement` component in the current `Elements`
-     * provider tree.
-     * Returns `null` if no `IssuingCardNumberDisplayElement` is rendered in the
-     * current `Elements` provider tree.
-     */
-    getElement(
-      component: IssuingCardNumberDisplayElementComponent
-    ): stripeJs.StripeIssuingCardNumberDisplayElement | null;
-
-    /**
-     * Returns the underlying element instance for the
-     * `IssuingCardCvcDisplayElement` component in the current `Elements`
-     * provider tree.
-     * Returns `null` if no `IssuingCardCvcDisplayElement` is rendered in the
-     * current `Elements` provider tree.
-     */
-    getElement(
-      component: IssuingCardCvcDisplayElementComponent
-    ): stripeJs.StripeIssuingCardCvcDisplayElement | null;
-
-    /**
-     * Returns the underlying element instance for the
-     * `IssuingCardExpiryDisplayElement` component in the current `Elements`
-     * provider tree.
-     * Returns `null` if no `IssuingCardExpiryDisplayElement` is rendered in the
-     * current `Elements` provider tree.
-     */
-    getElement(
-      component: IssuingCardExpiryDisplayElementComponent
-    ): stripeJs.StripeIssuingCardExpiryDisplayElement | null;
-
-    /**
-     * Returns the underlying element instance for the
-     * `IssuingCardPinDisplayElement` component in the current `Elements`
-     * provider tree.
-     * Returns `null` if no `IssuingCardPinDisplayElement` is rendered in the
-     * current `Elements` provider tree.
-     */
-    getElement(
-      component: IssuingCardPinDisplayElementComponent
-    ): stripeJs.StripeIssuingCardPinDisplayElement | null;
-
-    /**
-     * Returns the underlying element instance for the
-     * `IssuingCardCopyButtonElement` component in the current `Elements`
-     * provider tree.
-     * Returns `null` if no `IssuingCardCopyButtonElement` is rendered in the
-     * current `Elements` provider tree.
-     */
-    getElement(
-      component: IssuingCardCopyButtonElementComponent
-    ): stripeJs.StripeIssuingCardCopyButtonElement | null;
-  }
-}

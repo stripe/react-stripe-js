@@ -13,6 +13,11 @@ import {
   ExpressCheckoutElementComponent,
   AddressElementComponent,
   CheckoutFormComponent,
+  IssuingCardNumberDisplayElementComponent,
+  IssuingCardCvcDisplayElementComponent,
+  IssuingCardExpiryDisplayElementComponent,
+  IssuingCardPinDisplayElementComponent,
+  IssuingCardCopyButtonElementComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -988,6 +993,105 @@ describe('createElementComponent', () => {
 
       expect(mockElement.update).toHaveBeenCalledWith({
         style: {base: {fontSize: '30px'}},
+      });
+    });
+
+    describe('Issuing Elements', () => {
+      const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
+        'issuingCardNumberDisplay',
+        false
+      );
+      const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
+        'issuingCardCvcDisplay',
+        false
+      );
+      const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
+        'issuingCardExpiryDisplay',
+        false
+      );
+      const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
+        'issuingCardPinDisplay',
+        false
+      );
+      const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
+        'issuingCardCopyButton',
+        false
+      );
+
+      it.each([
+        ['issuingCardNumberDisplay', IssuingCardNumberDisplayElement] as const,
+        ['issuingCardCvcDisplay', IssuingCardCvcDisplayElement] as const,
+        ['issuingCardExpiryDisplay', IssuingCardExpiryDisplayElement] as const,
+        ['issuingCardPinDisplay', IssuingCardPinDisplayElement] as const,
+        ['issuingCardCopyButton', IssuingCardCopyButtonElement] as const,
+      ])(
+        'creates a %s element with options',
+        (expectedType, IssuingElement: any) => {
+          const options: any = {issuingCard: 'ic_123'};
+          render(
+            <Elements stripe={mockStripe}>
+              <IssuingElement options={options} />
+            </Elements>
+          );
+
+          expect(mockElements.create).toHaveBeenCalledWith(
+            expectedType,
+            options
+          );
+        }
+      );
+
+      it('propagates the ready event to the current onReady prop', () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        const options: any = {issuingCard: 'ic_123'};
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement
+              options={options}
+              onReady={mockHandler}
+            />
+          </Elements>
+        );
+        rerender(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement
+              options={options}
+              onReady={mockHandler2}
+            />
+          </Elements>
+        );
+
+        simulateEvent('ready');
+        expect(mockHandler2).toHaveBeenCalledWith(mockElement);
+        expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('propagates the click event to the current onClick prop', () => {
+        const mockHandler = jest.fn();
+        const mockHandler2 = jest.fn();
+        const options: any = {issuingCard: 'ic_123'};
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardCopyButtonElement
+              options={options}
+              onClick={mockHandler}
+            />
+          </Elements>
+        );
+        rerender(
+          <Elements stripe={mockStripe}>
+            <IssuingCardCopyButtonElement
+              options={options}
+              onClick={mockHandler2}
+            />
+          </Elements>
+        );
+
+        const clickEventMock = Symbol('click');
+        simulateEvent('click', clickEventMock);
+        expect(mockHandler2).toHaveBeenCalledWith(clickEventMock);
+        expect(mockHandler).not.toHaveBeenCalled();
       });
     });
 
