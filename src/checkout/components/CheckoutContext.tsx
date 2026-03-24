@@ -71,7 +71,14 @@ export const useElementsOrCheckoutContextWithUseCase = (
   }
 };
 
-type StripeCheckoutActions = Omit<CheckoutSdk, 'on' | 'loadActions'> &
+type DistributiveOmit<T, K extends keyof any> = T extends any
+  ? Omit<T, K>
+  : never;
+
+type StripeCheckoutActions = DistributiveOmit<
+  CheckoutSdk,
+  'on' | 'loadActions'
+> &
   Omit<LoadActionsSuccess, 'getSession'>;
 
 export type StripeCheckoutValue = StripeCheckoutActions &

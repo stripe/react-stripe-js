@@ -286,6 +286,11 @@ export interface CheckoutFormProps extends ElementProps {
   }) => any;
 
   /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'checkoutForm'}) => any;
+
+  /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
   onConfirm?: (event: stripeJs.StripeCheckoutFormConfirmEvent) => any;
