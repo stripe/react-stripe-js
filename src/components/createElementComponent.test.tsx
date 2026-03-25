@@ -1041,6 +1041,81 @@ describe('createElementComponent', () => {
         }
       );
 
+      it('creates display elements with all options', () => {
+        const fullOptions: any = {
+          issuingCard: 'ic_123',
+          nonce: 'test_nonce',
+          ephemeralKeySecret: 'ek_test_secret',
+          style: {
+            base: {
+              color: '#424770',
+              fontSize: '16px',
+              fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+              fontSmoothing: 'antialiased',
+              fontStyle: 'normal',
+              fontVariant: 'normal',
+              fontWeight: '400',
+              letterSpacing: '0.025em',
+              lineHeight: '1.5',
+              textDecoration: 'none',
+              textShadow: 'none',
+              textTransform: 'none',
+              '::placeholder': {
+                color: '#aab7c4',
+              },
+              ':hover': {
+                color: '#333',
+              },
+              ':focus': {
+                color: '#000',
+              },
+            },
+            complete: {
+              color: '#4caf50',
+            },
+            empty: {
+              color: '#9e9e9e',
+            },
+            invalid: {
+              color: '#f44336',
+            },
+          },
+        };
+        render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={fullOptions} />
+          </Elements>
+        );
+
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardNumberDisplay',
+          fullOptions
+        );
+      });
+
+      it('creates IssuingCardCopyButtonElement with each toCopy value', () => {
+        const toCopyValues = ['number', 'cvc', 'expiry', 'pin'] as const;
+        toCopyValues.forEach((toCopy) => {
+          mockElements.create.mockClear();
+          const {unmount} = render(
+            <Elements stripe={mockStripe}>
+              <IssuingCardCopyButtonElement
+                options={{toCopy, style: {base: {color: '#000'}}}}
+              />
+            </Elements>
+          );
+
+          expect(mockElements.create).toHaveBeenCalledWith(
+            'issuingCardCopyButton',
+            {
+              toCopy,
+              style: {base: {color: '#000'}},
+            }
+          );
+          unmount();
+        });
+      });
+
       it('propagates the ready event to the current onReady prop', () => {
         const mockHandler = jest.fn();
         const mockHandler2 = jest.fn();
@@ -1067,10 +1142,46 @@ describe('createElementComponent', () => {
         expect(mockHandler).not.toHaveBeenCalled();
       });
 
+      it.each([
+        [
+          'IssuingCardCvcDisplay',
+          IssuingCardCvcDisplayElement,
+          {issuingCard: 'ic_123'},
+        ] as const,
+        [
+          'IssuingCardExpiryDisplay',
+          IssuingCardExpiryDisplayElement,
+          {issuingCard: 'ic_123'},
+        ] as const,
+        [
+          'IssuingCardPinDisplay',
+          IssuingCardPinDisplayElement,
+          {issuingCard: 'ic_123'},
+        ] as const,
+        [
+          'IssuingCardCopyButton',
+          IssuingCardCopyButtonElement,
+          {toCopy: 'number'},
+        ] as const,
+      ])(
+        'propagates the ready event for %s',
+        (_name, IssuingElement: any, options: any) => {
+          const mockHandler = jest.fn();
+          render(
+            <Elements stripe={mockStripe}>
+              <IssuingElement options={options} onReady={mockHandler} />
+            </Elements>
+          );
+
+          simulateEvent('ready');
+          expect(mockHandler).toHaveBeenCalledWith(mockElement);
+        }
+      );
+
       it('propagates the click event to the current onClick prop', () => {
         const mockHandler = jest.fn();
         const mockHandler2 = jest.fn();
-        const options: any = {issuingCard: 'ic_123'};
+        const options: any = {toCopy: 'number'};
         const {rerender} = render(
           <Elements stripe={mockStripe}>
             <IssuingCardCopyButtonElement
@@ -1092,6 +1203,146 @@ describe('createElementComponent', () => {
         simulateEvent('click', clickEventMock);
         expect(mockHandler2).toHaveBeenCalledWith(clickEventMock);
         expect(mockHandler).not.toHaveBeenCalled();
+      });
+
+      it('passes id and className to the container DOM element', () => {
+        const options: any = {issuingCard: 'ic_123'};
+        const {container} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement
+              id="my-issuing-number"
+              className="my-issuing-class"
+              options={options}
+            />
+          </Elements>
+        );
+
+        const elementContainer = container.firstChild as Element;
+        expect(elementContainer.id).toBe('my-issuing-number');
+        expect(elementContainer).toHaveClass('my-issuing-class');
+      });
+
+      it('updates display element style options', () => {
+        const options: any = {
+          issuingCard: 'ic_123',
+          nonce: 'test_nonce',
+          ephemeralKeySecret: 'ek_test_secret',
+          style: {base: {fontSize: '16px'}},
+        };
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={options} />
+          </Elements>
+        );
+
+        const updatedOptions: any = {
+          issuingCard: 'ic_123',
+          nonce: 'test_nonce',
+          ephemeralKeySecret: 'ek_test_secret',
+          style: {base: {fontSize: '20px'}},
+        };
+        rerender(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={updatedOptions} />
+          </Elements>
+        );
+
+        expect(mockElement.update).toHaveBeenCalledWith({
+          style: {base: {fontSize: '20px'}},
+        });
+      });
+
+      it('updates IssuingCardCopyButtonElement toCopy option', () => {
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardCopyButtonElement options={{toCopy: 'number'}} />
+          </Elements>
+        );
+
+        rerender(
+          <Elements stripe={mockStripe}>
+            <IssuingCardCopyButtonElement options={{toCopy: 'cvc'}} />
+          </Elements>
+        );
+
+        expect(mockElement.update).toHaveBeenCalledWith({toCopy: 'cvc'});
+      });
+
+      it('does not trigger unnecessary updates for display elements', () => {
+        const options: any = {
+          issuingCard: 'ic_123',
+          style: {base: {fontSize: '16px'}},
+        };
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={options} />
+          </Elements>
+        );
+
+        rerender(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={options} />
+          </Elements>
+        );
+
+        expect(mockElement.update).not.toHaveBeenCalled();
+      });
+
+      it('destroys issuing elements when unmounted', () => {
+        const options: any = {issuingCard: 'ic_123'};
+        const {unmount} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={options} />
+          </Elements>
+        );
+
+        unmount();
+        expect(mockElement.destroy).toHaveBeenCalled();
+      });
+
+      it('destroys IssuingCardCopyButtonElement when unmounted', () => {
+        const {unmount} = render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardCopyButtonElement options={{toCopy: 'number'}} />
+          </Elements>
+        );
+
+        unmount();
+        expect(mockElement.destroy).toHaveBeenCalled();
+      });
+
+      it('mounts all five issuing elements simultaneously', () => {
+        const displayOptions: any = {issuingCard: 'ic_123'};
+        render(
+          <Elements stripe={mockStripe}>
+            <IssuingCardNumberDisplayElement options={displayOptions} />
+            <IssuingCardCvcDisplayElement options={displayOptions} />
+            <IssuingCardExpiryDisplayElement options={displayOptions} />
+            <IssuingCardPinDisplayElement options={displayOptions} />
+            <IssuingCardCopyButtonElement options={{toCopy: 'number'}} />
+          </Elements>
+        );
+
+        expect(mockElements.create).toHaveBeenCalledTimes(5);
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardNumberDisplay',
+          displayOptions
+        );
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardCvcDisplay',
+          displayOptions
+        );
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardExpiryDisplay',
+          displayOptions
+        );
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardPinDisplay',
+          displayOptions
+        );
+        expect(
+          mockElements.create
+        ).toHaveBeenCalledWith('issuingCardCopyButton', {toCopy: 'number'});
       });
     });
 
