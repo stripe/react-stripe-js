@@ -7,6 +7,11 @@ import {
   CardCvcElementComponent,
   ExpressCheckoutElementComponent,
   IbanElementComponent,
+  IssuingCardCopyButtonElementComponent,
+  IssuingCardCvcDisplayElementComponent,
+  IssuingCardExpiryDisplayElementComponent,
+  IssuingCardNumberDisplayElementComponent,
+  IssuingCardPinDisplayElementComponent,
   LinkAuthenticationElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
@@ -140,5 +145,45 @@ export const PaymentMethodMessagingElement: PaymentMethodMessagingElementCompone
  */
 export const TaxIdElement: TaxIdElementComponent = createElementComponent(
   'taxId',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
+  'issuingCardNumberDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
+  'issuingCardCvcDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
+  'issuingCardExpiryDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
+  'issuingCardPinDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
+  'issuingCardCopyButton',
   isServer
 );

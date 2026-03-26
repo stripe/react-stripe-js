@@ -670,6 +670,61 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: PaymentMethodMessagingElementComponent
     ): stripeJs.StripePaymentMethodMessagingElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardNumberDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardNumberDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardNumberDisplayElementComponent
+    ): stripeJs.StripeIssuingCardNumberDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardCvcDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardCvcDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardCvcDisplayElementComponent
+    ): stripeJs.StripeIssuingCardCvcDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardExpiryDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardExpiryDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardExpiryDisplayElementComponent
+    ): stripeJs.StripeIssuingCardExpiryDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardPinDisplayElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardPinDisplayElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardPinDisplayElementComponent
+    ): stripeJs.StripeIssuingCardPinDisplayElement | null;
+
+    /**
+     * Returns the underlying element instance for the
+     * `IssuingCardCopyButtonElement` component in the current `Elements`
+     * provider tree.
+     * Returns `null` if no `IssuingCardCopyButtonElement` is rendered in the
+     * current `Elements` provider tree.
+     */
+    getElement(
+      component: IssuingCardCopyButtonElementComponent
+    ): stripeJs.StripeIssuingCardCopyButtonElement | null;
   }
 }
 
@@ -706,3 +761,93 @@ export interface TaxIdElementProps extends ElementProps {
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
+
+export interface IssuingCardNumberDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeIssuingCardNumberDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeIssuingCardNumberDisplayElement) => any;
+}
+
+export type IssuingCardNumberDisplayElementComponent = FunctionComponent<
+  IssuingCardNumberDisplayElementProps
+>;
+
+export interface IssuingCardCvcDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeIssuingCardCvcDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeIssuingCardCvcDisplayElement) => any;
+}
+
+export type IssuingCardCvcDisplayElementComponent = FunctionComponent<
+  IssuingCardCvcDisplayElementProps
+>;
+
+export interface IssuingCardExpiryDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeIssuingCardExpiryDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeIssuingCardExpiryDisplayElement) => any;
+}
+
+export type IssuingCardExpiryDisplayElementComponent = FunctionComponent<
+  IssuingCardExpiryDisplayElementProps
+>;
+
+export interface IssuingCardPinDisplayElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeIssuingCardPinDisplayElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeIssuingCardPinDisplayElement) => any;
+}
+
+export type IssuingCardPinDisplayElementComponent = FunctionComponent<
+  IssuingCardPinDisplayElementProps
+>;
+
+export interface IssuingCardCopyButtonElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options: stripeJs.StripeIssuingCardCopyButtonElementOptions;
+
+  /**
+   * Triggered when the Element is clicked.
+   */
+  onClick?: (event: {elementType: 'issuingCardCopyButton'}) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls.
+   */
+  onReady?: (element: stripeJs.StripeIssuingCardCopyButtonElement) => any;
+}
+
+export type IssuingCardCopyButtonElementComponent = FunctionComponent<
+  IssuingCardCopyButtonElementProps
+>;

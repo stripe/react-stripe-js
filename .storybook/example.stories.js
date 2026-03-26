@@ -17,7 +17,7 @@ const ExampleComponent = ({file}) => {
 
 const addDemo = (directory, file, stories) => {
   const name = file
-    .replace('.js', '')
+    .replace(/\.(js|tsx?)$/, '')
     .split('-')
     .slice(1)
     .join(' ');
@@ -27,7 +27,7 @@ const addDemo = (directory, file, stories) => {
 
 const hooksStories = storiesOf('react-stripe-js/Hooks', module);
 require
-  .context('../examples/hooks/', false, /\/\d+-(.*).js$/)
+  .context('../examples/hooks/', false, /\/\d+-(.*)\.(js|tsx?)$/)
   .keys()
   .forEach((key) => {
     addDemo('hooks', key.slice(2), hooksStories);
