@@ -17,6 +17,7 @@ import {
   CheckoutFormComponent,
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
+  ContactDetailsElementComponent,
 } from './types';
 
 export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
@@ -42,6 +43,11 @@ export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createEle
 
 export const TaxIdElement: TaxIdElementComponent = createElementComponent(
   'taxId',
+  isServer
+);
+
+export const ContactDetailsElement: ContactDetailsElementComponent = createElementComponent(
+  'contactDetails',
   isServer
 );
 

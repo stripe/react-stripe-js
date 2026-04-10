@@ -251,6 +251,47 @@ export type LinkAuthenticationElementComponent = FunctionComponent<
   LinkAuthenticationElementProps
 >;
 
+export interface ContactDetailsElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options?: stripeJs.StripeContactDetailsElementOptions;
+
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   * For more information, refer to the [Stripe.js reference](https://stripe.com/docs/js/element/events/on_change?type=auBankAccountElement).
+   */
+  onChange?: (event: stripeJs.StripeContactDetailsElementChangeEvent) => any;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeContactDetailsElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {
+    elementType: 'contactDetails';
+    error: StripeError;
+  }) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'contactDetails'}) => any;
+}
+
+export type ContactDetailsElementComponent = FunctionComponent<
+  ContactDetailsElementProps
+>;
+
 /**
  * Requires beta access:
  * Contact [Stripe support](https://support.stripe.com/) for more information.

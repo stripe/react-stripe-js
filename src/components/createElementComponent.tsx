@@ -173,6 +173,9 @@ const createElementComponent = (
             case 'taxId':
               newElement = elementsSdk.createTaxIdElement(options);
               break;
+            case 'contactDetails':
+              newElement = elementsSdk.createContactDetailsElement();
+              break;
             default:
               throw new Error(
                 `<${displayName}> is not supported inside a checkout provider. Use an <Elements> provider instead.`

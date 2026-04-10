@@ -94,3 +94,19 @@ export interface TaxIdElementProps extends ElementProps {
 }
 
 export type TaxIdElementComponent = FunctionComponent<TaxIdElementProps>;
+
+export interface ContactDetailsElementProps extends ElementProps {
+  options?: stripeJs.StripeContactDetailsElementOptions;
+  onChange?: (event: stripeJs.StripeContactDetailsElementChangeEvent) => any;
+  onReady?: (element: stripeJs.StripeContactDetailsElement) => any;
+  onEscape?: () => any;
+  onLoadError?: (event: {
+    elementType: 'contactDetails';
+    error: StripeError;
+  }) => any;
+  onLoaderStart?: (event: {elementType: 'contactDetails'}) => any;
+}
+
+export type ContactDetailsElementComponent = FunctionComponent<
+  ContactDetailsElementProps
+>;

@@ -5,6 +5,7 @@ import {
   CardNumberElementComponent,
   CardExpiryElementComponent,
   CardCvcElementComponent,
+  ContactDetailsElementComponent,
   ExpressCheckoutElementComponent,
   IbanElementComponent,
   IssuingCardCopyButtonElementComponent,
@@ -109,6 +110,14 @@ export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
  */
 export const LinkAuthenticationElement: LinkAuthenticationElementComponent = createElementComponent(
   'linkAuthentication',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const ContactDetailsElement: ContactDetailsElementComponent = createElementComponent(
+  'contactDetails',
   isServer
 );
 
