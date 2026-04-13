@@ -107,6 +107,13 @@ export const mockCheckoutSdk = () => {
     getTaxIdElement: jest.fn(() => {
       return elements.taxId || null;
     }),
+    createContactDetailsElement: jest.fn(() => {
+      elements.contactDetails = mockElement();
+      return elements.contactDetails;
+    }),
+    getContactDetailsElement: jest.fn(() => {
+      return elements.contactDetails || null;
+    }),
 
     on: jest.fn((event, callback) => {
       if (event === 'change') {
