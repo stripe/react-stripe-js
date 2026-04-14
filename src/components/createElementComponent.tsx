@@ -1,5 +1,5 @@
 // Must use `import *` or named imports for React's types
-import {FunctionComponent} from 'react';
+import {FunctionComponent, useRef} from 'react';
 import * as stripeJs from '@stripe/stripe-js';
 
 import React from 'react';
@@ -39,6 +39,8 @@ interface PrivateElementProps {
 }
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+const BASE_DISALLOWED_OPTION_UPDATES = ['paymentRequest'];
 
 const createElementComponent = (
   type: stripeJs.StripeElementType,
@@ -81,6 +83,9 @@ const createElementComponent = (
     );
     const elementRef = React.useRef<stripeJs.StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
+    const disallowedOptionUpdates = useRef<string[]>(
+      BASE_DISALLOWED_OPTION_UPDATES
+    );
 
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
@@ -182,6 +187,17 @@ const createElementComponent = (
               );
           }
         } else if (elements) {
+          switch (type) {
+            case 'linkAuthentication':
+              disallowedOptionUpdates.current = [
+                ...BASE_DISALLOWED_OPTION_UPDATES,
+                'defaultValues',
+              ];
+              break;
+            default:
+              disallowedOptionUpdates.current = BASE_DISALLOWED_OPTION_UPDATES;
+              break;
+          }
           newElement = elements.create(type as any, options);
         }
 
@@ -202,9 +218,11 @@ const createElementComponent = (
         return;
       }
 
-      const updates = extractAllowedOptionsUpdates(options, prevOptions, [
-        'paymentRequest',
-      ]);
+      const updates = extractAllowedOptionsUpdates(
+        options,
+        prevOptions,
+        disallowedOptionUpdates.current
+      );
 
       if (updates && 'update' in elementRef.current) {
         elementRef.current.update(updates);
