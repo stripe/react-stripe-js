@@ -1,8 +1,14 @@
 export {CheckoutElementsProvider} from './components/CheckoutElementsProvider';
 export {
   useCheckout,
+  useCheckoutElements,
+  useCheckoutForm,
   StripeUseCheckoutResult,
+  StripeUseCheckoutElementsResult,
+  StripeUseCheckoutFormResult,
   StripeCheckoutValue,
+  StripeCheckoutElementsValue,
+  StripeCheckoutFormValue,
 } from './components/CheckoutContext';
 export {CheckoutFormProvider} from './components/CheckoutFormProvider';
 export * from './types';

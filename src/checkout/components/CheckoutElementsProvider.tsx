@@ -80,6 +80,7 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
               const {actions} = result;
               setState({
                 type: 'success',
+                sdkKind: 'elements',
                 sdk,
                 checkoutActions: actions,
                 session: actions.getSession(),
@@ -87,9 +88,13 @@ export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
 
               sdk.on('change', (session: stripeJs.StripeCheckoutSession) => {
                 setState((prevState) => {
-                  if (prevState.type === 'success') {
+                  if (
+                    prevState.type === 'success' &&
+                    prevState.sdkKind === 'elements'
+                  ) {
                     return {
                       type: 'success',
+                      sdkKind: 'elements',
                       sdk: prevState.sdk,
                       checkoutActions: prevState.checkoutActions,
                       session,
