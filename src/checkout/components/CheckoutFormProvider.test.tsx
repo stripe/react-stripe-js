@@ -159,7 +159,7 @@ describe('CheckoutFormProvider', () => {
       });
     });
 
-    // Mirrors the pay-server runtime transform that strips 5 client-only
+    // Mirrors the runtime transform of stripe-js that strips 5 client-only
     // update methods before loadActions() resolves. Guards against React
     // wiring that would accidentally re-expose those methods via
     // useCheckout() under <CheckoutFormProvider>.
