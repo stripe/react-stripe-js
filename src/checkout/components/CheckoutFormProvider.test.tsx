@@ -3,7 +3,11 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CheckoutFormProvider} from './CheckoutFormProvider';
-import {useCheckout} from './CheckoutContext';
+import {
+  useCheckout,
+  useCheckoutElements,
+  useCheckoutForm,
+} from './CheckoutContext';
 import * as mocks from '../../../test/mocks';
 import makeDeferred from '../../../test/makeDeferred';
 
@@ -153,6 +157,147 @@ describe('CheckoutFormProvider', () => {
           ...testMockSession,
         },
       });
+    });
+
+    // Mirrors the runtime transform of stripe-js that strips 5 client-only
+    // update methods before loadActions() resolves. Guards against React
+    // wiring that would accidentally re-expose those methods via
+    // useCheckout() under <CheckoutFormProvider>.
+    it('does not expose the 5 stripped action methods on useCheckout().checkout', async () => {
+      const stripe: any = mocks.mockStripe();
+      const mockSdk = mocks.mockCheckoutSdk();
+      const {
+        updateEmail: _updateEmail,
+        updatePhoneNumber: _updatePhoneNumber,
+        updateShippingAddress: _updateShippingAddress,
+        updateBillingAddress: _updateBillingAddress,
+        updateTaxIdInfo: _updateTaxIdInfo,
+        ...formStrippedActions
+      } = mocks.mockCheckoutActions();
+
+      mockSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: formStrippedActions,
+      });
+      stripe.initCheckoutFormSdk.mockReturnValue(mockSdk);
+
+      const wrapper = ({children}: any) => (
+        <CheckoutFormProvider
+          stripe={stripe}
+          options={{clientSecret: fakeClientSecret}}
+        >
+          {children}
+        </CheckoutFormProvider>
+      );
+
+      const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
+        wrapper,
+      });
+
+      await waitForNextUpdate();
+
+      if (result.current.type !== 'success') {
+        throw new Error(
+          `expected success, got ${JSON.stringify(result.current)}`
+        );
+      }
+      const {checkout} = result.current;
+
+      expect((checkout as any).updateEmail).toBeUndefined();
+      expect((checkout as any).updatePhoneNumber).toBeUndefined();
+      expect((checkout as any).updateShippingAddress).toBeUndefined();
+      expect((checkout as any).updateBillingAddress).toBeUndefined();
+      expect((checkout as any).updateTaxIdInfo).toBeUndefined();
+
+      expect(typeof checkout.applyPromotionCode).toBe('function');
+      expect(typeof checkout.removePromotionCode).toBe('function');
+      expect(typeof checkout.updateLineItemQuantity).toBe('function');
+      expect(typeof checkout.updateShippingOption).toBe('function');
+      expect(typeof checkout.confirm).toBe('function');
+    });
+
+    // useCheckoutForm() is the recommended hook for Form consumers — it
+    // returns the narrower StripeCheckoutFormValue where the 5 stripped
+    // methods are omitted at the type level, so calls to them become
+    // TypeScript errors instead of runtime "is not a function" failures.
+    it('useCheckoutForm() returns the Form-narrowed action surface', async () => {
+      const stripe: any = mocks.mockStripe();
+      const mockSdk = mocks.mockCheckoutSdk();
+      const {
+        updateEmail: _updateEmail,
+        updatePhoneNumber: _updatePhoneNumber,
+        updateShippingAddress: _updateShippingAddress,
+        updateBillingAddress: _updateBillingAddress,
+        updateTaxIdInfo: _updateTaxIdInfo,
+        ...formStrippedActions
+      } = mocks.mockCheckoutActions();
+
+      mockSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: formStrippedActions,
+      });
+      stripe.initCheckoutFormSdk.mockReturnValue(mockSdk);
+
+      const wrapper = ({children}: any) => (
+        <CheckoutFormProvider
+          stripe={stripe}
+          options={{clientSecret: fakeClientSecret}}
+        >
+          {children}
+        </CheckoutFormProvider>
+      );
+
+      const {result, waitForNextUpdate} = renderHook(() => useCheckoutForm(), {
+        wrapper,
+      });
+
+      await waitForNextUpdate();
+
+      if (result.current.type !== 'success') {
+        throw new Error(
+          `expected success, got ${JSON.stringify(result.current)}`
+        );
+      }
+      const {checkout} = result.current;
+
+      expect((checkout as any).updateEmail).toBeUndefined();
+      expect((checkout as any).updatePhoneNumber).toBeUndefined();
+      expect((checkout as any).updateShippingAddress).toBeUndefined();
+      expect((checkout as any).updateBillingAddress).toBeUndefined();
+      expect((checkout as any).updateTaxIdInfo).toBeUndefined();
+
+      expect(typeof checkout.applyPromotionCode).toBe('function');
+      expect(typeof checkout.removePromotionCode).toBe('function');
+      expect(typeof checkout.updateLineItemQuantity).toBe('function');
+      expect(typeof checkout.updateShippingOption).toBe('function');
+      expect(typeof checkout.confirm).toBe('function');
+    });
+
+    // useCheckoutElements() under the wrong provider must fail loudly at
+    // first render so integrators catch the misuse immediately instead of
+    // calling methods that don't exist on the Form SDK at runtime.
+    it('useCheckoutElements() throws when used under <CheckoutFormProvider>', async () => {
+      consoleError.mockImplementation(() => {});
+      const wrapper = ({children}: any) => (
+        <CheckoutFormProvider
+          stripe={mockStripe}
+          options={{clientSecret: fakeClientSecret}}
+        >
+          {children}
+        </CheckoutFormProvider>
+      );
+
+      const {result, waitForNextUpdate} = renderHook(
+        () => useCheckoutElements(),
+        {wrapper}
+      );
+
+      await waitForNextUpdate();
+
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(
+        /useCheckoutElements\(\) must be used inside <CheckoutElementsProvider>/
+      );
     });
   });
 

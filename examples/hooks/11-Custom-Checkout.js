@@ -3,7 +3,7 @@ import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
   CheckoutElementsProvider,
-  useCheckout,
+  useCheckoutElements,
   BillingAddressElement,
 } from '../../src/checkout';
 
@@ -44,7 +44,7 @@ const CustomerDetails = ({phoneNumber, setPhoneNumber, email, setEmail}) => {
 };
 
 const CheckoutForm = () => {
-  const checkoutState = useCheckout();
+  const checkoutState = useCheckoutElements();
   const [status, setStatus] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [phoneNumber, setPhoneNumber] = React.useState('');

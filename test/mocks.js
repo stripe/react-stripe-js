@@ -47,8 +47,10 @@ export const mockCheckoutActions = () => {
     updatePhoneNumber: jest.fn(),
     updateEmail: jest.fn(),
     updateLineItemQuantity: jest.fn(),
+    updateTaxIdInfo: jest.fn(),
     updateShippingOption: jest.fn(),
     confirm: jest.fn(),
+    runServerUpdate: jest.fn(),
   };
 };
 

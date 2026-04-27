@@ -3,13 +3,13 @@ import {loadStripe} from '@stripe/stripe-js';
 import {
   CheckoutForm,
   CheckoutFormProvider,
-  useCheckout,
+  useCheckoutForm,
 } from '../../src/checkout';
 
 import '../styles/common.css';
 
 const CheckoutFormExample = ({layout}) => {
-  const checkoutState = useCheckout();
+  const checkoutState = useCheckoutForm();
 
   if (checkoutState.type === 'error') {
     return <div>Error: {checkoutState.error.message}</div>;

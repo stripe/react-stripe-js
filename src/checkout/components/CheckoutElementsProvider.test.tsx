@@ -3,7 +3,11 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CheckoutElementsProvider} from './CheckoutElementsProvider';
-import {useCheckout} from './CheckoutContext';
+import {
+  useCheckout,
+  useCheckoutElements,
+  useCheckoutForm,
+} from './CheckoutContext';
 import {Elements} from '../../components/Elements';
 import {useStripe} from '../../components/useStripe';
 import * as mocks from '../../../test/mocks';
@@ -183,6 +187,103 @@ describe('CheckoutElementsProvider', () => {
       await act(() => mockStripePromise);
 
       expect(consoleError).not.toHaveBeenCalled();
+    });
+
+    // Regression guard for the public Elements SDK surface documented at
+    // https://docs.stripe.com/sdks/stripejs-react. Any accidental narrowing
+    // of StripeCheckoutValue that drops these methods would break every
+    // <CheckoutElementsProvider> consumer calling them from useCheckout().
+    it('exposes every action method returned by loadActions on useCheckout().checkout', async () => {
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      mockCheckoutSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: testMockCheckoutActions,
+      });
+
+      const {result, waitForNextUpdate} = renderHook(() => useCheckout(), {
+        wrapper,
+        initialProps: {stripe: mockStripe},
+      });
+
+      await waitForNextUpdate();
+
+      if (result.current.type !== 'success') {
+        throw new Error(
+          `expected success, got ${JSON.stringify(result.current)}`
+        );
+      }
+      const {checkout} = result.current;
+
+      // Every action key from the SDK (except getSession, whose fields are
+      // spread onto checkout as session data) must be a function. Derived
+      // from the mock so this stays honest if the shared mock is updated.
+      const {
+        getSession: _getSession,
+        ...expectedActionKeys
+      } = testMockCheckoutActions;
+      Object.keys(expectedActionKeys).forEach((key) => {
+        expect(typeof (checkout as any)[key]).toBe('function');
+      });
+    });
+
+    // Mirrors the regression guard above for useCheckoutElements(), which
+    // returns the same Elements-shaped surface but with a type that makes
+    // the contract explicit for Elements consumers.
+    it('useCheckoutElements() exposes every action method returned by loadActions', async () => {
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      mockCheckoutSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: testMockCheckoutActions,
+      });
+
+      const {result, waitForNextUpdate} = renderHook(
+        () => useCheckoutElements(),
+        {
+          wrapper,
+          initialProps: {stripe: mockStripe},
+        }
+      );
+
+      await waitForNextUpdate();
+
+      if (result.current.type !== 'success') {
+        throw new Error(
+          `expected success, got ${JSON.stringify(result.current)}`
+        );
+      }
+      const {checkout} = result.current;
+
+      const {
+        getSession: _getSession,
+        ...expectedActionKeys
+      } = testMockCheckoutActions;
+      Object.keys(expectedActionKeys).forEach((key) => {
+        expect(typeof (checkout as any)[key]).toBe('function');
+      });
+    });
+
+    // useCheckoutForm() under the wrong provider must fail loudly at first
+    // render instead of silently returning undefined-shaped actions. The
+    // error must name the expected provider so integrators can self-serve.
+    it('useCheckoutForm() throws when used under <CheckoutElementsProvider>', async () => {
+      consoleError.mockImplementation(() => {});
+      const testMockCheckoutActions = mocks.mockCheckoutActions();
+      mockCheckoutSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: testMockCheckoutActions,
+      });
+
+      const {result, waitForNextUpdate} = renderHook(() => useCheckoutForm(), {
+        wrapper,
+        initialProps: {stripe: mockStripe},
+      });
+
+      await waitForNextUpdate();
+
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(
+        /useCheckoutForm\(\) must be used inside <CheckoutFormProvider>/
+      );
     });
   });
 

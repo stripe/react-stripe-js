@@ -73,6 +73,7 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
               const {actions} = result;
               setState({
                 type: 'success',
+                sdkKind: 'form',
                 sdk,
                 checkoutActions: actions,
                 session: actions.getSession(),
@@ -80,9 +81,13 @@ export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
 
               sdk.on('change', (session: stripeJs.StripeCheckoutSession) => {
                 setState((prevState) => {
-                  if (prevState.type === 'success') {
+                  if (
+                    prevState.type === 'success' &&
+                    prevState.sdkKind === 'form'
+                  ) {
                     return {
                       type: 'success',
+                      sdkKind: 'form',
                       sdk: prevState.sdk,
                       checkoutActions: prevState.checkoutActions,
                       session,

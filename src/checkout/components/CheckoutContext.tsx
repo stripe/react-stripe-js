@@ -12,8 +12,13 @@ type CheckoutSdk =
   | stripeJs.StripeCheckoutElementsSdk
   | stripeJs.StripeCheckoutFormSdk;
 
-type LoadActionsSuccess = Extract<
+type ElementsLoadActionsSuccess = Extract<
   stripeJs.StripeCheckoutLoadActionsResult,
+  {type: 'success'}
+>['actions'];
+
+type FormLoadActionsSuccess = Extract<
+  stripeJs.StripeCheckoutFormLoadActionsResult,
   {type: 'success'}
 >['actions'];
 
@@ -24,8 +29,16 @@ export type CheckoutState =
     }
   | {
       type: 'success';
-      sdk: CheckoutSdk;
-      checkoutActions: LoadActionsSuccess;
+      sdkKind: 'elements';
+      sdk: stripeJs.StripeCheckoutElementsSdk;
+      checkoutActions: ElementsLoadActionsSuccess;
+      session: stripeJs.StripeCheckoutSession;
+    }
+  | {
+      type: 'success';
+      sdkKind: 'form';
+      sdk: stripeJs.StripeCheckoutFormSdk;
+      checkoutActions: FormLoadActionsSuccess;
       session: stripeJs.StripeCheckoutSession;
     }
   | {type: 'error'; error: {message: string}};
@@ -71,59 +84,125 @@ export const useElementsOrCheckoutContextWithUseCase = (
   }
 };
 
-type DistributiveOmit<T, K extends keyof any> = T extends any
-  ? Omit<T, K>
-  : never;
-
-type StripeCheckoutActions = DistributiveOmit<
-  CheckoutSdk,
+type StripeCheckoutElementsActions = Omit<
+  stripeJs.StripeCheckoutElementsSdk,
   'on' | 'loadActions'
 > &
-  Omit<LoadActionsSuccess, 'getSession'>;
+  Omit<ElementsLoadActionsSuccess, 'getSession'>;
 
-export type StripeCheckoutValue = StripeCheckoutActions &
+type StripeCheckoutFormActions = Omit<
+  stripeJs.StripeCheckoutFormSdk,
+  'on' | 'loadActions'
+> &
+  Omit<FormLoadActionsSuccess, 'getSession'>;
+
+export type StripeCheckoutElementsValue = StripeCheckoutElementsActions &
   stripeJs.StripeCheckoutSession;
 
-export type StripeUseCheckoutResult =
+export type StripeCheckoutFormValue = StripeCheckoutFormActions &
+  stripeJs.StripeCheckoutSession;
+
+// Back-compat alias: pre-existing consumers of StripeCheckoutValue see the
+// Elements shape (unchanged behavior). Form consumers should prefer the
+// narrower StripeCheckoutFormValue returned by useCheckoutForm().
+export type StripeCheckoutValue = StripeCheckoutElementsValue;
+
+export type StripeUseCheckoutElementsResult =
   | {type: 'loading'}
   | {
       type: 'success';
-      checkout: StripeCheckoutValue;
+      checkout: StripeCheckoutElementsValue;
     }
   | {type: 'error'; error: {message: string}};
 
-const mapStateToUseCheckoutResult = (
+export type StripeUseCheckoutFormResult =
+  | {type: 'loading'}
+  | {
+      type: 'success';
+      checkout: StripeCheckoutFormValue;
+    }
+  | {type: 'error'; error: {message: string}};
+
+// Back-compat alias: useCheckout() keeps returning the Elements-shaped result
+// regardless of which provider wraps the tree. See useCheckout() JSDoc below.
+export type StripeUseCheckoutResult = StripeUseCheckoutElementsResult;
+
+// One runtime shape, two possible static types depending on the calling hook.
+// The spread destructure runs uniformly against either SDK kind because both
+// StripeCheckoutElementsSdk and StripeCheckoutFormSdk expose `on` and
+// `loadActions`; the final cast selects the surface that the caller expects.
+const mapStateToCheckoutResult = <
+  T extends StripeCheckoutElementsValue | StripeCheckoutFormValue
+>(
   checkoutState: CheckoutState
-): StripeUseCheckoutResult => {
+):
+  | {type: 'loading'}
+  | {type: 'success'; checkout: T}
+  | {type: 'error'; error: {message: string}} => {
   if (checkoutState.type === 'success') {
     const {sdk, session, checkoutActions} = checkoutState;
-    const {on: _on, loadActions: _loadActions, ...elementsMethods} = sdk;
+    const {on: _on, loadActions: _loadActions, ...sdkMethods} = sdk;
     const {getSession: _getSession, ...otherCheckoutActions} = checkoutActions;
-    const actions = {
-      ...elementsMethods,
-      ...otherCheckoutActions,
-    };
     return {
       type: 'success',
-      checkout: {
+      checkout: ({
         ...session,
-        ...actions,
-      },
+        ...sdkMethods,
+        ...otherCheckoutActions,
+      } as unknown) as T,
     };
   } else if (checkoutState.type === 'loading') {
-    return {
-      type: 'loading',
-    };
+    return {type: 'loading'};
   } else {
-    return {
-      type: 'error',
-      error: checkoutState.error,
-    };
+    return {type: 'error', error: checkoutState.error};
   }
 };
 
+/**
+ * @deprecated Since v6.3.0. Will be removed in v7.0.0. Prefer the
+ * provider-specific hooks:
+ * - Inside `<CheckoutElementsProvider>`, use `useCheckoutElements()`.
+ * - Inside `<CheckoutFormProvider>`, use `useCheckoutForm()`.
+ *
+ * The provider-specific hooks return the exact action surface exposed by
+ * their SDK.
+ *
+ * `useCheckout()` will keep working under both providers and returns the
+ * Elements-shaped result for backward compatibility.
+ */
 export const useCheckout = (): StripeUseCheckoutResult => {
   const ctx = React.useContext(CheckoutContext);
   const {checkoutState} = validateCheckoutContext(ctx, 'calls useCheckout()');
-  return mapStateToUseCheckoutResult(checkoutState);
+  return mapStateToCheckoutResult<StripeCheckoutElementsValue>(checkoutState);
+};
+
+export const useCheckoutElements = (): StripeUseCheckoutElementsResult => {
+  const ctx = React.useContext(CheckoutContext);
+  const {checkoutState} = validateCheckoutContext(
+    ctx,
+    'calls useCheckoutElements()'
+  );
+  if (
+    checkoutState.type === 'success' &&
+    checkoutState.sdkKind !== 'elements'
+  ) {
+    throw new Error(
+      'useCheckoutElements() must be used inside <CheckoutElementsProvider>. Inside <CheckoutFormProvider>, use useCheckoutForm() instead.'
+    );
+  }
+  return mapStateToCheckoutResult<StripeCheckoutElementsValue>(checkoutState);
+};
+
+export const useCheckoutForm = (): StripeUseCheckoutFormResult => {
+  const ctx = React.useContext(CheckoutContext);
+  const {checkoutState} = validateCheckoutContext(
+    ctx,
+    'calls useCheckoutForm()'
+  );
+  if (checkoutState.type === 'success' && checkoutState.sdkKind !== 'form') {
+    throw new Error(
+      'useCheckoutForm() must be used inside <CheckoutFormProvider>. Inside <CheckoutElementsProvider>, use useCheckoutElements() instead.'
+    );
+  }
+  return mapStateToCheckoutResult<StripeCheckoutFormValue>(checkoutState);
 };
