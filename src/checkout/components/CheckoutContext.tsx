@@ -159,7 +159,8 @@ const mapStateToCheckoutResult = <
 };
 
 /**
- * @deprecated Prefer the provider-specific hooks:
+ * @deprecated Since v6.3.0. Will be removed in v7.0.0. Prefer the
+ * provider-specific hooks:
  * - Inside `<CheckoutElementsProvider>`, use `useCheckoutElements()`.
  * - Inside `<CheckoutFormProvider>`, use `useCheckoutForm()`.
  *
