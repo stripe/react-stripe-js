@@ -401,6 +401,11 @@ export interface PaymentElementProps extends ElementProps {
     error?: string;
     payment_method: stripeJs.StripePaymentElementChangeEvent['value']['payment_method'];
   }) => any;
+
+  /**
+   * Triggered when the set of available payment methods changes.
+   */
+  onAvailablePaymentMethodsChange?: (event: any) => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
@@ -458,6 +463,11 @@ export interface ExpressCheckoutElementProps extends ElementProps {
   onShippingRateChange?: (
     event: stripeJs.StripeExpressCheckoutElementShippingRateChangeEvent
   ) => any;
+
+  /**
+   * Triggered when the set of available payment methods changes.
+   */
+  onAvailablePaymentMethodsChange?: (event: any) => any;
 }
 
 export type ExpressCheckoutElementComponent = FunctionComponent<
