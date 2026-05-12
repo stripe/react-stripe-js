@@ -818,6 +818,32 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
+    it('propagates the Element`s availablepaymentmethodschange event to the current onAvailablePaymentMethodsChange prop for ExpressCheckoutElement', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <ExpressCheckoutElement
+            onConfirm={() => {}}
+            onAvailablePaymentMethodsChange={mockHandler}
+          />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <ExpressCheckoutElement
+            onConfirm={() => {}}
+            onAvailablePaymentMethodsChange={mockHandler2}
+          />
+        </Elements>
+      );
+
+      const eventMock = Symbol('availablepaymentmethodschange');
+      simulateEvent('availablepaymentmethodschange', eventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(eventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
     it('propagates the Element`s savedpaymentmethodremove event to the current onSavedPaymentMethodRemove prop', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
@@ -855,6 +881,26 @@ describe('createElementComponent', () => {
       const updateEventMock = Symbol('savedpaymentmethodupdate');
       simulateEvent('savedpaymentmethodupdate', updateEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(updateEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('propagates the Element`s availablepaymentmethodschange event to the current onAvailablePaymentMethodsChange prop for PaymentElement', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onAvailablePaymentMethodsChange={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onAvailablePaymentMethodsChange={mockHandler2} />
+        </Elements>
+      );
+
+      const eventMock = Symbol('availablepaymentmethodschange');
+      simulateEvent('availablepaymentmethodschange', eventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(eventMock);
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
