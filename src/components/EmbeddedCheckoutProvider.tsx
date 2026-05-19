@@ -150,8 +150,8 @@ export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
 
   // Attach react-stripe-js version to stripe.js instance
   React.useEffect(() => {
-    registerWithStripeJs(loadedStripe);
-  }, [loadedStripe]);
+    registerWithStripeJs(loadedStripe.current);
+  }, [ctx.embeddedCheckout]);
 
   // Warn on changes to stripe prop.
   // The stripe prop value can only go from null to non-null once and
