@@ -75,7 +75,6 @@ export type ExpressCheckoutElementProps = Omit<
   RootExpressCheckoutElementProps,
   | 'options'
   | 'onClick'
-  | 'onCancel'
   | 'onShippingAddressChange'
   | 'onShippingRateChange'
 > & {options?: stripeJs.StripeCheckoutExpressCheckoutElementOptions};
