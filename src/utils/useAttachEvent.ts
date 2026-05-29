@@ -20,10 +20,11 @@ export const useAttachEvent = <A extends unknown[]>(
       return () => {};
     }
 
-    const decoratedCb = (...args: A): void => {
+    const decoratedCb = (...args: A) => {
       if (cbRef.current) {
-        cbRef.current(...args);
+        return cbRef.current(...args);
       }
+      return undefined;
     };
 
     (element as any).on(event, decoratedCb);

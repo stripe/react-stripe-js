@@ -4,8 +4,10 @@ import {render, act, waitFor} from '@testing-library/react';
 import * as ElementsModule from './Elements';
 import * as CheckoutContextModule from '../checkout/components/CheckoutContext';
 import {CheckoutElementsProvider} from '../checkout/components/CheckoutElementsProvider';
+import {CheckoutFormProvider} from '../checkout/components/CheckoutFormProvider';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
+import makeDeferred from '../../test/makeDeferred';
 import {
   CardElementComponent,
   PaymentElementComponent,
@@ -21,7 +23,7 @@ import {
 } from '../types';
 
 const {Elements} = ElementsModule;
-const {useCheckout} = CheckoutContextModule;
+const {useCheckout, useCheckoutForm} = CheckoutContextModule;
 
 describe('createElementComponent', () => {
   let mockStripe: any;
@@ -515,6 +517,65 @@ describe('createElementComponent', () => {
       simulateEvent('confirm', confirmEventMock);
       expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock);
       expect(mockHandler).not.toHaveBeenCalled();
+    });
+
+    it('returns the Payment Form Element`s async confirm handler result', async () => {
+      const validation = makeDeferred<void>();
+      const mockActions = mocks.mockCheckoutActions();
+      mockActions.confirm.mockResolvedValue({type: 'success'});
+      mockCheckoutSdk.loadActions.mockResolvedValue({
+        type: 'success',
+        actions: mockActions,
+      });
+      mockStripe.initCheckoutFormSdk.mockReturnValue(mockCheckoutSdk);
+
+      const CheckoutFormWithAsyncConfirm = () => {
+        const checkoutState = useCheckoutForm();
+        const onConfirm = async (event: any) => {
+          if (checkoutState.type !== 'success') {
+            return undefined;
+          }
+
+          await validation.promise;
+          return checkoutState.checkout.confirm({formConfirmEvent: event});
+        };
+
+        return <CheckoutForm onConfirm={onConfirm} />;
+      };
+
+      render(
+        <CheckoutFormProvider
+          stripe={mockStripe}
+          options={{clientSecret: 'cs_123'}}
+        >
+          <CheckoutFormWithAsyncConfirm />
+        </CheckoutFormProvider>
+      );
+
+      await waitFor(() =>
+        expect(mockCheckoutSdk.on).toHaveBeenCalledWith(
+          'change',
+          expect.any(Function)
+        )
+      );
+
+      const confirmHandler = simulateOn.mock.calls.find(
+        ([event]: any[]) => event === 'confirm'
+      )?.[1];
+      expect(confirmHandler).toEqual(expect.any(Function));
+
+      const confirmEventMock = Symbol('confirm');
+      const handlerResult = confirmHandler(confirmEventMock);
+
+      expect(handlerResult).toHaveProperty('then', expect.any(Function));
+      expect(mockActions.confirm).not.toHaveBeenCalled();
+
+      await validation.resolve(undefined);
+      await handlerResult;
+
+      expect(mockActions.confirm).toHaveBeenCalledWith({
+        formConfirmEvent: confirmEventMock,
+      });
     });
 
     it('propagates the Payment Form Element`s cancel event to the current onCancel prop', () => {
