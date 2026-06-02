@@ -682,17 +682,6 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardExpiryElement | null;
 
     /**
-     * Requires beta access:
-     * Contact [Stripe support](https://support.stripe.com/) for more information.
-     *
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=currencySelector) for the `CurrencySelectorElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `CurrencySelectorElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: CurrencySelectorElementComponent
-    ): stripeJs.StripeCurrencySelectorElement | null;
-
-    /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=iban) for the `IbanElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
      * Returns `null` if no `IbanElement` is rendered in the current `Elements` provider tree.
      */
