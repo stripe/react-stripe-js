@@ -20,6 +20,7 @@ import {
   AddressElementComponent,
   PaymentMethodMessagingElementComponent,
   TaxIdElementComponent,
+  CurrencySelectorElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
@@ -73,6 +74,15 @@ export const CardExpiryElement: CardExpiryElementComponent = createElementCompon
  */
 export const CardCvcElement: CardCvcElementComponent = createElementComponent(
   'cardCvc',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
+  'currencySelector',
   isServer
 );
 
