@@ -1,0 +1,261 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+RELEASE_TYPE=${1:-}
+IS_RELEASE_CANDIDATE=$(node scripts/is_release_candidate.js)
+
+echo_help() {
+  cat << EOF
+USAGE:
+    ./scripts/publish <release_type>
+
+ARGS:
+    <release_type>
+            A Semantic Versioning release type used to bump the version number. Either "patch", "minor", or "major".
+EOF
+}
+
+verify_prerequisites() {
+  echo "Verifying prerequisites..."
+  
+  # Check npm login status
+  if ! npm whoami &> /dev/null; then
+    echo "Error! You are not logged in to npm."
+    echo "Please run 'npm login' and try again."
+    exit 1
+  fi
+  
+  # Check yarn login status
+  if ! yarn login --silent &> /dev/null; then
+    echo "Error! You are not logged in to yarn."
+    echo "Please run 'yarn login' and try again."
+    exit 1
+  fi
+  
+  # Check for hub command
+  if ! which hub &> /dev/null; then
+    echo "Error! 'hub' command not found."
+    echo "Please install hub with 'brew install hub'."
+    exit 1
+  fi
+  
+  # Check GitHub token
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    echo "Error! GITHUB_TOKEN environment variable is not set."
+    exit 1
+  fi
+
+  # Check GitHub authorization before tagging so we don't leave behind extra tags on failure.
+  if ! hub api user &> /dev/null; then
+    echo "Error! GitHub authorization failed for hub."
+    echo "This is usually an expired/invalid GITHUB_TOKEN (hub error: Unauthorized/Bad credentials)."
+    echo "Please refresh your GitHub token and try again."
+    exit 1
+  fi
+  
+  # Check git signing configuration
+  if [ "$(git config --get gpg.format)" != "ssh" ]; then
+    echo "Error! Git is not configured to use SSH for commit signing."
+    echo "Please run: git config --global gpg.format ssh"
+    exit 1
+  fi
+  
+  # Check signing key configuration
+  if [ -z "$(git config --get user.signingkey)" ]; then
+    echo "Error! Git signing key is not configured."
+    echo "Please run: git config --global user.signingkey ~/.ssh/id_ed25519.pub"
+    exit 1
+  fi
+  
+  # Check if signing key exists
+  local signing_key=$(git config --get user.signingkey)
+  if [ ! -f "$signing_key" ]; then
+    echo "Error! Git signing key does not exist at: $signing_key"
+    echo "Please set up SSH key for signing as described in the documentation."
+    exit 1
+  fi
+  
+  # Check if commit signing is enabled
+  if [ "$(git config --get commit.gpgsign)" != "true" ]; then
+    echo "Error! Git commit signing is not enabled."
+    echo "Please run: git config --global commit.gpgsign true"
+    exit 1
+  fi
+  
+  echo "All prerequisites verified successfully!"
+}
+
+create_github_release() {
+  if which hub | grep -q "not found"; then
+    create_github_release_fallback
+    return
+  fi
+
+  # Get the last two non-release-candidate releases. For example, `("v1.3.1" "v1.3.2")`
+  local versions=($(git tag --sort version:refname | grep '^v' | grep -v "rc" | tail -n 2))
+
+  # If we didn't find exactly two previous version versions, give up
+  if [ ${#versions[@]} -ne 2 ]; then
+    create_github_release_fallback
+    return
+  fi
+
+  local previous_version="${versions[0]}"
+  local current_version="${versions[1]}"
+  local commit_titles=$(git log --pretty=format:"- %s" "$previous_version".."$current_version"^)
+  local release_notes="$(cat << EOF
+$current_version
+
+<!-- Please group the following commits into one of the sections below. -->
+<!-- Remove empty sections when done. -->
+
+$commit_titles
+
+### New features
+
+### Fixes
+
+### Changed
+
+EOF
+)"
+
+  echo "Creating GitHub release"
+  echo ""
+  echo -n "    "
+  hub release create -em "$release_notes" "$current_version"
+}
+
+create_github_release_fallback() {
+  cat << EOF
+Remember to create a release on GitHub with a changelog notes:
+
+    https://github.com/stripe/stripe-js/releases/new
+
+EOF
+}
+
+verify_commit_is_signed() {
+  local commit_hash=$(git log -1 --format="%H")
+
+  if git show --no-patch --pretty=format:"%G?" "$commit_hash" | grep "N" &> /dev/null; then
+    echo "Error! Commit $commit_hash is not signed"
+    echo "Please follow https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account and sign your commit"
+    exit 1
+  fi
+}
+
+# Require release type when not a beta release
+# Not necessary for beta releases because the prerelease versions
+# can be incremented automatically
+if [ "$IS_RELEASE_CANDIDATE" -ne 1 ]; then
+
+  # Show help if no arguments passed
+  if [ $# -eq 0 ]; then
+    echo "Error! Missing release type argument"
+    echo ""
+    echo_help
+    exit 1
+  fi
+
+  # Validate passed release type
+  case $RELEASE_TYPE in
+    patch | minor | major)
+      ;;
+
+    *)
+      echo "Error! Invalid release type supplied"
+      echo ""
+      echo_help
+      exit 1
+      ;;
+  esac
+fi
+
+# Show help message if -h, --help, or help passed
+case "${1:-}" in
+  -h | --help | help)
+    echo_help
+    exit 0
+    ;;
+esac
+
+# Make sure our working dir is the repo root directory
+cd "$(git rev-parse --show-toplevel)"
+
+verify_prerequisites
+
+echo "Fetching git remotes"
+git fetch
+
+GIT_STATUS=$(git status)
+
+if ! grep -q 'On branch master' <<< "$GIT_STATUS"; then
+  echo "Error! Must be on master branch to publish"
+  exit 1
+fi
+
+if ! grep -q "Your branch is up to date with 'origin/master'." <<< "$GIT_STATUS"; then
+  echo "Error! Must be up to date with origin/master to publish"
+  exit 1
+fi
+
+if ! grep -q 'working tree clean' <<< "$GIT_STATUS"; then
+  echo "Error! Cannot publish with dirty working tree"
+  exit 1
+fi
+
+echo "Installing dependencies according to lockfile"
+yarn install --frozen-lockfile
+
+echo "Bumping package.json $RELEASE_TYPE version and tagging commit"
+if [ "$IS_RELEASE_CANDIDATE" -eq 1 ]; then
+  # The Github changelog is based on tag history, so do not create tags for beta versions
+  # rc = release candidate
+  if [ -z "$RELEASE_TYPE" ]; then
+    # increment only the prerelease version if necessary, e.g. 
+    # 1.2.3-rc.0 -> 1.2.3-rc.1
+    # 1.2.3 -> 1.2.3-rc.0
+    yarn version --prerelease --preid=rc
+  else
+    # always increment the main version, e.g. 
+    # patch: 1.2.3-rc.0 -> 1.2.4-rc.0
+    # patch: 1.2.3 -> 1.2.4-rc.0
+    # major: 1.2.3 -> 2.0.0-rc.0
+    yarn version "--pre$RELEASE_TYPE" --preid=rc
+  fi
+else
+  # increment the main version with no prerelease version, e.g.
+  # patch: 1.2.3-rc.0 -> 1.2.4
+  # major: 1.2.3 -> 2.0.0
+  yarn version "--$RELEASE_TYPE" 
+fi
+
+echo "Building"
+yarn run build
+
+echo "Running tests"
+yarn run test
+
+verify_commit_is_signed
+
+echo "Pushing git commit and tag"
+git push --follow-tags
+
+if [ "$IS_RELEASE_CANDIDATE" -ne 1 ]; then
+  # Create release after commit and tag are pushed to ensure package.json
+  # is bumped in the GitHub release.
+  create_github_release
+fi
+
+echo "Publishing release"
+if [ "$IS_RELEASE_CANDIDATE" -eq 1 ]; then
+  yarn --ignore-scripts publish --tag=rc --non-interactive --access=public
+else
+  yarn --ignore-scripts publish --non-interactive --access=public
+fi
+
+echo "Publish successful!"
+echo ""

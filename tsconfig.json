@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "esnext", // Let Babel deal with transpiling new language features
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "noEmit": true,
+    "declaration": true,
+    "allowJs": true,
+    "removeComments": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true
+  },
+  "include": ["./src"]
+}

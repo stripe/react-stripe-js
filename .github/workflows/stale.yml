@@ -1,0 +1,30 @@
+name: 'Close stale issues and PRs'
+on:
+  schedule:
+    - cron: '30 1 * * *' # Run daily at 1:30 AM UTC
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # Number of days of inactivity before an issue becomes stale
+          days-before-stale: 20
+          # Number of days of inactivity before a stale issue is closed
+          days-before-close: 7
+          # Never mark PRs as stale or close them
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          # Issues with these labels will never be considered stale
+          exempt-issue-labels: 'pinned,security'
+          # Comment to post when marking an issue as stale
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not
+            had recent activity. It will be closed if no further activity
+            occurs. Thank you for your contributions.
+          # Close comment is disabled
+          # close-issue-message and close-pr-message are omitted to disable close comments

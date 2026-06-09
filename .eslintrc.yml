@@ -1,0 +1,47 @@
+---
+root: true
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:react/recommended
+parser: '@typescript-eslint/parser'
+parserOptions:
+  # project: './tsconfig.json'
+  ecmaFeatures:
+    jsx: true
+plugins:
+  - '@typescript-eslint'
+  - jest
+  - react
+  - react-hooks
+settings:
+  react:
+    version: detect
+env:
+  jest/globals: true
+  browser: true
+  es6: true
+rules:
+  no-console: 0
+  func-style: 2
+  consistent-return: 2
+  prefer-arrow-callback:
+    - 2
+    - allowNamedFunctions: false
+      allowUnboundThis: false
+  jest/no-disabled-tests: 2
+  jest/no-focused-tests: 2
+  react/prop-types: 0
+  react/forbid-prop-types: 0
+  react/no-unused-prop-types: 0
+  react-hooks/rules-of-hooks: 2
+  react-hooks/exhaustive-deps: 1
+  '@typescript-eslint/no-explicit-any': 0
+  '@typescript-eslint/no-empty-interface': 0
+  '@typescript-eslint/explicit-function-return-type': 0
+  '@typescript-eslint/camelcase': 0
+  '@typescript-eslint/no-empty-function': 0
+  '@typescript-eslint/no-unused-vars':
+    - 2
+    - varsIgnorePattern: ^_

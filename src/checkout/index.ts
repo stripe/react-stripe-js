@@ -1,0 +1,76 @@
+export {CheckoutElementsProvider} from './components/CheckoutElementsProvider';
+export {
+  useCheckout,
+  useCheckoutElements,
+  useCheckoutForm,
+  StripeUseCheckoutResult,
+  StripeUseCheckoutElementsResult,
+  StripeUseCheckoutFormResult,
+  StripeCheckoutValue,
+  StripeCheckoutElementsValue,
+  StripeCheckoutFormValue,
+} from './components/CheckoutContext';
+export {CheckoutFormProvider} from './components/CheckoutFormProvider';
+export * from './types';
+import React from 'react';
+import createElementComponent from '../components/createElementComponent';
+import {isServer} from '../utils/isServer';
+import {
+  CurrencySelectorElementComponent,
+  BillingAddressElementComponent,
+  ShippingAddressElementComponent,
+  PaymentElementComponent,
+  CheckoutFormComponent,
+  ExpressCheckoutElementComponent,
+  TaxIdElementComponent,
+  ContactDetailsElementComponent,
+} from './types';
+
+export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
+  'currencySelector',
+  isServer
+);
+
+export const PaymentElement: PaymentElementComponent = createElementComponent(
+  'payment',
+  isServer
+);
+
+export const CheckoutForm: CheckoutFormComponent = createElementComponent(
+  'paymentForm',
+  isServer,
+  'CheckoutForm'
+);
+
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
+  'expressCheckout',
+  isServer
+);
+
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
+  isServer
+);
+
+export const ContactDetailsElement: ContactDetailsElementComponent = createElementComponent(
+  'contactDetails',
+  isServer
+);
+
+const AddressElementBase = createElementComponent('address', isServer) as any;
+
+export const BillingAddressElement: BillingAddressElementComponent = ((
+  props
+) => {
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'billing'};
+  return React.createElement(AddressElementBase, {...rest, options: merged});
+}) as BillingAddressElementComponent;
+
+export const ShippingAddressElement: ShippingAddressElementComponent = ((
+  props
+) => {
+  const {options, ...rest} = props as any;
+  const merged = {...options, mode: 'shipping'};
+  return React.createElement(AddressElementBase, {...rest, options: merged});
+}) as ShippingAddressElementComponent;

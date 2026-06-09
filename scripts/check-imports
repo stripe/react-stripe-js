@@ -1,0 +1,26 @@
+#!/bin/sh
+
+BASE_DIR="$(dirname "$0")/..";
+
+checkImport() {
+    file=$1
+    regexp=$2
+    message=$3
+    grep "${regexp}" "${BASE_DIR}${file}"
+
+    case $? in
+        1) true
+            ;; 
+        0) 
+            echo "Found disallowed import in ${file}"
+            echo "${message}"
+            false
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+checkImport "/dist/react-stripe.d.ts" 'import [^*{]' 'Please only use * or named imports for types' && \
+checkImport "/dist/react-stripe.esm.mjs" 'import.*{' 'Please do not use named imports for dependencies'

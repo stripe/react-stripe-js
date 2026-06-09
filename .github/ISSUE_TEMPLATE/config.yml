@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Stripe Support
+    url: https://support.stripe.com/contact
+    about: If you are having general trouble with Stripe.js or your Stripe integration, please reach out to Stripe Support instead.

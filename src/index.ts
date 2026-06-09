@@ -1,0 +1,208 @@
+import createElementComponent from './components/createElementComponent';
+import {
+  AuBankAccountElementComponent,
+  CardElementComponent,
+  CardNumberElementComponent,
+  CardExpiryElementComponent,
+  CardCvcElementComponent,
+  ContactDetailsElementComponent,
+  ExpressCheckoutElementComponent,
+  IbanElementComponent,
+  IssuingCardCopyButtonElementComponent,
+  IssuingCardCvcDisplayElementComponent,
+  IssuingCardExpiryDisplayElementComponent,
+  IssuingCardNumberDisplayElementComponent,
+  IssuingCardPinDisplayElementComponent,
+  LinkAuthenticationElementComponent,
+  PaymentElementComponent,
+  PaymentRequestButtonElementComponent,
+  ShippingAddressElementComponent,
+  AddressElementComponent,
+  PaymentMethodMessagingElementComponent,
+  TaxIdElementComponent,
+  CurrencySelectorElementComponent,
+} from './types';
+import {isServer} from './utils/isServer';
+
+export * from './types';
+
+export {useElements, Elements, ElementsConsumer} from './components/Elements';
+
+export {EmbeddedCheckout} from './components/EmbeddedCheckout';
+export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
+export {FinancialAccountDisclosure} from './components/FinancialAccountDisclosure';
+export {IssuingDisclosure} from './components/IssuingDisclosure';
+export {useStripe} from './components/useStripe';
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AuBankAccountElement: AuBankAccountElementComponent = createElementComponent(
+  'auBankAccount',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const CardElement: CardElementComponent = createElementComponent(
+  'card',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const CardNumberElement: CardNumberElementComponent = createElementComponent(
+  'cardNumber',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const CardExpiryElement: CardExpiryElementComponent = createElementComponent(
+  'cardExpiry',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const CardCvcElement: CardCvcElementComponent = createElementComponent(
+  'cardCvc',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
+  'currencySelector',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const IbanElement: IbanElementComponent = createElementComponent(
+  'iban',
+  isServer
+);
+
+export const PaymentElement: PaymentElementComponent = createElementComponent(
+  'payment',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
+  'expressCheckout',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
+  'paymentRequestButton',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const LinkAuthenticationElement: LinkAuthenticationElementComponent = createElementComponent(
+  'linkAuthentication',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const ContactDetailsElement: ContactDetailsElementComponent = createElementComponent(
+  'contactDetails',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const AddressElement: AddressElementComponent = createElementComponent(
+  'address',
+  isServer
+);
+
+/**
+ * @deprecated
+ * Use `AddressElement` instead.
+ *
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const ShippingAddressElement: ShippingAddressElementComponent = createElementComponent(
+  'shippingAddress',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/stripe-js/react#element-components
+ */
+export const PaymentMethodMessagingElement: PaymentMethodMessagingElementComponent = createElementComponent(
+  'paymentMethodMessaging',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TaxIdElement: TaxIdElementComponent = createElementComponent(
+  'taxId',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
+  'issuingCardNumberDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
+  'issuingCardCvcDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
+  'issuingCardExpiryDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
+  'issuingCardPinDisplay',
+  isServer
+);
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
+  'issuingCardCopyButton',
+  isServer
+);
