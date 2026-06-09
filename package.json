@@ -56,6 +56,10 @@
     "type": "git",
     "url": "https://github.com/stripe/react-stripe-js.git"
   },
+  "homepage": "https://stripe.com/docs/stripe-js/react",
+  "bugs": {
+    "url": "https://github.com/stripe/react-stripe-js/issues"
+  },
   "files": [
     "dist",
     "src",
