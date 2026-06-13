@@ -1,6 +1,9 @@
 {
   "name": "@stripe/react-stripe-js",
   "version": "6.6.0",
+  "bugs": {
+    "url": "https://github.com/stripe/react-stripe-js/issues"
+  },
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.mjs",
