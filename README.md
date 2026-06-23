@@ -238,5 +238,6 @@ Typings in React Stripe.js follow the same
 
 ### Contributing
 
-If you would like to contribute to React Stripe.js, please make sure to read our
-[contributor guidelines](CONTRIBUTING.md).
+This project is maintained by Stripe and does not accept external pull requests.
+If you have feedback or ideas, please
+[open an issue](https://github.com/stripe/react-stripe-js/issues/new).
