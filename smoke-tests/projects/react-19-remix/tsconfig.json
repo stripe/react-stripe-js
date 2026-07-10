@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "noEmit": true,
+    "paths": {"~/*": ["./app/*"]}
+  },
+  "include": ["app/**/*", "tests/**/*", "react-router.config.ts", "vite.config.ts"],
+  "exclude": ["node_modules"]
+}

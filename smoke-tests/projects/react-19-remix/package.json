@@ -1,0 +1,29 @@
+{
+  "name": "react-stripe-smoke-react-19-remix",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "react-router dev --port 3005",
+    "build": "react-router build",
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-router/node": "^7.5.0",
+    "@react-router/serve": "^7.5.0",
+    "@stripe/react-stripe-js": "file:../../tarball/stripe-react-stripe-js-5.6.0.tgz",
+    "@stripe/stripe-js": "8.7.0",
+    "isbot": "^4.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-router": "^7.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@react-router/dev": "^7.5.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.4.0",
+    "vite": "^5.4.0"
+  }
+}
