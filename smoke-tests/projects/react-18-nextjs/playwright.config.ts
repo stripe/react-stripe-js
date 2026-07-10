@@ -11,7 +11,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    {name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chrome'}},
+    {name: 'chromium', use: {...devices['Desktop Chrome'], ...(process.env.CI ? {} : {channel: 'chrome'})}},
   ],
   webServer: {
     command: 'npm run dev',

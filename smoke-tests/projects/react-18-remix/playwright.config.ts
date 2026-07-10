@@ -15,9 +15,9 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
-          executablePath:
-            process.env.CHROME_EXECUTABLE_PATH ||
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+          ...(process.env.CHROME_EXECUTABLE_PATH
+            ? {executablePath: process.env.CHROME_EXECUTABLE_PATH}
+            : {}),
           args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         },
       },
