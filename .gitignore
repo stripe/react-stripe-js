@@ -9,3 +9,9 @@ lib
 .vscode/
 smoke-tests/tarball/*.tgz
 smoke-tests/projects/*/node_modules/
+smoke-tests/projects/*/.next/
+smoke-tests/projects/*/next-env.d.ts
+smoke-tests/projects/*/.react-router/
+smoke-tests/projects/*/build/
+smoke-tests/projects/*/test-results/
+smoke-tests/projects/*/playwright-report/

@@ -5,6 +5,11 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECTS_DIR="$SCRIPTS_DIR/../projects"
 
+# Playwright projects: prefer system Chrome if available and bundled chromium is not installed.
+if [[ -z "$CHROME_EXECUTABLE_PATH" ]] && [[ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then
+  export CHROME_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+fi
+
 declare -A RESULTS
 
 run_project() {
@@ -14,7 +19,12 @@ run_project() {
   echo "========================================="
   echo "  $name"
   echo "========================================="
-  if (cd "$dir" && npm install --prefer-offline && npm test); then
+  # CRA projects require --legacy-peer-deps due to react-scripts peer dep constraints
+  local install_flags="--prefer-offline"
+  if [[ "$name" == *"-cra" ]]; then
+    install_flags="--prefer-offline --legacy-peer-deps"
+  fi
+  if (cd "$dir" && npm install $install_flags && npm test); then
     RESULTS["$name"]="PASS"
   else
     RESULTS["$name"]="FAIL"
