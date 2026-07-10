@@ -1,0 +1,36 @@
+{
+  "name": "react-stripe-smoke-react-16-cra",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "test": "CI=true react-scripts test && tsc --noEmit",
+    "build": "react-scripts build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "file:../../tarball/stripe-react-stripe-js-5.6.0.tgz",
+    "@stripe/stripe-js": "8.7.0",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
+    "react-scripts": "4.0.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/jest": "^27.5.0",
+    "@types/node": "^16.0.0",
+    "@types/react": "^16.0.0",
+    "@types/react-dom": "^16.0.0",
+    "typescript": "^4.9.0"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  },
+  "eslintConfig": {"extends": ["react-app", "react-app/jest"]},
+  "overrides": {
+    "@babel/core": "^7.24.0"
+  }
+}
