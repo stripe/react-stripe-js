@@ -1,0 +1,6 @@
+node_modules/
+build/
+public/
+.cache/
+test-results/
+playwright-report/

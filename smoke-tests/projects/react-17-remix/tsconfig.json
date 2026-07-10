@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2017"],
+    "noEmit": true,
+    "paths": {"~/*": ["./app/*"]}
+  },
+  "include": ["app/**/*", "tests/**/*"],
+  "exclude": ["node_modules"]
+}
