@@ -1,0 +1,37 @@
+{
+  "name": "react-stripe-smoke-react-16-webpack",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode production",
+    "test": "jest && tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "file:../../tarball/stripe-react-stripe-js-5.6.0.tgz",
+    "@stripe/stripe-js": "8.7.0",
+    "react": "16.14.0",
+    "react-dom": "16.14.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
+    "@babel/preset-typescript": "^7.24.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^12.1.4",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/jest": "^29.0.0",
+    "@types/react": "^16.0.0",
+    "@types/react-dom": "^16.0.0",
+    "babel-jest": "^29.0.0",
+    "babel-loader": "^9.1.0",
+    "html-webpack-plugin": "^5.6.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "react-test-renderer": "16.14.0",
+    "typescript": "^5.4.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.0"
+  }
+}
