@@ -4,3 +4,6 @@ test-results/
 playwright-report/
 tsconfig.tsbuildinfo
 next-env.d.ts
+# un-ignore src/lib/ which is caught by root .gitignore's bare "lib" rule
+!src/lib/
+!src/lib/**
