@@ -7,3 +7,5 @@ lib
 *.log
 .vim
 .vscode/
+smoke-tests/tarball/*.tgz
+smoke-tests/projects/*/node_modules/
