@@ -4,3 +4,6 @@ public/build/
 .cache/
 test-results/
 playwright-report/
+# Override root .gitignore's bare 'lib' pattern so app/lib/ stays tracked
+!app/lib/
+!app/lib/**
