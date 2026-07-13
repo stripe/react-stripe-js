@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run && tsc --noEmit",
+    "dev": "vite",
+    "test": "vitest run && tsc --noEmit && playwright test",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
@@ -15,6 +18,7 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.45.0",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.0",
