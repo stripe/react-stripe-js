@@ -116,6 +116,13 @@ export const mockCheckoutSdk = () => {
     getContactDetailsElement: jest.fn(() => {
       return elements.contactDetails || null;
     }),
+    createTermsElement: jest.fn(() => {
+      elements.terms = mockElement();
+      return elements.terms;
+    }),
+    getTermsElement: jest.fn(() => {
+      return elements.terms || null;
+    }),
 
     on: jest.fn((event, callback) => {
       if (event === 'change') {

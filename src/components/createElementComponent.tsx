@@ -183,6 +183,11 @@ const createElementComponent = (
             case 'contactDetails':
               newElement = elementsSdk.createContactDetailsElement();
               break;
+            case 'terms':
+              newElement = elementsSdk.createTermsElement(
+                options as stripeJs.StripeCheckoutTermsElementOptions
+              );
+              break;
             default:
               throw new Error(
                 `<${displayName}> is not supported inside a checkout provider. Use an <Elements> provider instead.`

@@ -106,3 +106,13 @@ export interface ContactDetailsElementProps extends ElementProps {
 export type ContactDetailsElementComponent = FunctionComponent<
   ContactDetailsElementProps
 >;
+
+export interface TermsElementProps extends ElementProps {
+  options?: stripeJs.StripeCheckoutTermsElementOptions;
+  onReady?: (element: stripeJs.StripeTermsElement) => any;
+  onEscape?: () => any;
+  onLoadError?: (event: {elementType: 'terms'; error: StripeError}) => any;
+  onLoaderStart?: (event: {elementType: 'terms'}) => any;
+}
+
+export type TermsElementComponent = FunctionComponent<TermsElementProps>;

@@ -21,6 +21,7 @@ import {
   PaymentMethodMessagingElementComponent,
   TaxIdElementComponent,
   CurrencySelectorElementComponent,
+  TermsElementComponent,
 } from './types';
 import {isServer} from './utils/isServer';
 
@@ -204,5 +205,14 @@ export const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent
  */
 export const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
   'issuingCardCopyButton',
+  isServer
+);
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TermsElement: TermsElementComponent = createElementComponent(
+  'terms',
   isServer
 );
