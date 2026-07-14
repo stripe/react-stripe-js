@@ -24,6 +24,7 @@ import {
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
   ContactDetailsElementComponent,
+  TermsElementComponent,
 } from './types';
 
 export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
@@ -74,3 +75,12 @@ export const ShippingAddressElement: ShippingAddressElementComponent = ((
   const merged = {...options, mode: 'shipping'};
   return React.createElement(AddressElementBase, {...rest, options: merged});
 }) as ShippingAddressElementComponent;
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TermsElement: TermsElementComponent = createElementComponent(
+  'terms',
+  isServer
+);
