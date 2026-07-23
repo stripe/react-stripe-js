@@ -3,34 +3,36 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {FormEventHandler} from 'react';
+import {useEffect, useState} from 'react';
+import {loadStripe, Stripe} from '@stripe/stripe-js';
 import {EmbeddedCheckoutProvider, EmbeddedCheckout} from '../../src';
 
 import '../styles/common.css';
 
 const App = () => {
-  const [pk, setPK] = React.useState(
+  const [pk, setPK] = useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
-  const [clientSecret, setClientSecret] = React.useState(
+  const [clientSecret, setClientSecret] = useState(
     window.sessionStorage.getItem('react-stripe-js-embedded-client-secret') ||
       ''
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem(
       'react-stripe-js-embedded-client-secret',
       clientSecret || ''
     );
   }, [clientSecret]);
 
-  const [stripePromise, setStripePromise] = React.useState();
+  const [stripePromise, setStripePromise] =
+    useState<Promise<Stripe | null> | null>();
 
-  const handleSubmit = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(loadStripe(pk));
   };

@@ -2,8 +2,9 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import React, {useState} from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import type {FormEventHandler} from 'react';
+import {useState} from 'react';
+import {loadStripe, PaymentMethod} from '@stripe/stripe-js';
 import {
   CardNumberElement,
   CardCvcElement,
@@ -37,10 +38,12 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const [name, setName] = useState('');
   const [postal, setPostal] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
+    null
+  );
 
-  const handleSubmit = async (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     if (!stripe || !elements) {
@@ -68,7 +71,7 @@ const CheckoutForm = () => {
 
     if (payload.error) {
       console.log('[error]', payload.error);
-      setErrorMessage(payload.error.message);
+      setErrorMessage(payload.error.message ?? null);
       setPaymentMethod(null);
     } else {
       console.log('[PaymentMethod]', payload.paymentMethod);
