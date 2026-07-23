@@ -17,9 +17,8 @@ export type EmbeddedCheckoutContextValue = {
   embeddedCheckout: EmbeddedCheckoutPublicInterface | null;
 };
 
-const EmbeddedCheckoutContext = React.createContext<EmbeddedCheckoutContextValue | null>(
-  null
-);
+const EmbeddedCheckoutContext =
+  React.createContext<EmbeddedCheckoutContextValue | null>(null);
 EmbeddedCheckoutContext.displayName = 'EmbeddedCheckoutProviderContext';
 
 export const useEmbeddedCheckoutContext = (): EmbeddedCheckoutContextValue => {
@@ -71,9 +70,9 @@ interface PrivateEmbeddedCheckoutProviderProps {
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
-export const EmbeddedCheckoutProvider: FunctionComponent<PropsWithChildren<
-  EmbeddedCheckoutProviderProps
->> = ({
+export const EmbeddedCheckoutProvider: FunctionComponent<
+  PropsWithChildren<EmbeddedCheckoutProviderProps>
+> = ({
   stripe: rawStripeProp,
   options,
   children,

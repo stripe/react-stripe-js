@@ -164,10 +164,8 @@ describe('createElementComponent', () => {
       'card',
       false
     );
-    const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
-      'card',
-      false
-    );
+    const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
+      createElementComponent('card', false);
     const PaymentElement: PaymentElementComponent = createElementComponent(
       'payment',
       false
@@ -177,10 +175,8 @@ describe('createElementComponent', () => {
       false
     );
 
-    const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
-      'expressCheckout',
-      false
-    );
+    const ExpressCheckoutElement: ExpressCheckoutElementComponent =
+      createElementComponent('expressCheckout', false);
 
     const CheckoutForm = createElementComponent(
       'paymentForm',
@@ -1104,26 +1100,16 @@ describe('createElementComponent', () => {
     });
 
     describe('Issuing Elements', () => {
-      const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
-        'issuingCardNumberDisplay',
-        false
-      );
-      const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
-        'issuingCardCvcDisplay',
-        false
-      );
-      const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
-        'issuingCardExpiryDisplay',
-        false
-      );
-      const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
-        'issuingCardPinDisplay',
-        false
-      );
-      const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
-        'issuingCardCopyButton',
-        false
-      );
+      const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent =
+        createElementComponent('issuingCardNumberDisplay', false);
+      const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent =
+        createElementComponent('issuingCardCvcDisplay', false);
+      const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent =
+        createElementComponent('issuingCardExpiryDisplay', false);
+      const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent =
+        createElementComponent('issuingCardPinDisplay', false);
+      const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent =
+        createElementComponent('issuingCardCopyButton', false);
 
       it.each([
         ['issuingCardNumberDisplay', IssuingCardNumberDisplayElement] as const,
@@ -1447,9 +1433,10 @@ describe('createElementComponent', () => {
           'issuingCardPinDisplay',
           displayOptions
         );
-        expect(
-          mockElements.create
-        ).toHaveBeenCalledWith('issuingCardCopyButton', {toCopy: 'number'});
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardCopyButton',
+          {toCopy: 'number'}
+        );
       });
     });
 

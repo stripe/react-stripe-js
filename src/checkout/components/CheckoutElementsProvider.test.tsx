@@ -129,10 +129,8 @@ describe('CheckoutElementsProvider', () => {
       );
 
       const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
-      const {
-        getSession: _getSession,
-        ...otherCheckoutActions
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...otherCheckoutActions} =
+        testMockCheckoutActions;
 
       const expectedCheckout = {
         ...elementsMethods,
@@ -217,10 +215,8 @@ describe('CheckoutElementsProvider', () => {
       // Every action key from the SDK (except getSession, whose fields are
       // spread onto checkout as session data) must be a function. Derived
       // from the mock so this stays honest if the shared mock is updated.
-      const {
-        getSession: _getSession,
-        ...expectedActionKeys
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...expectedActionKeys} =
+        testMockCheckoutActions;
       Object.keys(expectedActionKeys).forEach((key) => {
         expect(typeof (checkout as any)[key]).toBe('function');
       });
@@ -253,10 +249,8 @@ describe('CheckoutElementsProvider', () => {
       }
       const {checkout} = result.current;
 
-      const {
-        getSession: _getSession,
-        ...expectedActionKeys
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...expectedActionKeys} =
+        testMockCheckoutActions;
       Object.keys(expectedActionKeys).forEach((key) => {
         expect(typeof (checkout as any)[key]).toBe('function');
       });
@@ -347,10 +341,8 @@ describe('CheckoutElementsProvider', () => {
       );
 
       const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
-      const {
-        getSession: _getSession,
-        ...otherCheckoutActions
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...otherCheckoutActions} =
+        testMockCheckoutActions;
 
       const expectedCheckout = {
         ...elementsMethods,
@@ -397,10 +389,8 @@ describe('CheckoutElementsProvider', () => {
       );
 
       const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
-      const {
-        getSession: _getSession,
-        ...otherCheckoutActions
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...otherCheckoutActions} =
+        testMockCheckoutActions;
 
       const expectedCheckout = {
         ...elementsMethods,
@@ -452,10 +442,8 @@ describe('CheckoutElementsProvider', () => {
       );
 
       const {on: _on, loadActions: _loadActions, ...elementsMethods} = mockSdk;
-      const {
-        getSession: _getSession,
-        ...otherCheckoutActions
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...otherCheckoutActions} =
+        testMockCheckoutActions;
 
       const expectedCheckout = {
         ...elementsMethods,
