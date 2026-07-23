@@ -38,7 +38,7 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 
 ```jsx
 import React, {useState} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
@@ -126,14 +126,15 @@ const App = () => (
   </Elements>
 );
 
-ReactDOM.render(<App />, document.body);
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
 ```
 
 #### Using class components
 
 ```jsx
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {loadStripe} from '@stripe/stripe-js';
 import {
   PaymentElement,
@@ -223,7 +224,8 @@ const App = () => (
   </Elements>
 );
 
-ReactDOM.render(<App />, document.body);
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
 ```
 
 ### TypeScript support

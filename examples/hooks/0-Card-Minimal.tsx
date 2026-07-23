@@ -1,7 +1,7 @@
 // This example shows you how to set up React Stripe.js and use Elements.
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
-import type {FormEventHandler} from 'react';
+import type {SubmitEventHandler} from 'react';
 import {loadStripe} from '@stripe/stripe-js';
 import {CardElement, Elements, useElements, useStripe} from '../../src';
 
@@ -11,7 +11,7 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     // Block native form submission.
     event.preventDefault();
 
