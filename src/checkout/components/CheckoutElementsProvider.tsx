@@ -40,9 +40,9 @@ const maybeSdk = (
   }
 };
 
-export const CheckoutElementsProvider: FunctionComponent<PropsWithChildren<
-  CheckoutElementsProviderProps
->> = (({
+export const CheckoutElementsProvider: FunctionComponent<
+  PropsWithChildren<CheckoutElementsProviderProps>
+> = (({
   stripe: rawStripeProp,
   options,
   children,

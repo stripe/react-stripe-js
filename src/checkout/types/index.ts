@@ -35,9 +35,8 @@ export interface CurrencySelectorElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'currencySelector'}) => any;
 }
 
-export type CurrencySelectorElementComponent = FunctionComponent<
-  CurrencySelectorElementProps
->;
+export type CurrencySelectorElementComponent =
+  FunctionComponent<CurrencySelectorElementProps>;
 
 export type BillingAddressElementProps = Omit<
   RootAddressElementProps,
@@ -46,9 +45,8 @@ export type BillingAddressElementProps = Omit<
   options?: stripeJs.StripeCheckoutAddressElementOptions;
 };
 
-export type BillingAddressElementComponent = FunctionComponent<
-  BillingAddressElementProps
->;
+export type BillingAddressElementComponent =
+  FunctionComponent<BillingAddressElementProps>;
 
 export type ShippingAddressElementProps = Omit<
   RootAddressElementProps,
@@ -57,9 +55,8 @@ export type ShippingAddressElementProps = Omit<
   options?: stripeJs.StripeCheckoutAddressElementOptions;
 };
 
-export type ShippingAddressElementComponent = FunctionComponent<
-  ShippingAddressElementProps
->;
+export type ShippingAddressElementComponent =
+  FunctionComponent<ShippingAddressElementProps>;
 
 export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
   options?: stripeJs.StripeCheckoutPaymentElementOptions;
@@ -76,9 +73,8 @@ export type ExpressCheckoutElementProps = Omit<
   'options' | 'onClick' | 'onShippingAddressChange' | 'onShippingRateChange'
 > & {options?: stripeJs.StripeCheckoutExpressCheckoutElementOptions};
 
-export type ExpressCheckoutElementComponent = FunctionComponent<
-  ExpressCheckoutElementProps
->;
+export type ExpressCheckoutElementComponent =
+  FunctionComponent<ExpressCheckoutElementProps>;
 
 export interface TaxIdElementProps extends ElementProps {
   options: stripeJs.StripeTaxIdElementOptions;
@@ -103,9 +99,8 @@ export interface ContactDetailsElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'contactDetails'}) => any;
 }
 
-export type ContactDetailsElementComponent = FunctionComponent<
-  ContactDetailsElementProps
->;
+export type ContactDetailsElementComponent =
+  FunctionComponent<ContactDetailsElementProps>;
 
 export interface TermsElementProps extends ElementProps {
   options?: stripeJs.StripeCheckoutTermsElementOptions;

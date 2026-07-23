@@ -137,21 +137,16 @@ const IssuingElementsDemo: React.FC<IssuingElementsDemoProps> = ({
   const handleGetElement = useCallback(() => {
     if (!elements) return;
 
-    const numberEl: StripeIssuingCardNumberDisplayElement | null = elements.getElement(
-      IssuingCardNumberDisplayElement
-    );
-    const cvcEl: StripeIssuingCardCvcDisplayElement | null = elements.getElement(
-      IssuingCardCvcDisplayElement
-    );
-    const expiryEl: StripeIssuingCardExpiryDisplayElement | null = elements.getElement(
-      IssuingCardExpiryDisplayElement
-    );
-    const pinEl: StripeIssuingCardPinDisplayElement | null = elements.getElement(
-      IssuingCardPinDisplayElement
-    );
-    const copyEl: StripeIssuingCardCopyButtonElement | null = elements.getElement(
-      IssuingCardCopyButtonElement
-    );
+    const numberEl: StripeIssuingCardNumberDisplayElement | null =
+      elements.getElement(IssuingCardNumberDisplayElement);
+    const cvcEl: StripeIssuingCardCvcDisplayElement | null =
+      elements.getElement(IssuingCardCvcDisplayElement);
+    const expiryEl: StripeIssuingCardExpiryDisplayElement | null =
+      elements.getElement(IssuingCardExpiryDisplayElement);
+    const pinEl: StripeIssuingCardPinDisplayElement | null =
+      elements.getElement(IssuingCardPinDisplayElement);
+    const copyEl: StripeIssuingCardCopyButtonElement | null =
+      elements.getElement(IssuingCardCopyButtonElement);
 
     console.log('[getElement results]', {
       number: numberEl,
@@ -192,12 +187,9 @@ const IssuingElementsDemo: React.FC<IssuingElementsDemoProps> = ({
   };
 
   // Type-safe options for each copy button variant
-  const toCopyValues: Array<StripeIssuingCardCopyButtonElementOptions['toCopy']> = [
-    'number',
-    'cvc',
-    'expiry',
-    'pin',
-  ];
+  const toCopyValues: Array<
+    StripeIssuingCardCopyButtonElementOptions['toCopy']
+  > = ['number', 'cvc', 'expiry', 'pin'];
 
   return (
     <div>

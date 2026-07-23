@@ -151,13 +151,11 @@ const createElementComponent = (
               if ('mode' in options) {
                 const {mode, ...restOptions} = options;
                 if (mode === 'shipping') {
-                  newElement = elementsSdk.createShippingAddressElement(
-                    restOptions
-                  );
+                  newElement =
+                    elementsSdk.createShippingAddressElement(restOptions);
                 } else if (mode === 'billing') {
-                  newElement = elementsSdk.createBillingAddressElement(
-                    restOptions
-                  );
+                  newElement =
+                    elementsSdk.createBillingAddressElement(restOptions);
                 } else {
                   throw new Error(
                     "Invalid options.mode. mode must be 'billing' or 'shipping'."
@@ -170,9 +168,9 @@ const createElementComponent = (
               }
               break;
             case 'expressCheckout':
-              newElement = (elementsSdk.createExpressCheckoutElement(
+              newElement = elementsSdk.createExpressCheckoutElement(
                 options as stripeJs.StripeCheckoutExpressCheckoutElementOptions
-              ) as unknown) as stripeJs.StripeExpressCheckoutElement;
+              ) as unknown as stripeJs.StripeExpressCheckoutElement;
               break;
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();
