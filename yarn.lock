@@ -2294,14 +2294,6 @@
     picocolors "^1.1.1"
     redent "^3.0.0"
 
-"@testing-library/react-hooks@^8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/react-hooks/-/react-hooks-8.0.0.tgz#7d0164bffce4647f506039de0a97f6fcbd20f4bf"
-  integrity sha512-uZqcgtcUUtw7Z9N32W13qQhVAD+Xki2hxbTR461MKax8T6Jr8nsUvZB+vcBTkzY2nFvsUet434CsgF0ncW2yFw==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    react-error-boundary "^3.1.0"
-
 "@testing-library/react@^16.1.0":
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-16.3.2.tgz#672883b7acb8e775fc0492d9e9d25e06e89786d0"
@@ -7811,13 +7803,6 @@ react-dom@19.1.0:
   dependencies:
     scheduler "^0.26.0"
 
-react-error-boundary@^3.1.0:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-3.1.4.tgz#255db92b23197108757a888b01e5b729919abde0"
-  integrity sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-
 react-is@^16.12.0, react-is@^16.8.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -7827,19 +7812,6 @@ react-is@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
-
-react-is@^19.1.0:
-  version "19.2.8"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.8.tgz#09826f9fbc187bc668e3e5c62edc001f804d5018"
-  integrity sha512-s5un28nYxKJw5gvUHyW5PCC28CvBqLu9r3cWgzHT4Vo/5fqqkFcdRYsGcKf50WMPpjjFZS5d76fn3YCo2njKwQ==
-
-react-test-renderer@19.1.0:
-  version "19.1.0"
-  resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-19.1.0.tgz#89e1baa9e45a6da064b9760f92251d5b8e1f34ab"
-  integrity sha512-jXkSl3CpvPYEF+p/eGDLB4sPoDX8pKkYvRl9+rR8HxLY0X04vW7hCm1/0zHoUSjPZ3bDa+wXWNTDVIw/R8aDVw==
-  dependencies:
-    react-is "^19.1.0"
-    scheduler "^0.26.0"
 
 react@19.1.0:
   version "19.1.0"
