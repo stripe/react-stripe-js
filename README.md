@@ -14,7 +14,7 @@ version, we recommend using legacy
 
 ## Getting started
 
-- [Build a custom checkout page](https://stripe.com/docs/payments/custom-checkout)
+- [Build a custom payment form using the Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
 - [Add React Stripe.js to your React app](https://stripe.com/docs/stripe-js/react#setup)
 - [Try it out using CodeSandbox](https://codesandbox.io/s/react-stripe-official-q1loc?fontsize=14&hidenavigation=1&theme=dark)
 
@@ -36,9 +36,11 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 
 #### Using hooks
 
-> **Building a checkout page?** This is Stripe's recommended integration. Create
-> a [Checkout Session](https://stripe.com/docs/payments/custom-checkout) on your
-> server and pass its `clientSecret` to `CheckoutElementsProvider`.
+> **Building a custom payment form?** Use the
+> [Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
+> integration shown below — the recommended approach for most integrations.
+> Create a Checkout Session on your server and pass its `clientSecret` to
+> `CheckoutElementsProvider`.
 
 ```jsx
 import React, {useState} from 'react';
