@@ -36,9 +36,9 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 
 #### Using hooks
 
-> **Building a checkout page?** This is Stripe's recommended integration.
-> Create a [Checkout Session](https://stripe.com/docs/payments/custom-checkout)
-> on your server and pass its `clientSecret` to `CheckoutElementsProvider`.
+> **Building a checkout page?** This is Stripe's recommended integration. Create
+> a [Checkout Session](https://stripe.com/docs/payments/custom-checkout) on your
+> server and pass its `clientSecret` to `CheckoutElementsProvider`.
 
 ```jsx
 import React, {useState} from 'react';
