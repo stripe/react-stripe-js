@@ -42,6 +42,32 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 > Create a Checkout Session on your server with `ui_mode: 'elements'` and pass
 > its `clientSecret` to `CheckoutElementsProvider`.
 
+Your server endpoint should create a Checkout Session and return its client
+secret:
+
+```js
+// POST /create-checkout-session
+const session = await stripe.checkout.sessions.create({
+  ui_mode: 'elements',
+  mode: 'payment',
+  return_url: 'https://example.com/order/123/complete',
+  line_items: [
+    {
+      price_data: {
+        currency: 'usd',
+        product_data: {name: 'T-shirt'},
+        unit_amount: 1099,
+      },
+      quantity: 1,
+    },
+  ],
+});
+
+res.json({clientSecret: session.client_secret});
+```
+
+Client:
+
 ```jsx
 import React, {useState} from 'react';
 import {createRoot} from 'react-dom/client';
