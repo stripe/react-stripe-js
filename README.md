@@ -39,8 +39,8 @@ npm install @stripe/react-stripe-js @stripe/stripe-js
 > **Building a custom payment form?** Use the
 > [Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
 > integration shown below — the recommended approach for most integrations.
-> Create a Checkout Session on your server and pass its `clientSecret` to
-> `CheckoutElementsProvider`.
+> Create a Checkout Session on your server with `ui_mode: 'elements'` and pass
+> its `clientSecret` to `CheckoutElementsProvider`.
 
 ```jsx
 import React, {useState} from 'react';
@@ -87,7 +87,8 @@ const CheckoutForm = () => {
   );
 };
 
-const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+// Use the publishable key for the same account that created the Checkout Session.
+const stripePromise = loadStripe('pk_test_...');
 
 const App = () => {
   // Fetch clientSecret from your server when the page loads.
