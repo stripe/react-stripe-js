@@ -79,9 +79,10 @@ export const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
   options,
   children,
 }: PrivateElementsProps) => {
-  const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
-    rawStripeProp,
-  ]);
+  const parsed = React.useMemo(
+    () => parseStripeProp(rawStripeProp),
+    [rawStripeProp]
+  );
 
   // For a sync stripe instance, initialize into context
   const [ctx, setContext] = React.useState<ElementsContextValue>(() => ({

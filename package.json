@@ -116,7 +116,7 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "fork-ts-checker-webpack-plugin": "^4.0.3",
     "jest": "^25.1.0",
-    "prettier": "^1.19.1",
+    "prettier": "^2.8.8",
     "react": "18.1.0",
     "react-docgen-typescript-loader": "^3.6.0",
     "react-dom": "18.1.0",

@@ -50,9 +50,10 @@ export const IssuingDisclosure: FunctionComponent<IssuingDisclosureProps> = ({
   const learnMoreLink = options?.learnMoreLink;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
-    rawStripeProp,
-  ]);
+  const parsed = React.useMemo(
+    () => parseStripeProp(rawStripeProp),
+    [rawStripeProp]
+  );
   const [stripeState, setStripeState] = React.useState<stripeJs.Stripe | null>(
     parsed.tag === 'sync' ? parsed.stripe : null
   );
@@ -96,10 +97,9 @@ export const IssuingDisclosure: FunctionComponent<IssuingDisclosureProps> = ({
         return;
       }
 
-      const {
-        htmlElement: disclosureContent,
-        error,
-      } = await (stripeState as any).createIssuingDisclosure({
+      const {htmlElement: disclosureContent, error} = await (
+        stripeState as any
+      ).createIssuingDisclosure({
         issuingProgramID,
         publicCardProgramName,
         learnMoreLink,

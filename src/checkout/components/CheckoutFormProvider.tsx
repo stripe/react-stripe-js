@@ -33,9 +33,9 @@ interface PrivateCheckoutFormProviderProps {
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `CheckoutFormProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
 
-export const CheckoutFormProvider: FunctionComponent<PropsWithChildren<
-  CheckoutFormProviderProps
->> = (({
+export const CheckoutFormProvider: FunctionComponent<
+  PropsWithChildren<CheckoutFormProviderProps>
+> = (({
   stripe: rawStripeProp,
   options,
   children,
