@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe-js",
-  "version": "6.8.0",
+  "version": "6.8.1",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.mjs",
@@ -96,7 +96,6 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@storybook/react": "^10.2.3",
     "@storybook/react-webpack5": "^10.2.3",
-    "storybook": "^10.2.3",
     "@stripe/stripe-js": "^9.10.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
@@ -128,6 +127,7 @@
     "rimraf": "^2.6.2",
     "rollup": "^4.12.0",
     "rollup-plugin-ts": "^3.4.5",
+    "storybook": "^10.2.3",
     "ts-jest": "^25.1.0",
     "ts-loader": "^6.2.1",
     "typescript": "^4.1.2"
