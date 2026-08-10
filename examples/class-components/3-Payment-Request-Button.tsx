@@ -2,8 +2,13 @@
 // Learn how to accept a payment with the PaymentRequestButton using the official Stripe docs.
 // https://stripe.com/docs/stripe-js/elements/payment-request-button#react
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
+import {Component} from 'react';
+import {
+  loadStripe,
+  Stripe,
+  PaymentMethod,
+  PaymentRequest,
+} from '@stripe/stripe-js';
 import {
   PaymentRequestButtonElement,
   Elements,
@@ -33,14 +38,27 @@ const NotAvailableResult = () => (
 const ELEMENT_OPTIONS = {
   style: {
     paymentRequestButton: {
-      type: 'buy',
-      theme: 'dark',
+      type: 'buy' as const,
+      theme: 'dark' as const,
     },
   },
 };
 
-class CheckoutForm extends React.Component {
-  constructor(props) {
+interface CheckoutFormProps {
+  stripe: Stripe | null;
+}
+
+interface CheckoutFormState {
+  canMakePayment: boolean;
+  hasCheckedAvailability: boolean;
+  errorMessage: string | null;
+  paymentMethod?: PaymentMethod;
+}
+
+class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
+  paymentRequest?: PaymentRequest;
+
+  constructor(props: CheckoutFormProps) {
     super(props);
     this.state = {
       canMakePayment: false,
@@ -58,7 +76,7 @@ class CheckoutForm extends React.Component {
     }
   }
 
-  async createPaymentRequest(stripe) {
+  async createPaymentRequest(stripe: Stripe) {
     this.paymentRequest = stripe.paymentRequest({
       country: 'US',
       currency: 'usd',
@@ -90,7 +108,7 @@ class CheckoutForm extends React.Component {
     } = this.state;
     return (
       <form>
-        {canMakePayment && (
+        {canMakePayment && this.paymentRequest && (
           <PaymentRequestButtonElement
             onClick={(event) => {
               if (paymentMethod) {
