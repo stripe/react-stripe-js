@@ -30,11 +30,11 @@ version, we recommend using legacy
 For a new custom checkout page, we recommend the
 [Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
 with `ui_mode: 'elements'`. This lets you combine Stripe Elements with your own
-React layout while Checkout Sessions manages the checkout state. If you're
-maintaining an existing integration or need to manage payment state directly,
-see the
-[PaymentIntents integration](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=payment-intents)
-guide.
+React layout while Checkout Sessions manages the checkout state. If you want to
+own every part of your checkout, the lower-level
+[Payment Intents API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=payment-intents)
+provides more fine-grained control, but requires significantly more code and
+ongoing maintenance.
 
 First, install React Stripe.js and
 [Stripe.js](https://github.com/stripe/stripe-js).
