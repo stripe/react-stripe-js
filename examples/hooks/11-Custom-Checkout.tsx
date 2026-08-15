@@ -1,8 +1,8 @@
 import type {
   ChangeEventHandler,
   Dispatch,
-  FormEventHandler,
   SetStateAction,
+  SubmitEventHandler,
 } from 'react';
 import {useEffect, useState} from 'react';
 import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
@@ -68,7 +68,7 @@ const CheckoutForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setStatus(undefined);
 
@@ -132,7 +132,7 @@ const App = () => {
     useState<Promise<Stripe | null> | null>();
   const [theme, setTheme] = useState<Appearance['theme']>('stripe');
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(loadStripe(pk));
   };
