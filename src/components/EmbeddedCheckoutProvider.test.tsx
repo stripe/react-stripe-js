@@ -52,6 +52,28 @@ describe('EmbeddedCheckoutProvider', () => {
     expect(result.current.embeddedCheckout).toBe(mockEmbeddedCheckout);
   });
 
+  it('registers react-stripe-js as a wrapper with the resolved Stripe instance', async () => {
+    const wrapper = ({children}: {children?: React.ReactNode}) => (
+      <EmbeddedCheckoutProvider stripe={mockStripe} options={fakeOptions}>
+        {children}
+      </EmbeddedCheckoutProvider>
+    );
+
+    renderHook(() => useEmbeddedCheckoutContext(), {wrapper});
+
+    await act(() => mockEmbeddedCheckoutPromise);
+
+    expect(mockStripe._registerWrapper).toHaveBeenCalledWith(
+      expect.objectContaining({name: 'react-stripe-js'})
+    );
+    expect(mockStripe.registerAppInfo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'react-stripe-js',
+        url: 'https://stripe.com/docs/stripe-js/react',
+      })
+    );
+  });
+
   it('only creates elements once', async () => {
     const TestConsumerComponent = () => {
       const _ = useEmbeddedCheckoutContext();
