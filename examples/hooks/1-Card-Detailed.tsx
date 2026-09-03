@@ -6,7 +6,7 @@ import type {
   ChangeEvent,
   ChangeEventHandler,
   ReactNode,
-  FormEventHandler,
+  SubmitEventHandler,
 } from 'react';
 import {useState} from 'react';
 import {
@@ -154,7 +154,7 @@ const CheckoutForm = () => {
     name: '',
   });
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     if (!stripe || !elements) {
