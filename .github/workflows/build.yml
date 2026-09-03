@@ -4,6 +4,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,3 +21,21 @@ jobs:
     - run: yarn run test:unit
     - run: yarn run build
     - run: yarn run test:package-types
+  min-peer-deps:
+    # Pin @stripe/stripe-js to the peer floor and typecheck + build against it,
+    # to confirm using an absent type/API fails CI. You likely need to bump the
+    # stripe-js peer dependency if this test fails.
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+    - run: yarn install --frozen-lockfile
+    - name: Pin @stripe/stripe-js to declared peer floor
+      run: |
+        FLOOR=$(node -p "require('./package.json').peerDependencies['@stripe/stripe-js'].match(/>=\s*([0-9]+\.[0-9]+\.[0-9]+)/)[1]")
+        echo "Typechecking against @stripe/stripe-js@$FLOOR"
+        yarn add --dev --exact "@stripe/stripe-js@$FLOOR"
+    - run: yarn run typecheck
+    - run: yarn run build
