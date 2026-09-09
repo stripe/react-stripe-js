@@ -58,5 +58,3 @@ const LinkSignupElementTypeTest = () => {
 test('Link Signup Element type assertions compile', () => {
   expect(LinkSignupElementTypeTest).toBeDefined();
 });
-
-export default LinkSignupElementTypeTest;

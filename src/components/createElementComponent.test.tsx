@@ -892,6 +892,40 @@ describe('createElementComponent', () => {
     });
 
     describe('LinkSignupElement', () => {
+      const mockHandlers = () => ({
+        onFocus: jest.fn(),
+        onBlur: jest.fn(),
+        onEscape: jest.fn(),
+        onLoaderStart: jest.fn(),
+        onLoadError: jest.fn(),
+        onReady: jest.fn(),
+      });
+
+      const expectEvents = (handlers: ReturnType<typeof mockHandlers>) => {
+        const focus = {elementType: 'linkSignup'};
+        const blur = {elementType: 'linkSignup'};
+        const escape = {elementType: 'linkSignup'};
+        const loaderStart = {elementType: 'linkSignup'};
+        const loadError = {
+          elementType: 'linkSignup',
+          error: {type: 'validation_error'},
+        };
+
+        simulateEvent('focus', focus);
+        simulateEvent('blur', blur);
+        simulateEvent('escape', escape);
+        simulateEvent('loaderstart', loaderStart);
+        simulateEvent('loaderror', loadError);
+        simulateEvent('ready', {elementType: 'linkSignup'});
+
+        expect(handlers.onFocus).toHaveBeenCalledWith(focus);
+        expect(handlers.onBlur).toHaveBeenCalledWith(blur);
+        expect(handlers.onEscape).toHaveBeenCalledWith(escape);
+        expect(handlers.onLoaderStart).toHaveBeenCalledWith(loaderStart);
+        expect(handlers.onLoadError).toHaveBeenCalledWith(loadError);
+        expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+      };
+
       it('creates with initial options and is discoverable through useElements', async () => {
         const options = {
           defaultValues: {email: 'jenny.rosen@example.com'},
@@ -920,62 +954,22 @@ describe('createElementComponent', () => {
       });
 
       it('propagates every supported event and passes the native Element on ready', () => {
-        const onFocus = jest.fn();
-        const onBlur = jest.fn();
-        const onEscape = jest.fn();
-        const onLoaderStart = jest.fn();
-        const onLoadError = jest.fn();
-        const onReady = jest.fn();
+        const handlers = mockHandlers();
 
         render(
           <Elements stripe={mockStripe}>
-            <LinkSignupElement
-              onFocus={onFocus}
-              onBlur={onBlur}
-              onEscape={onEscape}
-              onLoaderStart={onLoaderStart}
-              onLoadError={onLoadError}
-              onReady={onReady}
-            />
+            <LinkSignupElement {...handlers} />
           </Elements>
         );
 
-        const focusEvent = {elementType: 'linkSignup'};
-        const blurEvent = {elementType: 'linkSignup'};
-        const escapeEvent = {elementType: 'linkSignup'};
-        const loaderStartEvent = {elementType: 'linkSignup'};
-        const loadErrorEvent = {
-          elementType: 'linkSignup',
-          error: {type: 'validation_error'},
-        };
-
-        simulateEvent('focus', focusEvent);
-        simulateEvent('blur', blurEvent);
-        simulateEvent('escape', escapeEvent);
-        simulateEvent('loaderstart', loaderStartEvent);
-        simulateEvent('loaderror', loadErrorEvent);
-        simulateEvent('ready', {elementType: 'linkSignup'});
-
-        expect(onFocus).toHaveBeenCalledWith(focusEvent);
-        expect(onBlur).toHaveBeenCalledWith(blurEvent);
-        expect(onEscape).toHaveBeenCalledWith(escapeEvent);
-        expect(onLoaderStart).toHaveBeenCalledWith(loaderStartEvent);
-        expect(onLoadError).toHaveBeenCalledWith(loadErrorEvent);
-        expect(onReady).toHaveBeenCalledWith(mockElement);
+        expectEvents(handlers);
       });
 
       it('creates through Checkout and propagates all supported events', async () => {
         const options = {
           defaultValues: {email: 'jenny.rosen@example.com'},
         };
-        const handlers = {
-          onFocus: jest.fn(),
-          onBlur: jest.fn(),
-          onEscape: jest.fn(),
-          onLoaderStart: jest.fn(),
-          onLoadError: jest.fn(),
-          onReady: jest.fn(),
-        };
+        const handlers = mockHandlers();
         mockCheckoutSdk.createLinkSignupElement.mockReturnValue(mockElement);
 
         render(
@@ -993,28 +987,7 @@ describe('createElementComponent', () => {
           )
         );
 
-        const focusEvent = {elementType: 'linkSignup'};
-        const blurEvent = {elementType: 'linkSignup'};
-        const escapeEvent = {elementType: 'linkSignup'};
-        const loaderStartEvent = {elementType: 'linkSignup'};
-        const loadErrorEvent = {
-          elementType: 'linkSignup',
-          error: {type: 'validation_error'},
-        };
-
-        simulateEvent('focus', focusEvent);
-        simulateEvent('blur', blurEvent);
-        simulateEvent('escape', escapeEvent);
-        simulateEvent('loaderstart', loaderStartEvent);
-        simulateEvent('loaderror', loadErrorEvent);
-        simulateEvent('ready', {elementType: 'linkSignup'});
-
-        expect(handlers.onFocus).toHaveBeenCalledWith(focusEvent);
-        expect(handlers.onBlur).toHaveBeenCalledWith(blurEvent);
-        expect(handlers.onEscape).toHaveBeenCalledWith(escapeEvent);
-        expect(handlers.onLoaderStart).toHaveBeenCalledWith(loaderStartEvent);
-        expect(handlers.onLoadError).toHaveBeenCalledWith(loadErrorEvent);
-        expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+        expectEvents(handlers);
       });
 
       it('is discoverable through useCheckout using the created Element', async () => {
