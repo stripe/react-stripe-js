@@ -162,6 +162,8 @@ export const LinkAuthenticationElement: LinkAuthenticationElementComponent = cre
 /**
  * Requires beta access:
  * Contact [Stripe support](https://support.stripe.com/) for more information.
+ *
+ * Requires `@stripe/stripe-js` version 7.10.0 or later.
  */
 export const LinkSignupElement: LinkSignupElementComponent = createElementComponent(
   'linkSignup',

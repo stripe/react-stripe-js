@@ -329,17 +329,65 @@ export type LinkAuthenticationElementComponent = FunctionComponent<
   LinkAuthenticationElementProps
 >;
 
+type LinkSignupElementEventMap = {
+  ready: {elementType: 'linkSignup'};
+  focus: {elementType: 'linkSignup'};
+  blur: {elementType: 'linkSignup'};
+  escape: {elementType: 'linkSignup'};
+  loaderstart: {elementType: 'linkSignup'};
+  loaderror: {elementType: 'linkSignup'; error: StripeError};
+};
+
+/**
+ * Configuration options for `LinkSignupElement`.
+ *
+ * Using `LinkSignupElement` requires `@stripe/stripe-js` version 7.10.0 or later.
+ */
+export interface LinkSignupElementOptions {
+  defaultValues?: {
+    email?: string;
+    name?: string;
+    phone?: string;
+  };
+}
+
+/**
+ * The underlying Element instance returned by `LinkSignupElement`.
+ *
+ * Using `LinkSignupElement` requires `@stripe/stripe-js` version 7.10.0 or later.
+ */
+export type LinkSignupElementInstance = {
+  mount(domElement: string | HTMLElement): void;
+  blur(): void;
+  clear(): void;
+  destroy(): void;
+  focus(): void;
+  unmount(): void;
+  on<EventType extends keyof LinkSignupElementEventMap>(
+    eventType: EventType,
+    handler: (event: LinkSignupElementEventMap[EventType]) => any
+  ): LinkSignupElementInstance;
+  once<EventType extends keyof LinkSignupElementEventMap>(
+    eventType: EventType,
+    handler: (event: LinkSignupElementEventMap[EventType]) => any
+  ): LinkSignupElementInstance;
+  off<EventType extends keyof LinkSignupElementEventMap>(
+    eventType: EventType,
+    handler?: (event: LinkSignupElementEventMap[EventType]) => any
+  ): LinkSignupElementInstance;
+};
+
 export interface LinkSignupElementProps extends ElementProps {
   /**
    * An object containing Element configuration options.
    */
-  options?: stripeJs.StripeLinkSignupElementOptions;
+  options?: LinkSignupElementOptions;
 
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
    * Called with a reference to the underlying Element instance.
    */
-  onReady?: (element: stripeJs.StripeLinkSignupElement) => any;
+  onReady?: (element: LinkSignupElementInstance) => any;
 
   /**
    * Triggered when the escape key is pressed within the Element.
@@ -823,7 +871,7 @@ declare module '@stripe/stripe-js' {
      */
     getElement(
       component: LinkSignupElementComponent
-    ): stripeJs.StripeLinkSignupElement | null;
+    ): LinkSignupElementInstance | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.

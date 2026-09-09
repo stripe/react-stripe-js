@@ -12,6 +12,7 @@ import {
   ElementsContextValue,
   parseElementsContext,
 } from './Elements';
+import {LinkSignupElementInstance} from '../types';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 
 interface CheckoutSdkContextValue {
@@ -38,9 +39,14 @@ export const parseCheckoutSdkContext = (
 };
 
 type StripeCheckoutActions = Omit<
-  Omit<stripeJs.StripeCheckout, 'session'>,
-  'on'
->;
+  stripeJs.StripeCheckout,
+  'session' | 'on' | 'getLinkSignupElement'
+> & {
+  /**
+   * Requires `@stripe/stripe-js` version 7.10.0 or later.
+   */
+  getLinkSignupElement(): LinkSignupElementInstance | null;
+};
 
 export interface CheckoutContextValue
   extends StripeCheckoutActions,

@@ -1,14 +1,16 @@
 import React from 'react';
-import {LinkSignupElement, LinkSignupElementProps, useCheckout} from '../index';
 import {
-  StripeElements,
-  StripeError,
-  StripeLinkSignupElement,
-} from '@stripe/stripe-js';
+  LinkSignupElement,
+  LinkSignupElementInstance,
+  LinkSignupElementOptions,
+  LinkSignupElementProps,
+  useCheckout,
+} from '../index';
+import {StripeElements, StripeError} from '@stripe/stripe-js';
 
 declare const elements: StripeElements;
 
-const onReady = (element: StripeLinkSignupElement) => {
+const onReady = (element: LinkSignupElementInstance) => {
   element.focus();
 
   // @ts-expect-error Link Signup does not expose entered values.
@@ -17,20 +19,21 @@ const onReady = (element: StripeLinkSignupElement) => {
 
 const LinkSignupElementTypeTest = () => {
   const checkout = useCheckout();
-  const checkoutElement: StripeLinkSignupElement | null = checkout.getLinkSignupElement();
-  const regularElement: StripeLinkSignupElement | null = elements.getElement(
+  const checkoutElement: LinkSignupElementInstance | null = checkout.getLinkSignupElement();
+  const regularElement: LinkSignupElementInstance | null = elements.getElement(
     LinkSignupElement
   );
+  const options: LinkSignupElementOptions = {
+    defaultValues: {
+      email: 'jenny.rosen@example.com',
+      name: 'Jenny Rosen',
+      phone: '+15555555555',
+    },
+  };
   const props: LinkSignupElementProps = {
     id: 'link-signup',
     className: 'LinkSignupElement',
-    options: {
-      defaultValues: {
-        email: 'jenny.rosen@example.com',
-        name: 'Jenny Rosen',
-        phone: '+15555555555',
-      },
-    },
+    options,
     onReady,
     onFocus: (event) => event.elementType,
     onBlur: (event) => event.elementType,
