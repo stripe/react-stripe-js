@@ -25,6 +25,7 @@ import {
   TaxIdElementComponent,
   ContactDetailsElementComponent,
   TermsElementComponent,
+  LinkSignupElementComponent,
 } from './types';
 
 export const CurrencySelectorElement: CurrencySelectorElementComponent =
@@ -51,6 +52,17 @@ export const TaxIdElement: TaxIdElementComponent = createElementComponent(
 
 export const ContactDetailsElement: ContactDetailsElementComponent =
   createElementComponent('contactDetails', isServer);
+
+/**
+ * Requires beta access and must be used inside `CheckoutElementsProvider`.
+ * It is not supported inside `CheckoutFormProvider`.
+ *
+ * Options are read only when the Element mounts. Changing them after mount is
+ * silently ignored because the Element has no `update()` method. Remount the
+ * Element to apply new options.
+ */
+export const LinkSignupElement: LinkSignupElementComponent =
+  createElementComponent('linkSignup', isServer);
 
 const AddressElementBase = createElementComponent('address', isServer) as any;
 

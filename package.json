@@ -96,7 +96,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@storybook/react": "^10.2.3",
     "@storybook/react-webpack5": "^10.2.3",
-    "@stripe/stripe-js": "^9.10.0",
+    "@stripe/stripe-js": "^9.16.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
     "@testing-library/react-hooks": "^8.0.0",
@@ -136,7 +136,7 @@
     "@types/react": "18.0.5"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": ">=9.10.0 <10.0.0",
+    "@stripe/stripe-js": ">=9.16.0 <10.0.0",
     "react": ">=16.8.0 <20.0.0",
     "react-dom": ">=16.8.0 <20.0.0"
   }

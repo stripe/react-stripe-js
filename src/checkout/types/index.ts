@@ -7,6 +7,7 @@ import {
   CheckoutFormProps as RootCheckoutFormProps,
   ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
   AddressElementProps as RootAddressElementProps,
+  LinkSignupElementProps as RootLinkSignupElementProps,
 } from '../../types';
 
 export interface CurrencySelectorElementProps extends ElementProps {
@@ -37,6 +38,16 @@ export interface CurrencySelectorElementProps extends ElementProps {
 
 export type CurrencySelectorElementComponent =
   FunctionComponent<CurrencySelectorElementProps>;
+
+export type LinkSignupElementProps = Omit<
+  RootLinkSignupElementProps,
+  'options'
+> & {
+  options?: stripeJs.StripeCheckoutLinkSignupElementOptions;
+};
+
+export type LinkSignupElementComponent =
+  FunctionComponent<LinkSignupElementProps>;
 
 export type BillingAddressElementProps = Omit<
   RootAddressElementProps,

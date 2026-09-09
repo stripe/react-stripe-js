@@ -14,6 +14,7 @@ import {
   IssuingCardNumberDisplayElementComponent,
   IssuingCardPinDisplayElementComponent,
   LinkAuthenticationElementComponent,
+  LinkSignupElementComponent,
   PaymentElementComponent,
   PaymentRequestButtonElementComponent,
   ShippingAddressElementComponent,
@@ -109,6 +110,13 @@ export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
  */
 export const LinkAuthenticationElement: LinkAuthenticationElementComponent =
   createElementComponent('linkAuthentication', isServer);
+
+/**
+ * Requires beta access.
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const LinkSignupElement: LinkSignupElementComponent =
+  createElementComponent('linkSignup', isServer);
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components

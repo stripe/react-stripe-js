@@ -181,6 +181,15 @@ const createElementComponent = (
             case 'contactDetails':
               newElement = elementsSdk.createContactDetailsElement();
               break;
+            case 'linkSignup':
+              if ('createLinkSignupElement' in checkoutSdk) {
+                newElement = checkoutSdk.createLinkSignupElement(options);
+              } else {
+                throw new Error(
+                  '<LinkSignupElement> requires <CheckoutElementsProvider> and is not supported inside <CheckoutFormProvider>.'
+                );
+              }
+              break;
             case 'terms':
               newElement = elementsSdk.createTermsElement(
                 options as stripeJs.StripeCheckoutTermsElementOptions
