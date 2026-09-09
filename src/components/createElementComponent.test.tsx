@@ -964,7 +964,7 @@ describe('createElementComponent', () => {
         expect(onReady).toHaveBeenCalledWith(mockElement);
       });
 
-      it('creates through Checkout with all events and is discoverable through useCheckout', async () => {
+      it('creates through Checkout and propagates all supported events', async () => {
         const options = {
           defaultValues: {email: 'jenny.rosen@example.com'},
         };
@@ -977,15 +977,6 @@ describe('createElementComponent', () => {
           onReady: jest.fn(),
         };
         mockCheckoutSdk.createLinkSignupElement.mockReturnValue(mockElement);
-        mockCheckoutSdk.getLinkSignupElement.mockReturnValue(mockElement);
-        let foundElement: unknown;
-        const Consumer = () => {
-          const checkout = CheckoutModule.useCheckout();
-          React.useEffect(() => {
-            foundElement = checkout.getLinkSignupElement();
-          }, [checkout]);
-          return null;
-        };
 
         render(
           <CheckoutProvider
@@ -993,7 +984,6 @@ describe('createElementComponent', () => {
             options={{fetchClientSecret: async () => 'cs_123'}}
           >
             <LinkSignupElement options={options} {...handlers} />
-            <Consumer />
           </CheckoutProvider>
         );
 
@@ -1002,9 +992,6 @@ describe('createElementComponent', () => {
             options
           )
         );
-        const createdElement =
-          mockCheckoutSdk.createLinkSignupElement.mock.results[0].value;
-        await waitFor(() => expect(foundElement).toBe(createdElement));
 
         const focusEvent = {elementType: 'linkSignup'};
         const blurEvent = {elementType: 'linkSignup'};
@@ -1028,6 +1015,36 @@ describe('createElementComponent', () => {
         expect(handlers.onLoaderStart).toHaveBeenCalledWith(loaderStartEvent);
         expect(handlers.onLoadError).toHaveBeenCalledWith(loadErrorEvent);
         expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+      });
+
+      it('is discoverable through useCheckout using the created Element', async () => {
+        let foundElement: unknown;
+        const Consumer = () => {
+          const checkout = CheckoutModule.useCheckout();
+          React.useEffect(() => {
+            foundElement = checkout.getLinkSignupElement();
+          }, [checkout]);
+          return null;
+        };
+
+        render(
+          <CheckoutProvider
+            stripe={mockStripe}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          >
+            <LinkSignupElement />
+            <Consumer />
+          </CheckoutProvider>
+        );
+
+        await waitFor(() =>
+          expect(mockCheckoutSdk.createLinkSignupElement).toHaveBeenCalledTimes(
+            1
+          )
+        );
+        const createdElement =
+          mockCheckoutSdk.createLinkSignupElement.mock.results[0].value;
+        await waitFor(() => expect(foundElement).toBe(createdElement));
       });
 
       it('does not update or recreate a native Element without update', async () => {
