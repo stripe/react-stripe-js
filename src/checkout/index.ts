@@ -56,10 +56,7 @@ export const ContactDetailsElement: ContactDetailsElementComponent =
 /**
  * Requires beta access and must be used inside `CheckoutElementsProvider`.
  * It is not supported inside `CheckoutFormProvider`.
- *
- * Options are read only when the Element mounts. Changing them after mount is
- * silently ignored because the Element has no `update()` method. Remount the
- * Element to apply new options.
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
  */
 export const LinkSignupElement: LinkSignupElementComponent =
   createElementComponent('linkSignup', isServer);

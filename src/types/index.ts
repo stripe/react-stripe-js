@@ -247,13 +247,14 @@ export interface LinkAuthenticationElementProps extends ElementProps {
 export type LinkAuthenticationElementComponent =
   FunctionComponent<LinkAuthenticationElementProps>;
 
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
 export interface LinkSignupElementProps extends ElementProps {
   /**
    * An object containing Element configuration options.
    *
-   * Options are read only when the Element mounts. Changing this prop after
-   * mount is silently ignored because the Element has no `update()` method.
-   * Remount the Element to apply new options.
    */
   options?: stripeJs.StripeLinkSignupElementOptions;
 
