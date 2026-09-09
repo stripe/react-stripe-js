@@ -5,6 +5,7 @@ import * as ElementsModule from './Elements';
 import * as CheckoutModule from './CheckoutProvider';
 import createElementComponent from './createElementComponent';
 import * as mocks from '../../test/mocks';
+import {LinkSignupElement} from '../index';
 import {
   CardElementComponent,
   PaymentElementComponent,
@@ -887,6 +888,191 @@ describe('createElementComponent', () => {
 
       expect(mockElement.update).toHaveBeenCalledWith({
         style: {base: {fontSize: '30px'}},
+      });
+    });
+
+    describe('LinkSignupElement', () => {
+      it('creates with initial options and is discoverable through useElements', async () => {
+        const options = {
+          defaultValues: {email: 'jenny.rosen@example.com'},
+        };
+        const linkElements = mocks.mockElements();
+        mockStripe.elements.mockReturnValue(linkElements);
+        let foundElement: unknown;
+        const Consumer = () => {
+          const elements = ElementsModule.useElements();
+          React.useEffect(() => {
+            foundElement = elements?.getElement(LinkSignupElement);
+          }, [elements]);
+          return null;
+        };
+
+        render(
+          <Elements stripe={mockStripe}>
+            <LinkSignupElement options={options} />
+            <Consumer />
+          </Elements>
+        );
+
+        expect(linkElements.create).toHaveBeenCalledWith('linkSignup', options);
+        const createdElement = linkElements.create.mock.results[0].value;
+        await waitFor(() => expect(foundElement).toBe(createdElement));
+      });
+
+      it('propagates every supported event and passes the native Element on ready', () => {
+        const onFocus = jest.fn();
+        const onBlur = jest.fn();
+        const onEscape = jest.fn();
+        const onLoaderStart = jest.fn();
+        const onLoadError = jest.fn();
+        const onReady = jest.fn();
+
+        render(
+          <Elements stripe={mockStripe}>
+            <LinkSignupElement
+              onFocus={onFocus}
+              onBlur={onBlur}
+              onEscape={onEscape}
+              onLoaderStart={onLoaderStart}
+              onLoadError={onLoadError}
+              onReady={onReady}
+            />
+          </Elements>
+        );
+
+        const focusEvent = {elementType: 'linkSignup'};
+        const blurEvent = {elementType: 'linkSignup'};
+        const escapeEvent = {elementType: 'linkSignup'};
+        const loaderStartEvent = {elementType: 'linkSignup'};
+        const loadErrorEvent = {
+          elementType: 'linkSignup',
+          error: {type: 'validation_error'},
+        };
+
+        simulateEvent('focus', focusEvent);
+        simulateEvent('blur', blurEvent);
+        simulateEvent('escape', escapeEvent);
+        simulateEvent('loaderstart', loaderStartEvent);
+        simulateEvent('loaderror', loadErrorEvent);
+        simulateEvent('ready', {elementType: 'linkSignup'});
+
+        expect(onFocus).toHaveBeenCalledWith(focusEvent);
+        expect(onBlur).toHaveBeenCalledWith(blurEvent);
+        expect(onEscape).toHaveBeenCalledWith(escapeEvent);
+        expect(onLoaderStart).toHaveBeenCalledWith(loaderStartEvent);
+        expect(onLoadError).toHaveBeenCalledWith(loadErrorEvent);
+        expect(onReady).toHaveBeenCalledWith(mockElement);
+      });
+
+      it('creates through Checkout with all events and is discoverable through useCheckout', async () => {
+        const options = {
+          defaultValues: {email: 'jenny.rosen@example.com'},
+        };
+        const handlers = {
+          onFocus: jest.fn(),
+          onBlur: jest.fn(),
+          onEscape: jest.fn(),
+          onLoaderStart: jest.fn(),
+          onLoadError: jest.fn(),
+          onReady: jest.fn(),
+        };
+        mockCheckoutSdk.createLinkSignupElement.mockReturnValue(mockElement);
+        mockCheckoutSdk.getLinkSignupElement.mockReturnValue(mockElement);
+        let foundElement: unknown;
+        const Consumer = () => {
+          const checkout = CheckoutModule.useCheckout();
+          React.useEffect(() => {
+            foundElement = checkout.getLinkSignupElement();
+          }, [checkout]);
+          return null;
+        };
+
+        render(
+          <CheckoutProvider
+            stripe={mockStripe}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          >
+            <LinkSignupElement options={options} {...handlers} />
+            <Consumer />
+          </CheckoutProvider>
+        );
+
+        await waitFor(() =>
+          expect(mockCheckoutSdk.createLinkSignupElement).toHaveBeenCalledWith(
+            options
+          )
+        );
+        const createdElement =
+          mockCheckoutSdk.createLinkSignupElement.mock.results[0].value;
+        await waitFor(() => expect(foundElement).toBe(createdElement));
+
+        const focusEvent = {elementType: 'linkSignup'};
+        const blurEvent = {elementType: 'linkSignup'};
+        const escapeEvent = {elementType: 'linkSignup'};
+        const loaderStartEvent = {elementType: 'linkSignup'};
+        const loadErrorEvent = {
+          elementType: 'linkSignup',
+          error: {type: 'validation_error'},
+        };
+
+        simulateEvent('focus', focusEvent);
+        simulateEvent('blur', blurEvent);
+        simulateEvent('escape', escapeEvent);
+        simulateEvent('loaderstart', loaderStartEvent);
+        simulateEvent('loaderror', loadErrorEvent);
+        simulateEvent('ready', {elementType: 'linkSignup'});
+
+        expect(handlers.onFocus).toHaveBeenCalledWith(focusEvent);
+        expect(handlers.onBlur).toHaveBeenCalledWith(blurEvent);
+        expect(handlers.onEscape).toHaveBeenCalledWith(escapeEvent);
+        expect(handlers.onLoaderStart).toHaveBeenCalledWith(loaderStartEvent);
+        expect(handlers.onLoadError).toHaveBeenCalledWith(loadErrorEvent);
+        expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+      });
+
+      it('does not update or recreate a native Element without update', async () => {
+        const {
+          update: _update,
+          ...linkSignupElementWithoutUpdate
+        } = mocks.mockElement();
+        mockCheckoutSdk.createLinkSignupElement.mockReturnValue(
+          linkSignupElementWithoutUpdate
+        );
+
+        const {rerender} = render(
+          <CheckoutProvider
+            stripe={mockStripe}
+            options={{fetchClientSecret: async () => 'cs_123'}}
+          >
+            <LinkSignupElement
+              options={{
+                defaultValues: {email: 'jenny.rosen@example.com'},
+              }}
+            />
+          </CheckoutProvider>
+        );
+        await waitFor(() =>
+          expect(linkSignupElementWithoutUpdate.mount).toHaveBeenCalledTimes(1)
+        );
+
+        expect(() =>
+          rerender(
+            <CheckoutProvider
+              stripe={mockStripe}
+              options={{fetchClientSecret: async () => 'cs_123'}}
+            >
+              <LinkSignupElement
+                options={{defaultValues: {email: 'jane.doe@example.com'}}}
+              />
+            </CheckoutProvider>
+          )
+        ).not.toThrow();
+
+        expect(mockCheckoutSdk.createLinkSignupElement).toHaveBeenCalledTimes(
+          1
+        );
+        expect(linkSignupElementWithoutUpdate.mount).toHaveBeenCalledTimes(1);
+        expect(linkSignupElementWithoutUpdate.destroy).not.toHaveBeenCalled();
       });
     });
 

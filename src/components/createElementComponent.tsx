@@ -157,6 +157,9 @@ const createElementComponent = (
                 options as any
               ) as stripeJs.StripeExpressCheckoutElement;
               break;
+            case 'linkSignup':
+              newElement = checkoutSdk.createLinkSignupElement(options);
+              break;
             case 'currencySelector':
               newElement = checkoutSdk.createCurrencySelectorElement();
               break;

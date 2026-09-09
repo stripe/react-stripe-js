@@ -12,7 +12,11 @@ export const mockElements = () => {
       elements[type] = mockElement();
       return elements[type];
     }),
-    getElement: jest.fn((type) => {
+    getElement: jest.fn((typeOrComponent) => {
+      const type =
+        typeof typeOrComponent === 'string'
+          ? typeOrComponent
+          : typeOrComponent.__elementType;
       return elements[type] || null;
     }),
     update: jest.fn(),
@@ -59,6 +63,10 @@ export const mockCheckoutSdk = () => {
       elements.expressCheckout = mockElement();
       return elements.expressCheckout;
     }),
+    createLinkSignupElement: jest.fn(() => {
+      elements.linkSignup = mockElement();
+      return elements.linkSignup;
+    }),
     getPaymentElement: jest.fn(() => {
       return elements.payment || null;
     }),
@@ -70,6 +78,9 @@ export const mockCheckoutSdk = () => {
     }),
     getExpressCheckoutElement: jest.fn(() => {
       return elements.expressCheckout || null;
+    }),
+    getLinkSignupElement: jest.fn(() => {
+      return elements.linkSignup || null;
     }),
     session: jest.fn(() => mockCheckoutSession()),
     applyPromotionCode: jest.fn(),
