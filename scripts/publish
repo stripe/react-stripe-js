@@ -224,7 +224,7 @@ GIT_STATUS=$(git status)
 #   exit 1
 # fi
 
-if ! grep -q "Your branch is up to date with 'origin/cbala/v3.9.3'." <<< "$GIT_STATUS"; then
+if ! grep -q "Your branch is up to date with 'origin/v3.11.0'." <<< "$GIT_STATUS"; then
   echo "Error! Must be up to date with origin/master to publish"
   exit 1
 fi
