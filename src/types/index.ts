@@ -343,39 +343,49 @@ type LinkSignupElementEventMap = {
  *
  * Using `LinkSignupElement` requires `@stripe/stripe-js` version 7.10.0 or later.
  */
-export interface LinkSignupElementOptions {
+type LinkSignupElementOptionsFallback = {
   defaultValues?: {
     email?: string;
     name?: string;
     phone?: string;
   };
-}
+};
+
+export type LinkSignupElementOptions = 'createLinkSignupElement' extends keyof stripeJs.StripeCheckout
+  ? stripeJs.StripeCheckout extends {
+      createLinkSignupElement(...args: infer Args): any;
+    }
+    ? NonNullable<Args[0]>
+    : LinkSignupElementOptionsFallback
+  : LinkSignupElementOptionsFallback;
 
 /**
  * The underlying Element instance returned by `LinkSignupElement`.
  *
  * Using `LinkSignupElement` requires `@stripe/stripe-js` version 7.10.0 or later.
  */
-export type LinkSignupElementInstance = {
-  mount(domElement: string | HTMLElement): void;
-  blur(): void;
-  clear(): void;
-  destroy(): void;
-  focus(): void;
-  unmount(): void;
+type LinkSignupElementInstanceFallback = stripeJs.StripeElementBase & {
   on<EventType extends keyof LinkSignupElementEventMap>(
     eventType: EventType,
     handler: (event: LinkSignupElementEventMap[EventType]) => any
-  ): LinkSignupElementInstance;
+  ): LinkSignupElementInstanceFallback;
   once<EventType extends keyof LinkSignupElementEventMap>(
     eventType: EventType,
     handler: (event: LinkSignupElementEventMap[EventType]) => any
-  ): LinkSignupElementInstance;
+  ): LinkSignupElementInstanceFallback;
   off<EventType extends keyof LinkSignupElementEventMap>(
     eventType: EventType,
     handler?: (event: LinkSignupElementEventMap[EventType]) => any
-  ): LinkSignupElementInstance;
+  ): LinkSignupElementInstanceFallback;
 };
+
+export type LinkSignupElementInstance = 'getLinkSignupElement' extends keyof stripeJs.StripeCheckout
+  ? stripeJs.StripeCheckout extends {
+      getLinkSignupElement(...args: any[]): infer Element;
+    }
+    ? NonNullable<Element>
+    : LinkSignupElementInstanceFallback
+  : LinkSignupElementInstanceFallback;
 
 export interface LinkSignupElementProps extends ElementProps {
   /**

@@ -6,9 +6,39 @@ import {
   LinkSignupElementProps,
   useCheckout,
 } from '../index';
-import {StripeElements, StripeError} from '@stripe/stripe-js';
+import {
+  StripeCheckoutLinkSignupElementOptions,
+  StripeElements,
+  StripeError,
+  StripeLinkSignupElement,
+  StripeLinkSignupElementOptions,
+} from '@stripe/stripe-js';
 
 declare const elements: StripeElements;
+
+const assertStripeJsInterop = (
+  checkoutOptions: StripeCheckoutLinkSignupElementOptions,
+  elementOptions: StripeLinkSignupElementOptions,
+  element: StripeLinkSignupElement,
+  reactOptions: LinkSignupElementOptions,
+  reactElement: LinkSignupElementInstance
+) => {
+  const reactOptionsFromCheckout: LinkSignupElementOptions = checkoutOptions;
+  const reactOptionsFromElements: LinkSignupElementOptions = elementOptions;
+  const checkoutOptionsFromReact: StripeCheckoutLinkSignupElementOptions = reactOptions;
+  const elementOptionsFromReact: StripeLinkSignupElementOptions = reactOptions;
+  const reactElementFromStripeJs: LinkSignupElementInstance = element;
+  const stripeJsElementFromReact: StripeLinkSignupElement = reactElement;
+
+  return {
+    reactOptionsFromCheckout,
+    reactOptionsFromElements,
+    checkoutOptionsFromReact,
+    elementOptionsFromReact,
+    reactElementFromStripeJs,
+    stripeJsElementFromReact,
+  };
+};
 
 const onReady = (element: LinkSignupElementInstance) => {
   element.focus();
@@ -60,4 +90,5 @@ const LinkSignupElementTypeTest = () => {
 
 test('Link Signup Element type assertions compile', () => {
   expect(LinkSignupElementTypeTest).toBeDefined();
+  expect(assertStripeJsInterop).toBeDefined();
 });
