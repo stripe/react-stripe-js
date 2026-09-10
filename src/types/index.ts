@@ -247,6 +247,42 @@ export interface LinkAuthenticationElementProps extends ElementProps {
 export type LinkAuthenticationElementComponent =
   FunctionComponent<LinkAuthenticationElementProps>;
 
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export interface LinkSignupElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   *
+   */
+  options?: stripeJs.StripeLinkSignupElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls. Called with the underlying Element instance.
+   */
+  onReady?: (element: stripeJs.StripeLinkSignupElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'linkSignup'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the loader UI is mounted and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'linkSignup'}) => any;
+}
+
+export type LinkSignupElementComponent =
+  FunctionComponent<LinkSignupElementProps>;
+
 export interface ContactDetailsElementProps extends ElementProps {
   /**
    * An object containing Element configuration options.
@@ -686,6 +722,15 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: LinkAuthenticationElementComponent
     ): stripeJs.StripeLinkAuthenticationElement | null;
+
+    /**
+     * Returns the underlying Element instance for the `LinkSignupElement`
+     * component in the current `Elements` provider tree.
+     * Returns `null` if no `LinkSignupElement` is rendered.
+     */
+    getElement(
+      component: LinkSignupElementComponent
+    ): stripeJs.StripeLinkSignupElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
