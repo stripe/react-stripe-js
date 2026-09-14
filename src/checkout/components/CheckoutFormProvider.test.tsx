@@ -3,6 +3,7 @@ import {render, act, waitFor} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {CheckoutFormProvider} from './CheckoutFormProvider';
+import createElementComponent from '../../components/createElementComponent';
 import {
   useCheckout,
   useCheckoutElements,
@@ -43,6 +44,33 @@ describe('CheckoutFormProvider', () => {
   const fakeClientSecret = 'cs_123';
 
   describe('calls initCheckoutFormSdk (not initCheckoutElementsSdk)', () => {
+    it('mounts the form before loadActions resolves', async () => {
+      const deferred = makeDeferred();
+      mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+      const CheckoutForm = createElementComponent('paymentForm', false);
+
+      render(
+        <CheckoutFormProvider
+          stripe={mockStripe}
+          options={{clientSecret: fakeClientSecret}}
+        >
+          <CheckoutForm />
+        </CheckoutFormProvider>
+      );
+
+      const form = mockCheckoutSdk.getForm();
+      expect(form.mount).toHaveBeenCalledTimes(1);
+
+      await act(() =>
+        deferred.resolve({
+          type: 'success',
+          actions: mocks.mockCheckoutActions(),
+        })
+      );
+
+      expect(form.mount).toHaveBeenCalledTimes(1);
+    });
+
     it('calls initCheckoutFormSdk with the provided options', async () => {
       render(
         <CheckoutFormProvider
@@ -110,6 +138,114 @@ describe('CheckoutFormProvider', () => {
       );
     });
   });
+
+  describe.each([false, true])(
+    'initialization errors (StrictMode: %s)',
+    (strictMode) => {
+      const renderProvider = (stripe: any) => {
+        const TestComponent = () => {
+          const checkout = useCheckoutForm();
+          return (
+            <div>
+              {checkout.type === 'error'
+                ? checkout.error.message
+                : checkout.type}
+            </div>
+          );
+        };
+        const provider = (
+          <CheckoutFormProvider
+            stripe={stripe}
+            options={{clientSecret: fakeClientSecret}}
+          >
+            <TestComponent />
+          </CheckoutFormProvider>
+        );
+        return render(
+          strictMode ? <StrictMode>{provider}</StrictMode> : provider
+        );
+      };
+
+      it('exposes a rejected Stripe promise through useCheckoutForm', async () => {
+        const deferred = makeDeferred();
+        const error = new Error('Failed to load Stripe.js');
+        const result = renderProvider(deferred.promise);
+
+        expect(result.getByText('loading')).toBeInTheDocument();
+        await act(() => deferred.reject(error));
+
+        expect(result.getByText(error.message)).toBeInTheDocument();
+      });
+
+      it('exposes validation errors from a resolved Stripe promise', async () => {
+        const deferred = makeDeferred();
+        const result = renderProvider(deferred.promise);
+
+        await act(() => deferred.resolve({}));
+
+        expect(
+          result.getByText(
+            /Invalid prop `stripe` supplied to `CheckoutFormProvider`/
+          )
+        ).toBeInTheDocument();
+      });
+
+      describe.each(['sync', 'async'])(
+        'with a %s Stripe prop',
+        (stripeType) => {
+          it.each(['initCheckoutFormSdk', 'loadActions'])(
+            'exposes a synchronous exception from %s',
+            async (method) => {
+              const error = new Error(`${method} failed`);
+              const target =
+                method === 'initCheckoutFormSdk' ? mockStripe : mockCheckoutSdk;
+              target[method].mockImplementation(() => {
+                throw error;
+              });
+
+              const result = renderProvider(
+                stripeType === 'sync' ? mockStripe : mockStripePromise
+              );
+
+              await waitFor(() =>
+                expect(result.getByText(error.message)).toBeInTheDocument()
+              );
+              expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1);
+            }
+          );
+        }
+      );
+
+      it('still exposes a rejected loadActions promise', async () => {
+        const deferred = makeDeferred();
+        const error = new Error('Failed to load actions');
+        mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+        const result = renderProvider(mockStripe);
+
+        await act(() => deferred.reject(error));
+
+        expect(result.getByText(error.message)).toBeInTheDocument();
+      });
+
+      it.each(['stripe', 'loadActions'])(
+        'handles a rejected %s promise after unmount',
+        async (source) => {
+          const deferred = makeDeferred();
+          if (source === 'loadActions') {
+            mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+          }
+          const result = renderProvider(
+            source === 'stripe' ? deferred.promise : mockStripe
+          );
+
+          result.unmount();
+          await act(() => deferred.reject(new Error('Initialization failed')));
+
+          expect(consoleError).not.toHaveBeenCalled();
+        }
+      );
+    }
+  );
 
   describe('useCheckout() works within CheckoutFormProvider', () => {
     it('provides checkout state through shared context', async () => {

@@ -56,6 +56,118 @@ describe('CheckoutElementsProvider', () => {
     </CheckoutElementsProvider>
   );
 
+  describe.each([false, true])(
+    'initialization errors (StrictMode: %s)',
+    (strictMode) => {
+      const renderProvider = (stripe: any) => {
+        const TestComponent = () => {
+          const checkout = useCheckoutElements();
+          return (
+            <div>
+              {checkout.type === 'error'
+                ? checkout.error.message
+                : checkout.type}
+            </div>
+          );
+        };
+        const provider = (
+          <CheckoutElementsProvider
+            stripe={stripe}
+            options={{clientSecret: fakeClientSecret}}
+          >
+            <TestComponent />
+          </CheckoutElementsProvider>
+        );
+        return render(
+          strictMode ? <StrictMode>{provider}</StrictMode> : provider
+        );
+      };
+
+      it('exposes a rejected Stripe promise through useCheckoutElements', async () => {
+        const deferred = makeDeferred();
+        const error = new Error('Failed to load Stripe.js');
+        const result = renderProvider(deferred.promise);
+
+        expect(result.getByText('loading')).toBeInTheDocument();
+        await act(() => deferred.reject(error));
+
+        expect(result.getByText(error.message)).toBeInTheDocument();
+      });
+
+      it('exposes validation errors from a resolved Stripe promise', async () => {
+        const deferred = makeDeferred();
+        const result = renderProvider(deferred.promise);
+
+        await act(() => deferred.resolve({}));
+
+        expect(
+          result.getByText(
+            /Invalid prop `stripe` supplied to `CheckoutElementsProvider`/
+          )
+        ).toBeInTheDocument();
+      });
+
+      describe.each(['sync', 'async'])(
+        'with a %s Stripe prop',
+        (stripeType) => {
+          it.each(['initCheckoutElementsSdk', 'loadActions'])(
+            'exposes a synchronous exception from %s',
+            async (method) => {
+              const error = new Error(`${method} failed`);
+              const target =
+                method === 'initCheckoutElementsSdk'
+                  ? mockStripe
+                  : mockCheckoutSdk;
+              target[method].mockImplementation(() => {
+                throw error;
+              });
+
+              const result = renderProvider(
+                stripeType === 'sync' ? mockStripe : mockStripePromise
+              );
+
+              await waitFor(() =>
+                expect(result.getByText(error.message)).toBeInTheDocument()
+              );
+              expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(
+                1
+              );
+            }
+          );
+        }
+      );
+
+      it('still exposes a rejected loadActions promise', async () => {
+        const deferred = makeDeferred();
+        const error = new Error('Failed to load actions');
+        mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+        const result = renderProvider(mockStripe);
+
+        await act(() => deferred.reject(error));
+
+        expect(result.getByText(error.message)).toBeInTheDocument();
+      });
+
+      it.each(['stripe', 'loadActions'])(
+        'handles a rejected %s promise after unmount',
+        async (source) => {
+          const deferred = makeDeferred();
+          if (source === 'loadActions') {
+            mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+          }
+          const result = renderProvider(
+            source === 'stripe' ? deferred.promise : mockStripe
+          );
+
+          result.unmount();
+          await act(() => deferred.reject(new Error('Initialization failed')));
+
+          expect(consoleError).not.toHaveBeenCalled();
+        }
+      );
+    }
+  );
+
   describe('interaction with useStripe()', () => {
     it('works with a Stripe instance', async () => {
       const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
