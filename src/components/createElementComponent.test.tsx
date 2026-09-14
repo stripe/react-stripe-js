@@ -20,6 +20,7 @@ import {
   IssuingCardExpiryDisplayElementComponent,
   IssuingCardPinDisplayElementComponent,
   IssuingCardCopyButtonElementComponent,
+  LinkSignupElementComponent,
 } from '../types';
 
 const {Elements} = ElementsModule;
@@ -51,6 +52,8 @@ describe('createElementComponent', () => {
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement);
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement);
+    mockCheckoutSdk.createLinkSignupElement.mockReturnValue(mockElement);
+    mockCheckoutSdk.getLinkSignupElement.mockReturnValue(mockElement);
     jest.spyOn(React, 'useLayoutEffect');
 
     simulateElementsEvents = {};
@@ -164,10 +167,8 @@ describe('createElementComponent', () => {
       'card',
       false
     );
-    const PaymentRequestButtonElement: PaymentRequestButtonElementComponent = createElementComponent(
-      'card',
-      false
-    );
+    const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
+      createElementComponent('card', false);
     const PaymentElement: PaymentElementComponent = createElementComponent(
       'payment',
       false
@@ -177,10 +178,10 @@ describe('createElementComponent', () => {
       false
     );
 
-    const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
-      'expressCheckout',
-      false
-    );
+    const ExpressCheckoutElement: ExpressCheckoutElementComponent =
+      createElementComponent('expressCheckout', false);
+    const LinkSignupElement: LinkSignupElementComponent =
+      createElementComponent('linkSignup', false);
 
     const CheckoutForm = createElementComponent(
       'paymentForm',
@@ -1104,26 +1105,16 @@ describe('createElementComponent', () => {
     });
 
     describe('Issuing Elements', () => {
-      const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent = createElementComponent(
-        'issuingCardNumberDisplay',
-        false
-      );
-      const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent = createElementComponent(
-        'issuingCardCvcDisplay',
-        false
-      );
-      const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent = createElementComponent(
-        'issuingCardExpiryDisplay',
-        false
-      );
-      const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent = createElementComponent(
-        'issuingCardPinDisplay',
-        false
-      );
-      const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent = createElementComponent(
-        'issuingCardCopyButton',
-        false
-      );
+      const IssuingCardNumberDisplayElement: IssuingCardNumberDisplayElementComponent =
+        createElementComponent('issuingCardNumberDisplay', false);
+      const IssuingCardCvcDisplayElement: IssuingCardCvcDisplayElementComponent =
+        createElementComponent('issuingCardCvcDisplay', false);
+      const IssuingCardExpiryDisplayElement: IssuingCardExpiryDisplayElementComponent =
+        createElementComponent('issuingCardExpiryDisplay', false);
+      const IssuingCardPinDisplayElement: IssuingCardPinDisplayElementComponent =
+        createElementComponent('issuingCardPinDisplay', false);
+      const IssuingCardCopyButtonElement: IssuingCardCopyButtonElementComponent =
+        createElementComponent('issuingCardCopyButton', false);
 
       it.each([
         ['issuingCardNumberDisplay', IssuingCardNumberDisplayElement] as const,
@@ -1447,9 +1438,10 @@ describe('createElementComponent', () => {
           'issuingCardPinDisplay',
           displayOptions
         );
-        expect(
-          mockElements.create
-        ).toHaveBeenCalledWith('issuingCardCopyButton', {toCopy: 'number'});
+        expect(mockElements.create).toHaveBeenCalledWith(
+          'issuingCardCopyButton',
+          {toCopy: 'number'}
+        );
       });
     });
 
@@ -2285,6 +2277,145 @@ describe('createElementComponent', () => {
           });
         } catch (e) {
           expect((e as Error).message).toMatch('You must supply options.mode');
+        }
+      });
+    });
+
+    describe('LinkSignupElement', () => {
+      const options = {
+        defaultValues: {
+          email: 'jenny.rosen@example.com',
+        },
+      };
+
+      it('creates a regular Element with its initial options, events, and native lookup', () => {
+        mockElements.getElement.mockReturnValue(mockElement);
+        const handlers = {
+          onReady: jest.fn(),
+          onFocus: jest.fn(),
+          onBlur: jest.fn(),
+          onEscape: jest.fn(),
+          onLoaderStart: jest.fn(),
+          onLoadError: jest.fn(),
+        };
+
+        render(
+          <Elements stripe={mockStripe}>
+            <LinkSignupElement options={options} {...handlers} />
+          </Elements>
+        );
+
+        simulateEvent('ready');
+        simulateEvent('focus');
+        simulateEvent('blur');
+        simulateEvent('escape');
+        simulateEvent('loaderstart');
+        simulateEvent('loaderror');
+
+        expect(mockElements.create).toHaveBeenCalledWith('linkSignup', options);
+        expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+        expect(handlers.onFocus).toHaveBeenCalled();
+        expect(handlers.onBlur).toHaveBeenCalled();
+        expect(handlers.onEscape).toHaveBeenCalled();
+        expect(handlers.onLoaderStart).toHaveBeenCalled();
+        expect(handlers.onLoadError).toHaveBeenCalled();
+        expect(mockElements.getElement(LinkSignupElement)).toBe(mockElement);
+      });
+
+      it('creates a Checkout Element with its initial options and supports all events', async () => {
+        const handlers = {
+          onReady: jest.fn(),
+          onFocus: jest.fn(),
+          onBlur: jest.fn(),
+          onEscape: jest.fn(),
+          onLoaderStart: jest.fn(),
+          onLoadError: jest.fn(),
+        };
+
+        render(
+          <CheckoutElementsProvider
+            stripe={mockStripe}
+            options={{clientSecret: 'cs_123'}}
+          >
+            <LinkSignupElement options={options} {...handlers} />
+          </CheckoutElementsProvider>
+        );
+
+        await waitFor(() =>
+          expect(mockCheckoutSdk.createLinkSignupElement).toHaveBeenCalledWith(
+            options
+          )
+        );
+
+        simulateEvent('ready');
+        simulateEvent('focus');
+        simulateEvent('blur');
+        simulateEvent('escape');
+        simulateEvent('loaderstart');
+        simulateEvent('loaderror');
+
+        expect(handlers.onReady).toHaveBeenCalledWith(mockElement);
+        expect(handlers.onFocus).toHaveBeenCalled();
+        expect(handlers.onBlur).toHaveBeenCalled();
+        expect(handlers.onEscape).toHaveBeenCalled();
+        expect(handlers.onLoaderStart).toHaveBeenCalled();
+        expect(handlers.onLoadError).toHaveBeenCalled();
+        expect(mockCheckoutSdk.getLinkSignupElement()).toBe(mockElement);
+      });
+
+      it('ignores option changes when the Element has no update method', () => {
+        const linkSignupElement = {
+          mount: jest.fn(),
+          destroy: jest.fn(),
+          on: simulateOn,
+          off: simulateOff,
+        };
+        mockElements.create.mockReturnValue(linkSignupElement);
+
+        const {rerender} = render(
+          <Elements stripe={mockStripe}>
+            <LinkSignupElement options={options} />
+          </Elements>
+        );
+
+        rerender(
+          <Elements stripe={mockStripe}>
+            <LinkSignupElement
+              options={{defaultValues: {email: 'new@example.com'}}}
+            />
+          </Elements>
+        );
+
+        expect(mockElements.create).toHaveBeenCalledTimes(1);
+        expect(linkSignupElement.mount).toHaveBeenCalledTimes(1);
+      });
+
+      it('rejects CheckoutFormProvider with an actionable error', async () => {
+        expect.assertions(2);
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+        const {
+          createLinkSignupElement: _createLinkSignupElement,
+          getLinkSignupElement: _getLinkSignupElement,
+          ...mockCheckoutFormSdk
+        } = mockCheckoutSdk;
+        mockStripe.initCheckoutFormSdk.mockReturnValue(mockCheckoutFormSdk);
+
+        try {
+          await act(async () => {
+            render(
+              <CheckoutFormProvider
+                stripe={mockStripe}
+                options={{clientSecret: 'cs_123'}}
+              >
+                <LinkSignupElement />
+              </CheckoutFormProvider>
+            );
+          });
+        } catch (error) {
+          expect((error as Error).message).toContain('LinkSignupElement');
+          expect((error as Error).message).toContain(
+            'CheckoutElementsProvider'
+          );
         }
       });
     });

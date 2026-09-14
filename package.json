@@ -1,6 +1,6 @@
 {
   "name": "@stripe/react-stripe-js",
-  "version": "6.6.0",
+  "version": "6.10.0",
   "description": "React components for Stripe.js and Stripe Elements",
   "main": "dist/react-stripe.js",
   "module": "dist/react-stripe.esm.mjs",
@@ -43,7 +43,7 @@
     "prettier:fix": "prettier './**/*.js' './**/*.ts' './**/*.tsx' './**/*.css' './**/*.md' --write",
     "prepublishOnly": "echo \"\nPlease use ./scripts/publish instead\n\" && exit 1",
     "doctoc": "doctoc README.md",
-    "storybook": "start-storybook -p 6006 "
+    "storybook": "storybook dev -p 6006"
   },
   "keywords": [
     "React",
@@ -85,15 +85,18 @@
     "@arethetypeswrong/cli": "^0.15.3",
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
+    "@babel/plugin-transform-runtime": "^7.24.0",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
+    "@babel/preset-typescript": "^7.24.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@storybook/react": "^6.5.0-beta.8",
-    "@stripe/stripe-js": "^9.5.0",
+    "@storybook/react": "^10.2.3",
+    "@storybook/react-webpack5": "^10.2.3",
+    "@stripe/stripe-js": "^9.16.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
     "@testing-library/react-hooks": "^8.0.0",
@@ -112,11 +115,11 @@
     "eslint-plugin-jest": "^22.6.3",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react": "^7.23.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "fork-ts-checker-webpack-plugin": "^4.0.3",
     "jest": "^25.1.0",
-    "prettier": "^1.19.1",
+    "prettier": "^2.8.8",
     "react": "18.1.0",
     "react-docgen-typescript-loader": "^3.6.0",
     "react-dom": "18.1.0",
@@ -124,6 +127,7 @@
     "rimraf": "^2.6.2",
     "rollup": "^4.12.0",
     "rollup-plugin-ts": "^3.4.5",
+    "storybook": "^10.2.3",
     "ts-jest": "^25.1.0",
     "ts-loader": "^6.2.1",
     "typescript": "^4.1.2"
@@ -132,7 +136,7 @@
     "@types/react": "18.0.5"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": ">=9.5.0 <10.0.0",
+    "@stripe/stripe-js": ">=9.16.0 <10.0.0",
     "react": ">=16.8.0 <20.0.0",
     "react-dom": ">=16.8.0 <20.0.0"
   }

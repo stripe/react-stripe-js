@@ -37,19 +37,17 @@ interface FinancialAccountDisclosureProps {
   };
 }
 
-export const FinancialAccountDisclosure: FunctionComponent<FinancialAccountDisclosureProps> = ({
-  stripe: rawStripeProp,
-  onLoad,
-  onError,
-  options,
-}) => {
+export const FinancialAccountDisclosure: FunctionComponent<
+  FinancialAccountDisclosureProps
+> = ({stripe: rawStripeProp, onLoad, onError, options}) => {
   const businessName = options?.businessName;
   const learnMoreLink = options?.learnMoreLink;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const parsed = React.useMemo(() => parseStripeProp(rawStripeProp), [
-    rawStripeProp,
-  ]);
+  const parsed = React.useMemo(
+    () => parseStripeProp(rawStripeProp),
+    [rawStripeProp]
+  );
   const [stripeState, setStripeState] = React.useState<stripeJs.Stripe | null>(
     parsed.tag === 'sync' ? parsed.stripe : null
   );
@@ -93,10 +91,9 @@ export const FinancialAccountDisclosure: FunctionComponent<FinancialAccountDiscl
         return;
       }
 
-      const {
-        htmlElement: disclosureContent,
-        error,
-      } = await (stripeState as any).createFinancialAccountDisclosure({
+      const {htmlElement: disclosureContent, error} = await (
+        stripeState as any
+      ).createFinancialAccountDisclosure({
         businessName,
         learnMoreLink,
       });

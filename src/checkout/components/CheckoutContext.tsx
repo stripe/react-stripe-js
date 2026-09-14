@@ -145,11 +145,11 @@ const mapStateToCheckoutResult = <
     const {getSession: _getSession, ...otherCheckoutActions} = checkoutActions;
     return {
       type: 'success',
-      checkout: ({
+      checkout: {
         ...session,
         ...sdkMethods,
         ...otherCheckoutActions,
-      } as unknown) as T,
+      } as unknown as T,
     };
   } else if (checkoutState.type === 'loading') {
     return {type: 'loading'};

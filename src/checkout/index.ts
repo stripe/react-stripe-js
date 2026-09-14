@@ -24,12 +24,12 @@ import {
   ExpressCheckoutElementComponent,
   TaxIdElementComponent,
   ContactDetailsElementComponent,
+  TermsElementComponent,
+  LinkSignupElementComponent,
 } from './types';
 
-export const CurrencySelectorElement: CurrencySelectorElementComponent = createElementComponent(
-  'currencySelector',
-  isServer
-);
+export const CurrencySelectorElement: CurrencySelectorElementComponent =
+  createElementComponent('currencySelector', isServer);
 
 export const PaymentElement: PaymentElementComponent = createElementComponent(
   'payment',
@@ -42,20 +42,24 @@ export const CheckoutForm: CheckoutFormComponent = createElementComponent(
   'CheckoutForm'
 );
 
-export const ExpressCheckoutElement: ExpressCheckoutElementComponent = createElementComponent(
-  'expressCheckout',
-  isServer
-);
+export const ExpressCheckoutElement: ExpressCheckoutElementComponent =
+  createElementComponent('expressCheckout', isServer);
 
 export const TaxIdElement: TaxIdElementComponent = createElementComponent(
   'taxId',
   isServer
 );
 
-export const ContactDetailsElement: ContactDetailsElementComponent = createElementComponent(
-  'contactDetails',
-  isServer
-);
+export const ContactDetailsElement: ContactDetailsElementComponent =
+  createElementComponent('contactDetails', isServer);
+
+/**
+ * Requires beta access and must be used inside `CheckoutElementsProvider`.
+ * It is not supported inside `CheckoutFormProvider`.
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const LinkSignupElement: LinkSignupElementComponent =
+  createElementComponent('linkSignup', isServer);
 
 const AddressElementBase = createElementComponent('address', isServer) as any;
 
@@ -74,3 +78,12 @@ export const ShippingAddressElement: ShippingAddressElementComponent = ((
   const merged = {...options, mode: 'shipping'};
   return React.createElement(AddressElementBase, {...rest, options: merged});
 }) as ShippingAddressElementComponent;
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TermsElement: TermsElementComponent = createElementComponent(
+  'terms',
+  isServer
+);

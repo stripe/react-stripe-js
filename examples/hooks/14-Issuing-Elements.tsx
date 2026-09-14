@@ -8,7 +8,8 @@
 //   2. Server: POST /v1/ephemeral_keys with nonce + issuingCard -> secret
 //   3. Client: render elements with {issuingCard, nonce, ephemeralKeySecret}
 
-import React, {useState, useCallback} from 'react';
+import type {FC, FormEvent} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {
   loadStripe,
   Stripe,
@@ -67,7 +68,7 @@ interface IssuingElementsDemoProps {
 }
 
 // Demonstrates all 5 Issuing Elements with full configuration
-const IssuingElementsDemo: React.FC<IssuingElementsDemoProps> = ({
+const IssuingElementsDemo: FC<IssuingElementsDemoProps> = ({
   issuingCard,
   nonce,
   ephemeralKeySecret,
@@ -137,21 +138,16 @@ const IssuingElementsDemo: React.FC<IssuingElementsDemoProps> = ({
   const handleGetElement = useCallback(() => {
     if (!elements) return;
 
-    const numberEl: StripeIssuingCardNumberDisplayElement | null = elements.getElement(
-      IssuingCardNumberDisplayElement
-    );
-    const cvcEl: StripeIssuingCardCvcDisplayElement | null = elements.getElement(
-      IssuingCardCvcDisplayElement
-    );
-    const expiryEl: StripeIssuingCardExpiryDisplayElement | null = elements.getElement(
-      IssuingCardExpiryDisplayElement
-    );
-    const pinEl: StripeIssuingCardPinDisplayElement | null = elements.getElement(
-      IssuingCardPinDisplayElement
-    );
-    const copyEl: StripeIssuingCardCopyButtonElement | null = elements.getElement(
-      IssuingCardCopyButtonElement
-    );
+    const numberEl: StripeIssuingCardNumberDisplayElement | null =
+      elements.getElement(IssuingCardNumberDisplayElement);
+    const cvcEl: StripeIssuingCardCvcDisplayElement | null =
+      elements.getElement(IssuingCardCvcDisplayElement);
+    const expiryEl: StripeIssuingCardExpiryDisplayElement | null =
+      elements.getElement(IssuingCardExpiryDisplayElement);
+    const pinEl: StripeIssuingCardPinDisplayElement | null =
+      elements.getElement(IssuingCardPinDisplayElement);
+    const copyEl: StripeIssuingCardCopyButtonElement | null =
+      elements.getElement(IssuingCardCopyButtonElement);
 
     console.log('[getElement results]', {
       number: numberEl,
@@ -192,12 +188,9 @@ const IssuingElementsDemo: React.FC<IssuingElementsDemoProps> = ({
   };
 
   // Type-safe options for each copy button variant
-  const toCopyValues: Array<StripeIssuingCardCopyButtonElementOptions['toCopy']> = [
-    'number',
-    'cvc',
-    'expiry',
-    'pin',
-  ];
+  const toCopyValues: Array<
+    StripeIssuingCardCopyButtonElementOptions['toCopy']
+  > = ['number', 'cvc', 'expiry', 'pin'];
 
   return (
     <div>
@@ -322,7 +315,7 @@ interface NonceGeneratorProps {
 
 // Step 1 generates the nonce client-side, Step 2 lets user provide the
 // ephemeral key secret created server-side with that nonce.
-const NonceGenerator: React.FC<NonceGeneratorProps> = ({
+const NonceGenerator: FC<NonceGeneratorProps> = ({
   stripe,
   issuingCard,
   onComplete,
@@ -345,7 +338,7 @@ const NonceGenerator: React.FC<NonceGeneratorProps> = ({
         setNonce(result.nonce);
       }
     } catch (e) {
-      setError(e.message);
+      setError((e as Error).message);
     }
     setGenerating(false);
   };
@@ -444,7 +437,7 @@ interface SetupFlowProps {
 }
 
 // Wrapper that has access to the stripe instance via useStripe()
-const SetupFlow: React.FC<SetupFlowProps> = ({issuingCard, onComplete}) => {
+const SetupFlow: FC<SetupFlowProps> = ({issuingCard, onComplete}) => {
   const stripe = useStripe();
 
   if (!stripe) {
@@ -460,7 +453,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({issuingCard, onComplete}) => {
   );
 };
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [pk, setPK] = useState(
     window.sessionStorage.getItem('react-stripe-js-pk') || ''
   );
@@ -475,18 +468,18 @@ const App: React.FC = () => {
     ephemeralKeySecret: string;
   } | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem('react-stripe-js-pk', pk || '');
   }, [pk]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.sessionStorage.setItem(
       'react-stripe-js-issuing-card',
       issuingCard || ''
     );
   }, [issuingCard]);
 
-  const handleLoad = (e: React.FormEvent) => {
+  const handleLoad = (e: FormEvent) => {
     e.preventDefault();
     setCredentials(null);
     setStripePromise(loadStripe(pk));

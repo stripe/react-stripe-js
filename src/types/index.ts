@@ -48,9 +48,8 @@ export interface AuBankAccountElementProps extends ElementProps {
   onEscape?: () => any;
 }
 
-export type AuBankAccountElementComponent = FunctionComponent<
-  AuBankAccountElementProps
->;
+export type AuBankAccountElementComponent =
+  FunctionComponent<AuBankAccountElementProps>;
 
 export interface CardElementProps extends ElementProps {
   /**
@@ -124,9 +123,8 @@ export interface CardNumberElementProps extends ElementProps {
   onLoadError?: (event: {elementType: 'cardNumber'; error: StripeError}) => any;
 }
 
-export type CardNumberElementComponent = FunctionComponent<
-  CardNumberElementProps
->;
+export type CardNumberElementComponent =
+  FunctionComponent<CardNumberElementProps>;
 
 export interface CardExpiryElementProps extends ElementProps {
   /**
@@ -152,9 +150,8 @@ export interface CardExpiryElementProps extends ElementProps {
   onEscape?: () => any;
 }
 
-export type CardExpiryElementComponent = FunctionComponent<
-  CardExpiryElementProps
->;
+export type CardExpiryElementComponent =
+  FunctionComponent<CardExpiryElementProps>;
 
 export interface CardCvcElementProps extends ElementProps {
   /**
@@ -247,9 +244,44 @@ export interface LinkAuthenticationElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'linkAuthentication'}) => any;
 }
 
-export type LinkAuthenticationElementComponent = FunctionComponent<
-  LinkAuthenticationElementProps
->;
+export type LinkAuthenticationElementComponent =
+  FunctionComponent<LinkAuthenticationElementProps>;
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export interface LinkSignupElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   *
+   */
+  options?: stripeJs.StripeLinkSignupElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative
+   * `element.focus()` calls. Called with the underlying Element instance.
+   */
+  onReady?: (element: stripeJs.StripeLinkSignupElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'linkSignup'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the loader UI is mounted and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'linkSignup'}) => any;
+}
+
+export type LinkSignupElementComponent =
+  FunctionComponent<LinkSignupElementProps>;
 
 export interface ContactDetailsElementProps extends ElementProps {
   /**
@@ -288,9 +320,8 @@ export interface ContactDetailsElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'contactDetails'}) => any;
 }
 
-export type ContactDetailsElementComponent = FunctionComponent<
-  ContactDetailsElementProps
->;
+export type ContactDetailsElementComponent =
+  FunctionComponent<ContactDetailsElementProps>;
 
 /**
  * Requires beta access:
@@ -474,9 +505,8 @@ export interface ExpressCheckoutElementProps extends ElementProps {
   ) => any;
 }
 
-export type ExpressCheckoutElementComponent = FunctionComponent<
-  ExpressCheckoutElementProps
->;
+export type ExpressCheckoutElementComponent =
+  FunctionComponent<ExpressCheckoutElementProps>;
 
 export interface PaymentRequestButtonElementProps extends ElementProps {
   /**
@@ -498,9 +528,8 @@ export interface PaymentRequestButtonElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripePaymentRequestButtonElement) => any;
 }
 
-export type PaymentRequestButtonElementComponent = FunctionComponent<
-  PaymentRequestButtonElementProps
->;
+export type PaymentRequestButtonElementComponent =
+  FunctionComponent<PaymentRequestButtonElementProps>;
 
 export interface AddressElementProps extends ElementProps {
   /**
@@ -575,9 +604,8 @@ export interface ShippingAddressElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'shippingAddress'}) => any;
 }
 
-export type ShippingAddressElementComponent = FunctionComponent<
-  ShippingAddressElementProps
->;
+export type ShippingAddressElementComponent =
+  FunctionComponent<ShippingAddressElementProps>;
 
 export interface PaymentMethodMessagingElementProps {
   /**
@@ -602,9 +630,8 @@ export interface PaymentMethodMessagingElementProps {
   onReady?: (element: stripeJs.StripePaymentMethodMessagingElement) => any;
 }
 
-export type PaymentMethodMessagingElementComponent = FunctionComponent<
-  PaymentMethodMessagingElementProps
->;
+export type PaymentMethodMessagingElementComponent =
+  FunctionComponent<PaymentMethodMessagingElementProps>;
 
 export interface CurrencySelectorElementProps extends ElementProps {
   /**
@@ -632,9 +659,8 @@ export interface CurrencySelectorElementProps extends ElementProps {
   onLoaderStart?: (event: {elementType: 'currencySelector'}) => any;
 }
 
-export type CurrencySelectorElementComponent = FunctionComponent<
-  CurrencySelectorElementProps
->;
+export type CurrencySelectorElementComponent =
+  FunctionComponent<CurrencySelectorElementProps>;
 
 declare module '@stripe/stripe-js' {
   interface StripeElements {
@@ -696,6 +722,15 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: LinkAuthenticationElementComponent
     ): stripeJs.StripeLinkAuthenticationElement | null;
+
+    /**
+     * Returns the underlying Element instance for the `LinkSignupElement`
+     * component in the current `Elements` provider tree.
+     * Returns `null` if no `LinkSignupElement` is rendered.
+     */
+    getElement(
+      component: LinkSignupElementComponent
+    ): stripeJs.StripeLinkSignupElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
@@ -860,9 +895,8 @@ export interface IssuingCardNumberDisplayElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIssuingCardNumberDisplayElement) => any;
 }
 
-export type IssuingCardNumberDisplayElementComponent = FunctionComponent<
-  IssuingCardNumberDisplayElementProps
->;
+export type IssuingCardNumberDisplayElementComponent =
+  FunctionComponent<IssuingCardNumberDisplayElementProps>;
 
 export interface IssuingCardCvcDisplayElementProps extends ElementProps {
   /**
@@ -877,9 +911,8 @@ export interface IssuingCardCvcDisplayElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIssuingCardCvcDisplayElement) => any;
 }
 
-export type IssuingCardCvcDisplayElementComponent = FunctionComponent<
-  IssuingCardCvcDisplayElementProps
->;
+export type IssuingCardCvcDisplayElementComponent =
+  FunctionComponent<IssuingCardCvcDisplayElementProps>;
 
 export interface IssuingCardExpiryDisplayElementProps extends ElementProps {
   /**
@@ -894,9 +927,8 @@ export interface IssuingCardExpiryDisplayElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIssuingCardExpiryDisplayElement) => any;
 }
 
-export type IssuingCardExpiryDisplayElementComponent = FunctionComponent<
-  IssuingCardExpiryDisplayElementProps
->;
+export type IssuingCardExpiryDisplayElementComponent =
+  FunctionComponent<IssuingCardExpiryDisplayElementProps>;
 
 export interface IssuingCardPinDisplayElementProps extends ElementProps {
   /**
@@ -911,9 +943,8 @@ export interface IssuingCardPinDisplayElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIssuingCardPinDisplayElement) => any;
 }
 
-export type IssuingCardPinDisplayElementComponent = FunctionComponent<
-  IssuingCardPinDisplayElementProps
->;
+export type IssuingCardPinDisplayElementComponent =
+  FunctionComponent<IssuingCardPinDisplayElementProps>;
 
 export interface IssuingCardCopyButtonElementProps extends ElementProps {
   /**
@@ -933,6 +964,39 @@ export interface IssuingCardCopyButtonElementProps extends ElementProps {
   onReady?: (element: stripeJs.StripeIssuingCardCopyButtonElement) => any;
 }
 
-export type IssuingCardCopyButtonElementComponent = FunctionComponent<
-  IssuingCardCopyButtonElementProps
->;
+export type IssuingCardCopyButtonElementComponent =
+  FunctionComponent<IssuingCardCopyButtonElementProps>;
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export interface TermsElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options?: stripeJs.StripeTermsElementOptions;
+
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  onReady?: (element: stripeJs.StripeTermsElement) => any;
+
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  onEscape?: () => any;
+
+  /**
+   * Triggered when the Element fails to load.
+   */
+  onLoadError?: (event: {elementType: 'terms'; error: StripeError}) => any;
+
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  onLoaderStart?: (event: {elementType: 'terms'}) => any;
+}
+
+export type TermsElementComponent = FunctionComponent<TermsElementProps>;

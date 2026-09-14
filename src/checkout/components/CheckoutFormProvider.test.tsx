@@ -144,10 +144,8 @@ describe('CheckoutFormProvider', () => {
       );
 
       const {on: _on, loadActions: _loadActions, ...sdkMethods} = mockSdk;
-      const {
-        getSession: _getSession,
-        ...otherCheckoutActions
-      } = testMockCheckoutActions;
+      const {getSession: _getSession, ...otherCheckoutActions} =
+        testMockCheckoutActions;
 
       expect(result.current).toEqual({
         type: 'success',

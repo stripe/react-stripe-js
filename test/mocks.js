@@ -12,7 +12,8 @@ export const mockElements = () => {
       elements[type] = mockElement();
       return elements[type];
     }),
-    getElement: jest.fn((type) => {
+    getElement: jest.fn((componentOrType) => {
+      const type = componentOrType.__elementType || componentOrType;
       return elements[type] || null;
     }),
     update: jest.fn(),
@@ -115,6 +116,20 @@ export const mockCheckoutSdk = () => {
     }),
     getContactDetailsElement: jest.fn(() => {
       return elements.contactDetails || null;
+    }),
+    createTermsElement: jest.fn(() => {
+      elements.terms = mockElement();
+      return elements.terms;
+    }),
+    getTermsElement: jest.fn(() => {
+      return elements.terms || null;
+    }),
+    createLinkSignupElement: jest.fn(() => {
+      elements.linkSignup = mockElement();
+      return elements.linkSignup;
+    }),
+    getLinkSignupElement: jest.fn(() => {
+      return elements.linkSignup || null;
     }),
 
     on: jest.fn((event, callback) => {

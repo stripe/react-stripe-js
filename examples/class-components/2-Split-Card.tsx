@@ -1,16 +1,27 @@
 // This example shows you how to set up React Stripe.js and use Elements.
-// Learn how to accept a SEPA Debit payment using the official Stripe docs.
-// https://stripe.com/docs/payments/sepa-debit/accept-a-payment
+// Learn how to accept a payment using the official Stripe docs.
+// https://stripe.com/docs/payments/accept-a-payment#web
 
-import React from 'react';
-import {loadStripe} from '@stripe/stripe-js';
-import {IbanElement, Elements, ElementsConsumer} from '../../src';
+import type {FormEventHandler} from 'react';
+import {Component} from 'react';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  PaymentMethod,
+} from '@stripe/stripe-js';
+import {
+  CardNumberElement,
+  CardCvcElement,
+  CardExpiryElement,
+  Elements,
+  ElementsConsumer,
+} from '../../src';
 
 import {logEvent, Result, ErrorResult} from '../util';
 import '../styles/common.css';
 
 const ELEMENT_OPTIONS = {
-  supportedCountries: ['SEPA'],
   style: {
     base: {
       fontSize: '18px',
@@ -26,17 +37,33 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-class CheckoutForm extends React.Component {
-  constructor(props) {
+interface CheckoutFormProps {
+  stripe: Stripe | null;
+  elements: StripeElements | null;
+}
+
+interface CheckoutFormState {
+  name: string;
+  postal: string;
+  errorMessage: string | null | undefined;
+  paymentMethod: PaymentMethod | null;
+}
+
+class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
+  constructor(props: CheckoutFormProps) {
     super(props);
-    this.state = {name: '', email: '', errorMessage: null, paymentMethod: null};
+    this.state = {
+      name: '',
+      postal: '',
+      errorMessage: null,
+      paymentMethod: null,
+    };
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-
     const {stripe, elements} = this.props;
-    const {name, email} = this.state;
+    const {name, postal} = this.state;
 
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
@@ -44,18 +71,20 @@ class CheckoutForm extends React.Component {
       return;
     }
 
-    const ibanElement = elements.getElement(IbanElement);
+    const card = elements.getElement(CardNumberElement);
 
-    if (ibanElement == null) {
+    if (card == null) {
       return;
     }
 
     const payload = await stripe.createPaymentMethod({
-      type: 'sepa_debit',
-      sepa_debit: ibanElement,
+      type: 'card',
+      card,
       billing_details: {
         name,
-        email,
+        address: {
+          postal_code: postal,
+        },
       },
     });
 
@@ -75,8 +104,9 @@ class CheckoutForm extends React.Component {
   };
 
   render() {
-    const {errorMessage, paymentMethod, name, email} = this.state;
     const {stripe} = this.props;
+    const {postal, name, paymentMethod, errorMessage} = this.state;
+
     return (
       <form onSubmit={this.handleSubmit}>
         <label htmlFor="name">Full Name</label>
@@ -89,25 +119,42 @@ class CheckoutForm extends React.Component {
             this.setState({name: event.target.value});
           }}
         />
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          placeholder="jenny@example.com"
-          required
-          value={email}
-          onChange={(event) => {
-            this.setState({email: event.target.value});
-          }}
-        />
-        <label htmlFor="iban">Bank Account</label>
-        <IbanElement
-          id="iban"
+        <label htmlFor="cardNumber">Card Number</label>
+        <CardNumberElement
+          id="cardNumber"
           onBlur={logEvent('blur')}
           onChange={logEvent('change')}
           onFocus={logEvent('focus')}
           onReady={logEvent('ready')}
           options={ELEMENT_OPTIONS}
+        />
+        <label htmlFor="expiry">Card Expiration</label>
+        <CardExpiryElement
+          id="expiry"
+          onBlur={logEvent('blur')}
+          onChange={logEvent('change')}
+          onFocus={logEvent('focus')}
+          onReady={logEvent('ready')}
+          options={ELEMENT_OPTIONS}
+        />
+        <label htmlFor="cvc">CVC</label>
+        <CardCvcElement
+          id="cvc"
+          onBlur={logEvent('blur')}
+          onChange={logEvent('change')}
+          onFocus={logEvent('focus')}
+          onReady={logEvent('ready')}
+          options={ELEMENT_OPTIONS}
+        />
+        <label htmlFor="postal">Postal Code</label>
+        <input
+          id="postal"
+          required
+          placeholder="12345"
+          value={postal}
+          onChange={(event) => {
+            this.setState({postal: event.target.value});
+          }}
         />
         {errorMessage && <ErrorResult>{errorMessage}</ErrorResult>}
         {paymentMethod && (
