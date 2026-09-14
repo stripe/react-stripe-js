@@ -73,11 +73,7 @@ const createElementComponent = (
       `mounts <${displayName}>`
     );
     const elements = 'elements' in ctx ? ctx.elements : null;
-    const checkoutState = 'checkoutState' in ctx ? ctx.checkoutState : null;
-    const checkoutSdk =
-      checkoutState?.type === 'success' || checkoutState?.type === 'loading'
-        ? checkoutState.sdk
-        : null;
+    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null;
     const [element, setElement] = React.useState<stripeJs.StripeElement | null>(
       null
     );

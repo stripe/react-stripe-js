@@ -8,7 +8,11 @@ import {parseStripeProp} from '../../utils/parseStripeProp';
 import {usePrevious} from '../../utils/usePrevious';
 import {isEqual} from '../../utils/isEqual';
 import {registerWithStripeJs} from '../../utils/registerWithStripeJs';
-import {CheckoutContext, CheckoutState} from './CheckoutContext';
+import {
+  CheckoutContext,
+  CheckoutSdkContext,
+  CheckoutState,
+} from './CheckoutContext';
 
 interface CheckoutElementsProviderProps {
   /**
@@ -200,15 +204,21 @@ export const CheckoutElementsProvider: FunctionComponent<
   // when the context value object reference changes but the actual values haven't
   const contextValue = React.useMemo(
     () => ({
-      stripe,
       checkoutState: state,
     }),
-    [stripe, state]
+    [state]
+  );
+
+  const sdkContextValue = React.useMemo(
+    () => ({stripe, checkoutSdk: sdk}),
+    [stripe, sdk]
   );
 
   return (
     <CheckoutContext.Provider value={contextValue}>
-      {children}
+      <CheckoutSdkContext.Provider value={sdkContextValue}>
+        {children}
+      </CheckoutSdkContext.Provider>
     </CheckoutContext.Provider>
   );
 }) as FunctionComponent<PropsWithChildren<CheckoutElementsProviderProps>>;
