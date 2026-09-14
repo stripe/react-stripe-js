@@ -170,31 +170,38 @@ describe('CheckoutElementsProvider', () => {
 
   describe('interaction with useStripe()', () => {
     it('works with a Stripe instance', async () => {
-      const {result, waitForNextUpdate} = renderHook(() => useStripe(), {
+      const deferred = makeDeferred();
+      mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+      const {result} = renderHook(() => useStripe(), {
         wrapper,
         initialProps: {stripe: mockStripe},
       });
 
       expect(result.current).toBe(mockStripe);
 
-      await waitForNextUpdate();
+      await act(() =>
+        deferred.resolve({type: 'success', actions: mockCheckoutActions})
+      );
 
       expect(result.current).toBe(mockStripe);
     });
 
     it('works when updating null to a Stripe instance', async () => {
-      const {result, rerender, waitForNextUpdate} = renderHook(
-        () => useStripe(),
-        {
-          wrapper,
-          initialProps: {stripe: null},
-        }
-      );
+      const deferred = makeDeferred();
+      mockCheckoutSdk.loadActions.mockReturnValue(deferred.promise);
+      const {result, rerender} = renderHook(() => useStripe(), {
+        wrapper,
+        initialProps: {stripe: null},
+      });
 
       expect(result.current).toBe(null);
 
       rerender({stripe: mockStripe});
-      await waitForNextUpdate();
+      expect(result.current).toBe(mockStripe);
+
+      await act(() =>
+        deferred.resolve({type: 'success', actions: mockCheckoutActions})
+      );
 
       expect(result.current).toBe(mockStripe);
     });
