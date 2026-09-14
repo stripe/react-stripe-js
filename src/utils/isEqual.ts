@@ -3,6 +3,10 @@ import {isUnknownObject} from './guards';
 const PLAIN_OBJECT_STR = '[object Object]';
 
 export const isEqual = (left: unknown, right: unknown): boolean => {
+  if (left === right) {
+    return true;
+  }
+
   if (!isUnknownObject(left) || !isUnknownObject(right)) {
     return left === right;
   }
