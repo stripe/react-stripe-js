@@ -3,6 +3,9 @@
 React components for
 [Stripe.js and Elements](https://stripe.com/docs/stripe-js).
 
+> Why did the React component choose Stripe? It was tired of passing the buck
+> through props.
+
 [![npm version](https://img.shields.io/npm/v/@stripe/react-stripe-js.svg?style=flat-square)](https://www.npmjs.com/package/@stripe/react-stripe-js)
 
 ## Requirements
