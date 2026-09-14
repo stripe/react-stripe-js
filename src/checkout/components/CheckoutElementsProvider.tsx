@@ -47,10 +47,16 @@ export const CheckoutElementsProvider: FunctionComponent<
   options,
   children,
 }: PrivateCheckoutElementsProviderProps) => {
-  const parsed = React.useMemo(
-    () => parseStripeProp(rawStripeProp, INVALID_STRIPE_ERROR),
-    [rawStripeProp]
-  );
+  const parsed = React.useMemo(() => {
+    const result = parseStripeProp(rawStripeProp, INVALID_STRIPE_ERROR);
+    if (result.tag === 'async') {
+      // StrictMode can create two derived promises; only one reaches the effect.
+      // Observe both so the discarded promise cannot reject unhandled. The
+      // retained promise still rejects into the effect's error handler.
+      result.stripePromise.catch(() => {});
+    }
+    return result;
+  }, [rawStripeProp]);
 
   const [state, setState] = React.useState<CheckoutState>({
     type: 'loading',
@@ -63,6 +69,13 @@ export const CheckoutElementsProvider: FunctionComponent<
 
   React.useEffect(() => {
     let isMounted = true;
+
+    const handleError = (error: any) => {
+      // Do not gate this on the per-effect isMounted flag: StrictMode may clean
+      // up the effect that owns initialization, while initCalledRef prevents
+      // the next effect from starting another initialization.
+      setState({type: 'error', error});
+    };
 
     const init = ({stripe}: {stripe: stripeJs.Stripe}) => {
       if (stripe && isMounted && !initCalledRef.current) {
@@ -115,19 +128,22 @@ export const CheckoutElementsProvider: FunctionComponent<
     };
 
     if (parsed.tag === 'async') {
-      parsed.stripePromise.then((stripe) => {
-        setStripe(stripe);
-        if (stripe) {
-          init({stripe});
-        } else {
-          // Only update context if the component is still mounted
-          // and stripe is not null. We allow stripe to be null to make
-          // handling SSR easier.
-        }
-      });
+      parsed.stripePromise
+        .then((stripe) => {
+          setStripe(stripe);
+          // Allow a null Stripe instance for SSR; initialize only when set.
+          if (stripe) {
+            init({stripe});
+          }
+        })
+        .catch(handleError);
     } else if (parsed.tag === 'sync') {
       setStripe(parsed.stripe);
-      init({stripe: parsed.stripe});
+      try {
+        init({stripe: parsed.stripe});
+      } catch (error) {
+        handleError(error);
+      }
     }
 
     return () => {
