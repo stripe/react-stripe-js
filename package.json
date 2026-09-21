@@ -21,12 +21,21 @@
       "import": "./dist/checkout.esm.mjs",
       "default": "./dist/checkout.esm.mjs",
       "types": "./dist/checkout.d.ts"
+    },
+    "./pricing": {
+      "require": "./dist/pricing.js",
+      "import": "./dist/pricing.esm.mjs",
+      "default": "./dist/pricing.esm.mjs",
+      "types": "./dist/pricing.d.ts"
     }
   },
   "typesVersions": {
     "*": {
       "checkout": [
         "dist/checkout.d.ts"
+      ],
+      "pricing": [
+        "dist/pricing.d.ts"
       ]
     }
   },
@@ -60,7 +69,9 @@
     "dist",
     "src",
     "checkout.js",
-    "checkout.d.ts"
+    "checkout.d.ts",
+    "pricing.js",
+    "pricing.d.ts"
   ],
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",

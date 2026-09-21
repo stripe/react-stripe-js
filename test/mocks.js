@@ -151,8 +151,42 @@ export const mockEmbeddedCheckout = () => ({
   destroy: jest.fn(),
 });
 
+export const mockPricing = () => {
+  const changeListeners = new Set();
+
+  return {
+    on: jest.fn((event, listener) => {
+      if (event === 'change') {
+        changeListeners.add(listener);
+      }
+    }),
+    off: jest.fn((event, listener) => {
+      if (event === 'change') {
+        changeListeners.delete(listener);
+      }
+    }),
+    getAvailableCurrencies: jest
+      .fn()
+      .mockResolvedValue([{currency: 'usd'}, {currency: 'eur'}]),
+    getSelectedCurrency: jest.fn().mockResolvedValue({currency: 'usd'}),
+    setSelectedCurrency: jest.fn().mockResolvedValue(undefined),
+    resolvePrice: jest.fn().mockResolvedValue({
+      currency: 'usd',
+      unitAmount: {amount: '10.00', minorUnitsAmount: 1000},
+      unitAmountDecimal: {amount: '10.00', minorUnitsAmount: 1000},
+      minorUnitsAmountDivisor: 100,
+    }),
+    createPricingToken: jest.fn().mockResolvedValue({id: 'prctok_test'}),
+    emitChange: (event = {selectedCurrency: {currency: 'usd'}}) => {
+      changeListeners.forEach((listener) => listener(event));
+    },
+    changeListeners,
+  };
+};
+
 export const mockStripe = () => {
   const checkoutSdk = mockCheckoutSdk();
+  const pricing = mockPricing();
 
   return {
     elements: jest.fn(() => mockElements()),
@@ -166,6 +200,7 @@ export const mockStripe = () => {
     _registerWrapper: jest.fn(),
     initCheckoutElementsSdk: jest.fn(() => checkoutSdk),
     initCheckoutFormSdk: jest.fn(() => checkoutSdk),
+    __initializePricing: jest.fn(() => Promise.resolve(pricing)),
     createEmbeddedCheckoutPage: jest.fn(() =>
       Promise.resolve(mockEmbeddedCheckout())
     ),
