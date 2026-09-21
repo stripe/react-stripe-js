@@ -18,7 +18,7 @@ const wrapper = ({
   state,
   children,
 }: React.PropsWithChildren<{state: CheckoutState}>) => (
-  <CheckoutContext.Provider value={{stripe: null, checkoutState: state}}>
+  <CheckoutContext.Provider value={{checkoutState: state}}>
     {children}
   </CheckoutContext.Provider>
 );

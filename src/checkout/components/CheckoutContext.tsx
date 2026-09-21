@@ -44,7 +44,6 @@ export type CheckoutState =
   | {type: 'error'; error: {message: string}};
 
 export type CheckoutContextValue = {
-  stripe: stripeJs.Stripe | null;
   checkoutState: CheckoutState;
 };
 
@@ -52,6 +51,17 @@ export const CheckoutContext = React.createContext<CheckoutContextValue | null>(
   null
 );
 CheckoutContext.displayName = 'CheckoutContext';
+
+export type CheckoutSdkContextValue = {
+  stripe: stripeJs.Stripe | null;
+  checkoutSdk: CheckoutSdk | null;
+};
+
+// Element wrappers and useStripe need SDK references, not session updates.
+// A non-null value also identifies a checkout provider before initialization.
+export const CheckoutSdkContext =
+  React.createContext<CheckoutSdkContextValue | null>(null);
+CheckoutSdkContext.displayName = 'CheckoutSdkContext';
 
 export const validateCheckoutContext = (
   ctx: CheckoutContextValue | null,
@@ -67,8 +77,8 @@ export const validateCheckoutContext = (
 
 export const useElementsOrCheckoutContextWithUseCase = (
   useCaseString: string
-): CheckoutContextValue | ElementsContextValue => {
-  const checkout = React.useContext(CheckoutContext);
+): CheckoutSdkContextValue | ElementsContextValue => {
+  const checkout = React.useContext(CheckoutSdkContext);
   const elements = React.useContext(ElementsContext);
 
   if (checkout) {
