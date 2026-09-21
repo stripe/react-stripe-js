@@ -40,6 +40,16 @@ export default [
     ],
     plugins: PLUGINS,
   },
+  // Pricing subpath build
+  {
+    input: 'src/pricing/index.ts',
+    external: ['react', 'prop-types'],
+    output: [
+      {file: 'dist/pricing.js', format: 'cjs'},
+      {file: 'dist/pricing.esm.mjs', format: 'es'},
+    ],
+    plugins: PLUGINS,
+  },
   // UMD build with inline PropTypes
   {
     input: 'src/index.ts',
