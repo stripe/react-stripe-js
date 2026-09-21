@@ -5,7 +5,7 @@ import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {StripeError} from '@stripe/stripe-js';
 import {usePrevious} from '../utils/usePrevious';
 
-interface TreasuryDisclosureProps {
+interface FinancialAccountDisclosureProps {
   /**
    * A [Stripe object](https://stripe.com/docs/js/initializing) or a `Promise` resolving to a `Stripe` object.
    * The easiest way to initialize a `Stripe` object is with the the [Stripe.js wrapper module](https://github.com/stripe/stripe-js/blob/master/README.md#readme).
@@ -37,12 +37,9 @@ interface TreasuryDisclosureProps {
   };
 }
 
-export const TreasuryDisclosure: FunctionComponent<TreasuryDisclosureProps> = ({
-  stripe: rawStripeProp,
-  onLoad,
-  onError,
-  options,
-}) => {
+export const FinancialAccountDisclosure: FunctionComponent<
+  FinancialAccountDisclosureProps
+> = ({stripe: rawStripeProp, onLoad, onError, options}) => {
   const businessName = options?.businessName;
   const learnMoreLink = options?.learnMoreLink;
 
@@ -78,7 +75,7 @@ export const TreasuryDisclosure: FunctionComponent<TreasuryDisclosureProps> = ({
   React.useEffect(() => {
     if (prevStripe !== null && prevStripe !== rawStripeProp) {
       console.warn(
-        'Unsupported prop change on TreasuryDisclosure: You cannot change the `stripe` prop after setting it.'
+        'Unsupported prop change on FinancialAccountDisclosure: You cannot change the `stripe` prop after setting it.'
       );
     }
   }, [prevStripe, rawStripeProp]);
@@ -96,7 +93,7 @@ export const TreasuryDisclosure: FunctionComponent<TreasuryDisclosureProps> = ({
 
       const {htmlElement: disclosureContent, error} = await (
         stripeState as any
-      ).createTreasuryDisclosure({
+      ).createFinancialAccountDisclosure({
         businessName,
         learnMoreLink,
       });
