@@ -34,6 +34,7 @@ export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
 export {FinancialAccountDisclosure} from './components/FinancialAccountDisclosure';
 export {IssuingDisclosure} from './components/IssuingDisclosure';
+export {TreasuryDisclosure} from './components/TreasuryDisclosure';
 export {useStripe} from './components/useStripe';
 
 /**
