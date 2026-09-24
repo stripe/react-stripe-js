@@ -508,29 +508,6 @@ export interface ExpressCheckoutElementProps extends ElementProps {
 export type ExpressCheckoutElementComponent =
   FunctionComponent<ExpressCheckoutElementProps>;
 
-export interface PaymentRequestButtonElementProps extends ElementProps {
-  /**
-   * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton).
-   */
-  options?: stripeJs.StripePaymentRequestButtonElementOptions;
-
-  /**
-   * Triggered when the Element is clicked.
-   */
-  onClick?: (
-    event: stripeJs.StripePaymentRequestButtonElementClickEvent
-  ) => any;
-
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  onReady?: (element: stripeJs.StripePaymentRequestButtonElement) => any;
-}
-
-export type PaymentRequestButtonElementComponent =
-  FunctionComponent<PaymentRequestButtonElementProps>;
-
 export interface AddressElementProps extends ElementProps {
   /**
    * An object containing [Element configuration options](https://stripe.com/docs/js/elements_object/create_address_element#address_element_create-options).
@@ -758,14 +735,6 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: ExpressCheckoutElementComponent
     ): stripeJs.StripeElement | null;
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=paymentRequestButton) for the `PaymentRequestButtonElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.
-     * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: PaymentRequestButtonElementComponent
-    ): stripeJs.StripePaymentRequestButtonElement | null;
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_address_element) for the `AddressElement` component in the current [Elements](https://stripe.com/docs/stripe-js/react#elements-provider) provider tree.

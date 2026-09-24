@@ -16,7 +16,6 @@ import {
   LinkAuthenticationElementComponent,
   LinkSignupElementComponent,
   PaymentElementComponent,
-  PaymentRequestButtonElementComponent,
   ShippingAddressElementComponent,
   AddressElementComponent,
   PaymentMethodMessagingElementComponent,
@@ -99,12 +98,6 @@ export const PaymentElement: PaymentElementComponent = createElementComponent(
  */
 export const ExpressCheckoutElement: ExpressCheckoutElementComponent =
   createElementComponent('expressCheckout', isServer);
-
-/**
- * @docs https://stripe.com/docs/stripe-js/react#element-components
- */
-export const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
-  createElementComponent('paymentRequestButton', isServer);
 
 /**
  * @docs https://stripe.com/docs/stripe-js/react#element-components
