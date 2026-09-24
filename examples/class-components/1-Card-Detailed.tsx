@@ -2,7 +2,7 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import type {ChangeEvent, FormEventHandler, ReactNode} from 'react';
+import type {ChangeEvent, ReactNode, SubmitEventHandler} from 'react';
 import {Component} from 'react';
 import {
   loadStripe,
@@ -177,7 +177,7 @@ class CheckoutForm extends Component<CheckoutFormProps, CheckoutFormState> {
     this.state = DEFAULT_STATE;
   }
 
-  handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     const {stripe, elements} = this.props;

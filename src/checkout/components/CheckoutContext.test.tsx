@@ -1,6 +1,5 @@
 import React from 'react';
-import {act, render} from '@testing-library/react';
-import {renderHook} from '@testing-library/react-hooks';
+import {act, render, renderHook} from '@testing-library/react';
 
 import {
   CheckoutContext,
@@ -67,12 +66,14 @@ hookCases.forEach(({name, useHook, sdkKind}) => {
             }, [checkoutResult]);
             return checkoutResult;
           },
-          {wrapper, initialProps: {state}}
+          {
+            wrapper: ({children}) => wrapper({state, children}),
+          }
         );
         const initialResult = result.current;
 
         // The wrapper creates a new context value, but checkout state is unchanged.
-        rerender({state});
+        rerender();
 
         expect(result.current).toBe(initialResult);
         if (
@@ -86,15 +87,15 @@ hookCases.forEach(({name, useHook, sdkKind}) => {
     );
 
     it('updates the result on state transitions and session changes', () => {
-      const initialState: CheckoutState = {type: 'loading', sdk: null};
+      let state: CheckoutState = {type: 'loading', sdk: null};
       const {result, rerender} = renderHook(() => useHook(), {
-        wrapper,
-        initialProps: {state: initialState as CheckoutState},
+        wrapper: ({children}) => wrapper({state, children}),
       });
       expect(result.current).toEqual({type: 'loading'});
 
       const successState = makeSuccessState();
-      rerender({state: successState});
+      state = successState;
+      rerender();
       const initialSuccess = result.current;
       if (initialSuccess.type !== 'success') {
         throw new Error('Expected checkout to finish loading');
@@ -105,7 +106,8 @@ hookCases.forEach(({name, useHook, sdkKind}) => {
         ...successState,
         session: {...successState.session, currency: 'eur'},
       };
-      rerender({state: updatedState});
+      state = updatedState;
+      rerender();
       const updatedSuccess = result.current;
       if (updatedSuccess.type !== 'success') {
         throw new Error('Expected checkout to remain successful');
@@ -117,11 +119,12 @@ hookCases.forEach(({name, useHook, sdkKind}) => {
         initialSuccess.checkout.confirm
       );
 
-      rerender({state: updatedState});
+      rerender();
       expect(result.current).toBe(updatedSuccess);
 
       const error = {message: 'Unable to update checkout'};
-      rerender({state: {type: 'error', error}});
+      state = {type: 'error', error};
+      rerender();
       expect(result.current).toEqual({type: 'error', error});
     });
   });
@@ -152,15 +155,6 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     stripe[initMethod].mockReturnValue(sdk);
     sdk.loadActions.mockReturnValue(loadActions.promise);
     actions.getSession.mockReturnValue(session);
-
-    let onChange: (nextSession: typeof session) => void = () => {
-      throw new Error('The SDK change listener has not been attached');
-    };
-    sdk.on.mockImplementation((event, listener) => {
-      if (event === 'change') {
-        onChange = listener;
-      }
-    });
 
     let latestResult!: ReturnType<typeof useHook>;
     const Consumer = () => {
@@ -193,7 +187,7 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     act(() => {
       // An SDK change must invalidate the cache even if it reuses the session.
       session.currency = 'eur';
-      onChange(session);
+      sdk.on.emit('change', session);
     });
     expect(view.getByText('eur')).toBeInTheDocument();
     const updatedResult = latestResult;
@@ -202,6 +196,7 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     }
     expect(updatedResult).not.toBe(initialResult);
     expect(updatedResult.checkout).not.toBe(initialResult.checkout);
+    expect(updatedResult.checkout).toMatchObject(session);
 
     view.rerender(<App />);
     expect(latestResult).toBe(updatedResult);

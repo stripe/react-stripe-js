@@ -2,7 +2,7 @@
 // Learn how to accept a SEPA Debit payment using the official Stripe docs.
 // https://stripe.com/docs/payments/sepa-debit/accept-a-payment
 
-import type {FormEventHandler} from 'react';
+import type {SubmitEventHandler} from 'react';
 import {useState} from 'react';
 import {loadStripe, PaymentMethod} from '@stripe/stripe-js';
 import {IbanElement, Elements, useElements, useStripe} from '../../src';
@@ -37,7 +37,7 @@ const CheckoutForm = () => {
     null
   );
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     if (!stripe || !elements) {

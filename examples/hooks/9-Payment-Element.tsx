@@ -2,7 +2,7 @@
 // Learn how to accept a payment using the official Stripe docs.
 // https://stripe.com/docs/payments/accept-a-payment#web
 
-import type {ChangeEventHandler, FormEventHandler} from 'react';
+import type {ChangeEventHandler, SubmitEventHandler} from 'react';
 import {useEffect, useState} from 'react';
 import {Appearance, loadStripe, Stripe} from '@stripe/stripe-js';
 import {PaymentElement, Elements, useElements, useStripe} from '../../src';
@@ -15,7 +15,7 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     // Block native form submission.
     event.preventDefault();
 
@@ -71,7 +71,7 @@ const App = () => {
     useState<Promise<Stripe | null> | null>();
   const [theme, setTheme] = useState<Appearance['theme']>('stripe');
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setStripePromise(loadStripe(pk));
   };
