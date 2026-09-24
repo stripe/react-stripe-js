@@ -1,6 +1,6 @@
 import React from 'react';
 import {act, render} from '@testing-library/react';
-import {renderToString} from 'react-dom/server';
+import {renderToString} from 'react-dom/server.node';
 
 import * as CheckoutContextModule from './CheckoutContext';
 import {CheckoutFormProvider} from './CheckoutFormProvider';

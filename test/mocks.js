@@ -57,6 +57,31 @@ export const mockCheckoutActions = () => {
 
 export const mockCheckoutSdk = () => {
   const elements = {};
+  const listeners = {};
+
+  const emit = jest.fn((event, ...args) => {
+    (listeners[event] || []).forEach((callback) => callback(...args));
+  });
+
+  const emitInitialChange = jest.fn(
+    (session = mockCheckoutSession()) =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          emit('change', session);
+          resolve();
+        }, 0);
+      })
+  );
+  /**
+   * @type {jest.Mock & {emit: jest.Mock; emitInitialChange: jest.Mock}}
+   * call emitInitialChange to simulate initial session call
+   */
+  const on = Object.assign(
+    jest.fn((event, callback) => {
+      listeners[event] = [...(listeners[event] || []), callback];
+    }),
+    {emit, emitInitialChange}
+  );
 
   return {
     changeAppearance: jest.fn(),
@@ -132,12 +157,7 @@ export const mockCheckoutSdk = () => {
       return elements.linkSignup || null;
     }),
 
-    on: jest.fn((event, callback) => {
-      if (event === 'change') {
-        // Simulate initial session call
-        setTimeout(() => callback(mockCheckoutSession()), 0);
-      }
-    }),
+    on,
     loadActions: jest.fn().mockResolvedValue({
       type: 'success',
       actions: mockCheckoutActions(),

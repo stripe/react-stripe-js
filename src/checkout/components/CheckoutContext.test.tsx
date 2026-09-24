@@ -156,15 +156,6 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     sdk.loadActions.mockReturnValue(loadActions.promise);
     actions.getSession.mockReturnValue(session);
 
-    let onChange: (nextSession: typeof session) => void = () => {
-      throw new Error('The SDK change listener has not been attached');
-    };
-    sdk.on.mockImplementation((event, listener) => {
-      if (event === 'change') {
-        onChange = listener;
-      }
-    });
-
     let latestResult!: ReturnType<typeof useHook>;
     const Consumer = () => {
       latestResult = useHook();
@@ -196,7 +187,7 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     act(() => {
       // An SDK change must invalidate the cache even if it reuses the session.
       session.currency = 'eur';
-      onChange(session);
+      sdk.on.emit('change', session);
     });
     expect(view.getByText('eur')).toBeInTheDocument();
     const updatedResult = latestResult;
@@ -205,6 +196,7 @@ providerCases.forEach(({name, Provider, useHook, initMethod}) => {
     }
     expect(updatedResult).not.toBe(initialResult);
     expect(updatedResult.checkout).not.toBe(initialResult.checkout);
+    expect(updatedResult.checkout).toMatchObject(session);
 
     view.rerender(<App />);
     expect(latestResult).toBe(updatedResult);
