@@ -11,7 +11,6 @@ import makeDeferred from '../../test/makeDeferred';
 import {
   CardElementComponent,
   PaymentElementComponent,
-  PaymentRequestButtonElementComponent,
   ExpressCheckoutElementComponent,
   AddressElementComponent,
   CheckoutFormComponent,
@@ -167,8 +166,6 @@ describe('createElementComponent', () => {
       'card',
       false
     );
-    const PaymentRequestButtonElement: PaymentRequestButtonElementComponent =
-      createElementComponent('card', false);
     const PaymentElement: PaymentElementComponent = createElementComponent(
       'payment',
       false
@@ -712,12 +709,12 @@ describe('createElementComponent', () => {
       const mockHandler2 = jest.fn();
       const {rerender} = render(
         <Elements stripe={mockStripe}>
-          <PaymentRequestButtonElement onClick={mockHandler} />
+          <ExpressCheckoutElement onClick={mockHandler} onConfirm={() => {}} />
         </Elements>
       );
       rerender(
         <Elements stripe={mockStripe}>
-          <PaymentRequestButtonElement onClick={mockHandler2} />
+          <ExpressCheckoutElement onClick={mockHandler2} onConfirm={() => {}} />
         </Elements>
       );
 
@@ -998,37 +995,6 @@ describe('createElementComponent', () => {
       );
 
       expect(mockElement.update).not.toHaveBeenCalled();
-    });
-
-    it('warns on changes to non-updatable options', () => {
-      jest.spyOn(console, 'warn');
-      (console.warn as any).mockImplementation(() => {});
-
-      const {rerender} = render(
-        <Elements stripe={mockStripe}>
-          <PaymentRequestButtonElement
-            options={{
-              paymentRequest: Symbol('PaymentRequest') as any,
-            }}
-          />
-        </Elements>
-      );
-
-      rerender(
-        <Elements stripe={mockStripe}>
-          <PaymentRequestButtonElement
-            options={{
-              paymentRequest: Symbol('PaymentRequest') as any,
-            }}
-          />
-        </Elements>
-      );
-
-      expect(mockElement.update).not.toHaveBeenCalled();
-
-      expect(console.warn).toHaveBeenCalledWith(
-        'Unsupported prop change: options.paymentRequest is not a mutable property.'
-      );
     });
 
     it('destroys an existing Element when the component unmounts', () => {

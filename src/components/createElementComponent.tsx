@@ -217,9 +217,7 @@ const createElementComponent = (
         return;
       }
 
-      const updates = extractAllowedOptionsUpdates(options, prevOptions, [
-        'paymentRequest',
-      ]);
+      const updates = extractAllowedOptionsUpdates(options, prevOptions, []);
 
       if (updates && 'update' in elementRef.current) {
         elementRef.current.update(updates);
