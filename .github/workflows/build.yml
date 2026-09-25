@@ -34,7 +34,7 @@ jobs:
     - run: yarn install --frozen-lockfile
     - name: Pin @stripe/stripe-js to declared peer floor
       run: |
-        FLOOR=$(node -p "require('./package.json').peerDependencies['@stripe/stripe-js'].match(/>=\s*([0-9]+\.[0-9]+\.[0-9]+)/)[1]")
+        FLOOR=$(node -p "require('./package.json').peerDependencies['@stripe/stripe-js'].match(/>=\s*([0-9]+\.[0-9]+\.[0-9]+(?:-rc\.[0-9]+)?)/)[1]")
         echo "Typechecking against @stripe/stripe-js@$FLOOR"
         yarn add --dev --exact "@stripe/stripe-js@$FLOOR"
     - run: yarn run typecheck
