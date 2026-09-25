@@ -54,6 +54,29 @@ verify_prerequisites() {
     echo "Please refresh your GitHub token and try again."
     exit 1
   fi
+
+  # `hub release create` requires an org-scoped token, confirm the token has access to prevent failures mid-publish
+  echo "Verifying GITHUB_TOKEN is authorized for stripe's SAML SSO..."
+  local sso_headers
+  sso_headers=$(curl -sS -o /dev/null -D - \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -H "Accept: application/vnd.github+json" \
+    https://api.github.com/repos/stripe/react-stripe-js 2>&1) || true
+  local status_line
+  status_line=$(grep -iE '^HTTP/' <<< "$sso_headers" | tail -n 1 | tr -d '\r')
+  if grep -qiE '^x-github-sso: *required' <<< "$sso_headers"; then
+    local sso_url
+    sso_url=$(grep -iE '^x-github-sso:' <<< "$sso_headers" | sed -nE 's/.*url=([^;[:space:]]+).*/\1/p' | tr -d '\r')
+    echo "Error! GITHUB_TOKEN is not authorized for stripe's SAML SSO ($status_line)."
+    echo "Authorize this token for SSO, then re-export it and try again:"
+    echo "    ${sso_url:-https://github.com/settings/tokens}"
+    exit 1
+  fi
+  if ! grep -qiE '^HTTP/[0-9.]+ 2[0-9][0-9]' <<< "$sso_headers"; then
+    echo "Error! Could not verify GITHUB_TOKEN access to stripe/stripe-js ($status_line)."
+    echo "Check that the token is valid and has the 'repo' scope, then re-export it and try again."
+    exit 1
+  fi
   
   # Check git signing configuration
   if [ "$(git config --get gpg.format)" != "ssh" ]; then
