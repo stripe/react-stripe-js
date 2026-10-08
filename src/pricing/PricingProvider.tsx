@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import {parseStripeProp} from '../utils/parseStripeProp';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
-import {usePrevious} from '../utils/usePrevious';
 import {normalizeError, PricingContext, PricingState} from './PricingContext';
 import type {
   Pricing,
@@ -22,6 +21,12 @@ interface PrivatePricingProviderProps {
 
 type StripeWithPricing = Stripe & {
   initializePricing(options: PricingProviderOptions): Promise<Pricing>;
+};
+
+type ImmutableProps = {
+  stripe: unknown;
+  pricingPolicy: string;
+  detectedCurrencyOverride?: string;
 };
 
 const INVALID_STRIPE_ERROR =
@@ -46,160 +51,151 @@ export const PricingProvider: FunctionComponent<
   }, [rawStripeProp]);
 
   const [state, setState] = React.useState<PricingState>({type: 'loading'});
+  const [initializedPricing, setInitializedPricing] =
+    React.useState<Pricing | null>(null);
   const initializationRef = React.useRef<Promise<Pricing> | null>(null);
-  const optionsRef = React.useRef(options);
-  const initialStripePropRef = React.useRef<unknown>(null);
-  const initialPricingPolicyRef = React.useRef<string | undefined>(undefined);
-  const initialCurrencyOverrideRef = React.useRef<string | undefined>(
-    undefined
-  );
+  const initialPropsRef = React.useRef<ImmutableProps | null>(null);
   const pricingPolicy = options.pricingPolicy;
   const detectedCurrencyOverride = options.detectedCurrencyOverride;
-
-  if (!initializationRef.current) {
-    optionsRef.current = options;
-  }
+  const previousPropsRef = React.useRef<ImmutableProps>({
+    stripe: rawStripeProp,
+    pricingPolicy,
+    detectedCurrencyOverride,
+  });
 
   React.useEffect(() => {
     let isActive = true;
-    let subscribedPricing: Pricing | null = null;
 
-    const handleChange = () => {
-      if (!isActive) {
-        return;
-      }
+    if (!initializationRef.current) {
+      setState((current) =>
+        current.type === 'loading' ? current : {type: 'loading'}
+      );
+    }
 
-      setState((current) => {
-        if (current.type !== 'success') {
-          return current;
-        }
-
-        return {...current, changeVersion: current.changeVersion + 1};
-      });
-    };
-
-    const handleError = (error: unknown) => {
-      if (isActive) {
-        setState({type: 'error', error: normalizeError(error)});
-      }
-    };
-
-    const attachToInitialization = (initialization: Promise<Pricing>) => {
-      initialization.then((pricing) => {
-        if (!isActive) {
-          return;
-        }
-
-        try {
-          subscribedPricing = pricing;
-          pricing.on('change', handleChange);
-          setState((current) => {
-            if (current.type === 'success' && current.pricing === pricing) {
-              return current;
-            }
-
-            return {type: 'success', pricing, changeVersion: 0};
-          });
-        } catch (error) {
-          handleError(error);
-        }
-      }, handleError);
-    };
-
-    const initialize = (stripe: Stripe) => {
-      if (!isActive) {
-        return;
-      }
-
+    const startInitialization = (stripe: Stripe): Promise<Pricing> => {
       if (!initializationRef.current) {
-        initialStripePropRef.current = rawStripeProp;
-        initialPricingPolicyRef.current = pricingPolicy;
-        initialCurrencyOverrideRef.current = detectedCurrencyOverride;
-        setState({type: 'loading'});
-
-        try {
+        initialPropsRef.current = {
+          stripe: rawStripeProp,
+          pricingPolicy,
+          detectedCurrencyOverride,
+        };
+        initializationRef.current = (async () => {
           registerWithStripeJs(stripe);
-          initializationRef.current = Promise.resolve(
-            (stripe as StripeWithPricing).initializePricing(optionsRef.current)
-          );
-        } catch (error) {
-          initializationRef.current = Promise.reject(error);
-        }
+          return (stripe as StripeWithPricing).initializePricing(options);
+        })();
       }
 
-      attachToInitialization(initializationRef.current);
+      return initializationRef.current;
     };
 
-    if (initializationRef.current) {
-      attachToInitialization(initializationRef.current);
-    } else if (parsed.tag === 'async') {
-      parsed.stripePromise.then((stripe) => {
-        if (stripe) {
-          initialize(stripe);
+    const loadPricing = async () => {
+      try {
+        let initialization = initializationRef.current;
+        if (!initialization) {
+          const stripe =
+            parsed.tag === 'async'
+              ? await parsed.stripePromise
+              : parsed.tag === 'sync'
+              ? parsed.stripe
+              : null;
+
+          if (!isActive || !stripe) {
+            return;
+          }
+
+          initialization = startInitialization(stripe);
         }
-      }, handleError);
-    } else if (parsed.tag === 'sync') {
-      initialize(parsed.stripe);
+
+        const pricing = await initialization;
+        if (isActive) {
+          setInitializedPricing(pricing);
+        }
+      } catch (error) {
+        if (isActive) {
+          setState({type: 'error', error: normalizeError(error)});
+        }
+      }
+    };
+
+    loadPricing();
+
+    return () => {
+      isActive = false;
+    };
+  }, [parsed, rawStripeProp, options, pricingPolicy, detectedCurrencyOverride]);
+
+  React.useEffect(() => {
+    if (!initializedPricing) {
+      return undefined;
+    }
+
+    let isActive = true;
+    const handleChange = () => {
+      if (isActive) {
+        setState((current) =>
+          current.type === 'success' && current.pricing === initializedPricing
+            ? {...current, changeVersion: current.changeVersion + 1}
+            : current
+        );
+      }
+    };
+
+    try {
+      initializedPricing.on('change', handleChange);
+      setState({
+        type: 'success',
+        pricing: initializedPricing,
+        changeVersion: 0,
+      });
+    } catch (error) {
+      setState({type: 'error', error: normalizeError(error)});
+      return undefined;
     }
 
     return () => {
       isActive = false;
-
-      if (subscribedPricing) {
-        try {
-          subscribedPricing.off('change', handleChange);
-        } catch (_) {
-          // Cleanup errors must not mask an unmount or prop transition.
-        }
-      }
+      initializedPricing.off('change', handleChange);
     };
-  }, [parsed, rawStripeProp, pricingPolicy, detectedCurrencyOverride]);
+  }, [initializedPricing]);
 
-  const previousStripeProp = usePrevious(rawStripeProp);
   React.useEffect(() => {
-    if (
-      initializationRef.current &&
-      previousStripeProp !== rawStripeProp &&
-      initialStripePropRef.current !== rawStripeProp
-    ) {
+    const previous = previousPropsRef.current;
+    const initial = initialPropsRef.current;
+    previousPropsRef.current = {
+      stripe: rawStripeProp,
+      pricingPolicy,
+      detectedCurrencyOverride,
+    };
+
+    if (!initial) {
+      return;
+    }
+
+    if (previous.stripe !== rawStripeProp && initial.stripe !== rawStripeProp) {
       console.warn(
         'Unsupported prop change on PricingProvider: You cannot change the `stripe` prop after initialization has started.'
       );
     }
-  }, [previousStripeProp, rawStripeProp]);
-
-  const previousPricingPolicy = usePrevious(pricingPolicy);
-  React.useEffect(() => {
     if (
-      initializationRef.current &&
-      previousPricingPolicy !== pricingPolicy &&
-      initialPricingPolicyRef.current !== pricingPolicy
+      previous.pricingPolicy !== pricingPolicy &&
+      initial.pricingPolicy !== pricingPolicy
     ) {
       console.warn(
         'Unsupported prop change on PricingProvider: You cannot change `options.pricingPolicy` after initialization has started.'
       );
     }
-  }, [previousPricingPolicy, pricingPolicy]);
-
-  const previousCurrencyOverride = usePrevious(detectedCurrencyOverride);
-  React.useEffect(() => {
     if (
-      initializationRef.current &&
-      previousCurrencyOverride !== detectedCurrencyOverride &&
-      initialCurrencyOverrideRef.current !== detectedCurrencyOverride
+      previous.detectedCurrencyOverride !== detectedCurrencyOverride &&
+      initial.detectedCurrencyOverride !== detectedCurrencyOverride
     ) {
       console.warn(
         'Unsupported prop change on PricingProvider: You cannot change `options.detectedCurrencyOverride` after initialization has started.'
       );
     }
-  }, [previousCurrencyOverride, detectedCurrencyOverride]);
-
-  const contextValue = React.useMemo(() => state, [state]);
+  }, [rawStripeProp, pricingPolicy, detectedCurrencyOverride]);
 
   return (
-    <PricingContext.Provider value={contextValue}>
-      {children}
-    </PricingContext.Provider>
+    <PricingContext.Provider value={state}>{children}</PricingContext.Provider>
   );
 }) as FunctionComponent<PropsWithChildren<PricingProviderProps>>;
 

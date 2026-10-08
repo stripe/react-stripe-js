@@ -5,6 +5,7 @@ import type {
   CurrencySelection,
   CurrencySelectionResult,
   Pricing,
+  PricingDataResult,
 } from './types';
 
 type Request = {
@@ -13,9 +14,10 @@ type Request = {
   promise: Promise<CurrencySelection>;
 };
 
-type RequestState =
-  | {request: Request; result: {loading: false; data: CurrencySelection}}
-  | {request: Request; result: {loading: false; error: Error}};
+type RequestState = {
+  request: Request;
+  result: PricingDataResult<CurrencySelection>;
+};
 
 export const useCurrencySelection = (): CurrencySelectionResult => {
   const context = usePricingContext('useCurrencySelection');
@@ -34,33 +36,24 @@ export const useCurrencySelection = (): CurrencySelectionResult => {
       return undefined;
     }
 
-    let isActive = true;
     let request = requestRef.current;
-
     if (
       !request ||
       request.pricing !== pricing ||
       request.changeVersion !== changeVersion
     ) {
-      let promise: Promise<CurrencySelection>;
-
-      try {
-        promise = Promise.all([
-          pricing.getAvailableCurrencies(),
-          pricing.getSelectedCurrency(),
-        ]).then(([availableCurrencies, selectedCurrency]) => ({
-          availableCurrencies,
-          selectedCurrency,
-        }));
-      } catch (error) {
-        promise = Promise.reject(error);
-      }
-
+      // These getters can both refresh an expired quote. Run them in order.
+      const promise = (async (): Promise<CurrencySelection> => {
+        const availableCurrencies = await pricing.getAvailableCurrencies();
+        const selectedCurrency = await pricing.getSelectedCurrency();
+        return {availableCurrencies, selectedCurrency};
+      })();
       request = {pricing, changeVersion, promise};
       requestRef.current = request;
     }
 
-    const activeRequest = request as Request;
+    let isActive = true;
+    const activeRequest = request;
     activeRequest.promise.then(
       (data) => {
         if (isActive && requestRef.current === activeRequest) {
@@ -86,24 +79,17 @@ export const useCurrencySelection = (): CurrencySelectionResult => {
   }, [pricing, changeVersion]);
 
   const setSelectedCurrency = React.useCallback(
-    (currency: string): Promise<void> => {
+    async (currency: string): Promise<void> => {
       if (initializationError) {
-        return Promise.reject(initializationError);
+        throw initializationError;
       }
-
       if (!pricing) {
-        return Promise.reject(
-          new Error(
-            'Pricing is not ready. Wait for PricingProvider to finish initializing before calling setSelectedCurrency().'
-          )
+        throw new Error(
+          'Pricing is not ready. Wait for PricingProvider to finish initializing before calling setSelectedCurrency().'
         );
       }
 
-      try {
-        return Promise.resolve(pricing.setSelectedCurrency(currency));
-      } catch (error) {
-        return Promise.reject(error);
-      }
+      await pricing.setSelectedCurrency(currency);
     },
     [pricing, initializationError]
   );

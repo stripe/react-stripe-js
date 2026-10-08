@@ -27,5 +27,14 @@ export const normalizeError = (error: unknown): Error => {
     return error;
   }
 
+  if (
+    error !== null &&
+    typeof error === 'object' &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return new Error(error.message);
+  }
+
   return new Error(String(error));
 };

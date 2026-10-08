@@ -110,6 +110,35 @@ describe('PricingProvider', () => {
     expect(consoleWarn).not.toHaveBeenCalled();
   });
 
+  it('uses the latest committed options while waiting for a Stripe promise', async () => {
+    const stripeDeferred = makeDeferred<any>();
+    const {rerender} = render(
+      <PricingProvider
+        stripe={stripeDeferred.promise}
+        options={{...defaultOptions, detectedCurrencyOverride: 'usd'}}
+      >
+        <div />
+      </PricingProvider>
+    );
+
+    rerender(
+      <PricingProvider
+        stripe={stripeDeferred.promise}
+        options={{...defaultOptions, detectedCurrencyOverride: 'eur'}}
+      >
+        <div />
+      </PricingProvider>
+    );
+    await act(() => stripeDeferred.resolve(stripe));
+
+    expect(stripe.initializePricing).toHaveBeenCalledTimes(1);
+    expect(stripe.initializePricing).toHaveBeenCalledWith({
+      pricingPolicy: 'pricing_policy_123',
+      detectedCurrencyOverride: 'eur',
+    });
+    expect(consoleWarn).not.toHaveBeenCalled();
+  });
+
   it('warns only when immutable effective values change', async () => {
     const {rerender} = render(
       <PricingProvider
@@ -142,6 +171,9 @@ describe('PricingProvider', () => {
     );
     expect(consoleWarn).toHaveBeenCalledTimes(2);
     expect(nextStripe.initializePricing).not.toHaveBeenCalled();
+    expect(pricing.on).toHaveBeenCalledTimes(1);
+    expect(pricing.off).not.toHaveBeenCalled();
+    expect(pricing.changeListeners.size).toBe(1);
   });
 
   it('warns if the pricing policy changes after initialization', async () => {
@@ -210,6 +242,18 @@ describe('PricingProvider', () => {
       expect(initializationResult.result.current).toEqual({
         loading: false,
         error: initializationFailure,
+      })
+    );
+  });
+
+  it('keeps the message from Error-like initialization failures', async () => {
+    stripe.initializePricing.mockRejectedValue({message: 'quote unavailable'});
+
+    const {result} = renderHook(() => useResolvedPrice('price_123'), {wrapper});
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        loading: false,
+        error: new Error('quote unavailable'),
       })
     );
   });

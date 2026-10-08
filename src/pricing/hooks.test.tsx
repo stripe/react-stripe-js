@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {StrictMode} from 'react';
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import * as mocks from '../../test/mocks';
 import makeDeferred from '../../test/makeDeferred';
+import {PricingContext} from './PricingContext';
 import {PricingProvider} from './PricingProvider';
 import {useCurrencySelection} from './useCurrencySelection';
 import {usePricingToken} from './usePricingToken';
@@ -35,6 +36,32 @@ describe('Pricing hooks', () => {
     expect(() => renderHook(useHook as any)).toThrow(
       `Could not find Pricing context. You need to wrap the part of your app that calls ${hookName}() in a <PricingProvider>.`
     );
+  });
+
+  it('reuses read requests during StrictMode effect replay', async () => {
+    const context = {type: 'success' as const, pricing, changeVersion: 0};
+    const strictWrapper = ({children}: {children: React.ReactNode}) => (
+      <StrictMode>
+        <PricingContext.Provider value={context}>
+          {children}
+        </PricingContext.Provider>
+      </StrictMode>
+    );
+    const {result} = renderHook(
+      () => ({
+        price: useResolvedPrice('price_123'),
+        currency: useCurrencySelection(),
+      }),
+      {wrapper: strictWrapper}
+    );
+
+    await waitFor(() => {
+      expect(result.current.price.loading).toBe(false);
+      expect(result.current.currency.loading).toBe(false);
+    });
+    expect(pricing.resolvePrice).toHaveBeenCalledTimes(1);
+    expect(pricing.getAvailableCurrencies).toHaveBeenCalledTimes(1);
+    expect(pricing.getSelectedCurrency).toHaveBeenCalledTimes(1);
   });
 
   describe('useResolvedPrice', () => {
@@ -122,6 +149,31 @@ describe('Pricing hooks', () => {
   });
 
   describe('useCurrencySelection', () => {
+    it('reads selected currency after available currencies and ignores event data', async () => {
+      const firstCurrencies = makeDeferred<any>();
+      pricing.getAvailableCurrencies.mockReturnValueOnce(
+        firstCurrencies.promise
+      );
+      const {result} = renderHook(() => useCurrencySelection(), {wrapper});
+
+      await waitFor(() =>
+        expect(pricing.getAvailableCurrencies).toHaveBeenCalledTimes(1)
+      );
+      expect(pricing.getSelectedCurrency).not.toHaveBeenCalled();
+
+      await act(() => firstCurrencies.resolve([{currency: 'usd'}]));
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.data?.selectedCurrency).toEqual({currency: 'usd'});
+
+      pricing.getSelectedCurrency.mockResolvedValue({currency: 'jpy'});
+      act(() => pricing.emitChange({selectedCurrency: {currency: 'eur'}}));
+      await waitFor(() =>
+        expect(result.current.data?.selectedCurrency).toEqual({currency: 'jpy'})
+      );
+      expect(pricing.getAvailableCurrencies).toHaveBeenCalledTimes(2);
+      expect(pricing.getSelectedCurrency).toHaveBeenCalledTimes(2);
+    });
+
     it('loads currency state, delegates the setter, and refreshes on change', async () => {
       const {result} = renderHook(() => useCurrencySelection(), {wrapper});
       expect(result.current.loading).toBe(true);
@@ -148,6 +200,28 @@ describe('Pricing hooks', () => {
         expect(pricing.getAvailableCurrencies).toHaveBeenCalledTimes(2);
         expect(pricing.getSelectedCurrency).toHaveBeenCalledTimes(2);
       });
+    });
+
+    it('ignores currency reads that resolve after a newer change', async () => {
+      const first = makeDeferred<any>();
+      const second = makeDeferred<any>();
+      pricing.getSelectedCurrency
+        .mockReturnValueOnce(first.promise)
+        .mockReturnValueOnce(second.promise);
+      const {result} = renderHook(() => useCurrencySelection(), {wrapper});
+      await waitFor(() =>
+        expect(pricing.getSelectedCurrency).toHaveBeenCalledTimes(1)
+      );
+
+      act(() => pricing.emitChange());
+      await waitFor(() =>
+        expect(pricing.getSelectedCurrency).toHaveBeenCalledTimes(2)
+      );
+      await act(() => second.resolve({currency: 'eur'}));
+      expect(result.current.data?.selectedCurrency).toEqual({currency: 'eur'});
+
+      await act(() => first.resolve({currency: 'usd'}));
+      expect(result.current.data?.selectedCurrency).toEqual({currency: 'eur'});
     });
 
     it('rejects before initialization and preserves data after setter failure', async () => {

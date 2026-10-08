@@ -10,9 +10,7 @@ type Request = {
   promise: Promise<ResolvedPrice>;
 };
 
-type RequestState =
-  | {request: Request; result: {loading: false; data: ResolvedPrice}}
-  | {request: Request; result: {loading: false; error: Error}};
+type RequestState = {request: Request; result: ResolvedPriceResult};
 
 const LOADING_RESULT: ResolvedPriceResult = {loading: true};
 
@@ -32,28 +30,20 @@ export const useResolvedPrice = (price: string): ResolvedPriceResult => {
       return undefined;
     }
 
-    let isActive = true;
     let request = requestRef.current;
-
     if (
       !request ||
       request.pricing !== pricing ||
       request.price !== price ||
       request.changeVersion !== changeVersion
     ) {
-      let promise: Promise<ResolvedPrice>;
-
-      try {
-        promise = Promise.resolve(pricing.resolvePrice(price));
-      } catch (error) {
-        promise = Promise.reject(error);
-      }
-
+      const promise = (async () => pricing.resolvePrice(price))();
       request = {pricing, price, changeVersion, promise};
       requestRef.current = request;
     }
 
-    const activeRequest = request as Request;
+    let isActive = true;
+    const activeRequest = request;
     activeRequest.promise.then(
       (data) => {
         if (isActive && requestRef.current === activeRequest) {
@@ -78,24 +68,22 @@ export const useResolvedPrice = (price: string): ResolvedPriceResult => {
     };
   }, [pricing, price, changeVersion]);
 
-  return React.useMemo(() => {
-    if (context.type === 'error') {
-      return {loading: false, error: context.error};
-    }
+  if (context.type === 'error') {
+    return {loading: false, error: context.error};
+  }
 
-    const request = requestRef.current;
-    if (
-      context.type !== 'success' ||
-      !request ||
-      request.pricing !== context.pricing ||
-      request.price !== price ||
-      request.changeVersion !== context.changeVersion ||
-      !requestState ||
-      requestState.request !== request
-    ) {
-      return LOADING_RESULT;
-    }
+  const request = requestRef.current;
+  if (
+    context.type !== 'success' ||
+    !request ||
+    request.pricing !== context.pricing ||
+    request.price !== price ||
+    request.changeVersion !== context.changeVersion ||
+    !requestState ||
+    requestState.request !== request
+  ) {
+    return LOADING_RESULT;
+  }
 
-    return requestState.result;
-  }, [context, price, requestState]);
+  return requestState.result;
 };
