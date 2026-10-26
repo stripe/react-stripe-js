@@ -1,5 +1,12 @@
-export const registerWithStripeJs = (stripe: any) => {
-  if (!stripe || !stripe._registerWrapper || !stripe.registerAppInfo) {
+import * as stripeJs from '@stripe/stripe-js';
+
+export const registerWithStripeJs = (stripe: stripeJs.Stripe | null) => {
+  if (
+    !stripe ||
+    !('_registerWrapper' in stripe) ||
+    typeof stripe._registerWrapper !== 'function' ||
+    typeof stripe.registerAppInfo !== 'function'
+  ) {
     return;
   }
 
