@@ -196,6 +196,7 @@ export const mockPricing = () => {
       unitAmountDecimal: {amount: '10.00', minorUnitsAmount: 1000},
       minorUnitsAmountDivisor: 100,
     }),
+    createPricingToken: jest.fn().mockResolvedValue({id: 'prctok_test'}),
     emitChange: (event = {}) => {
       changeListeners.forEach((listener) => listener(event));
     },

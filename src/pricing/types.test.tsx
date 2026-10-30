@@ -4,9 +4,12 @@ import type {Stripe} from '@stripe/stripe-js';
 import {PricingProvider} from './PricingProvider';
 import {useResolvedPrice} from './useResolvedPrice';
 import {useCurrencySelection} from './useCurrencySelection';
+import {usePricingToken} from './usePricingToken';
 import type {
   CurrencySelection,
   CurrencySelectionResult,
+  PricingToken,
+  PricingTokenResult,
   ResolvedPrice,
   ResolvedPriceResult,
 } from './types';
@@ -66,8 +69,17 @@ const useAssertCurrencyTypes = () => {
   return [change, data];
 };
 
+const useAssertTokenTypes = () => {
+  const result: PricingTokenResult = usePricingToken();
+  const token: Promise<PricingToken> = result.createPricingToken();
+  // @ts-expect-error Token creation takes no arguments.
+  result.createPricingToken('price_123');
+  return token;
+};
+
 test('pricing contract type assertions compile', () => {
   expect(assertProviderTypes).toBeDefined();
   expect(useAssertPriceTypes).toBeDefined();
   expect(useAssertCurrencyTypes).toBeDefined();
+  expect(useAssertTokenTypes).toBeDefined();
 });

@@ -45,6 +45,14 @@ export type CurrencySelectionResult = PricingDataResult<CurrencySelection> & {
   setSelectedCurrency(currency: string): Promise<void>;
 };
 
+export interface PricingToken {
+  id: string;
+}
+
+export interface PricingTokenResult {
+  createPricingToken(): Promise<PricingToken>;
+}
+
 export type PricingChangeEvent = Record<string, never>;
 
 // Temporary bridge for the Pricing beta API until @stripe/stripe-js publishes
@@ -57,4 +65,5 @@ export interface Pricing {
   getSelectedCurrency(): Promise<Currency>;
   setSelectedCurrency(currency: string): Promise<void>;
   resolvePrice(price: string): Promise<ResolvedPrice>;
+  createPricingToken(): Promise<PricingToken>;
 }
