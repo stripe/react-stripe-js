@@ -185,6 +185,11 @@ export const mockPricing = () => {
         changeListeners.delete(listener);
       }
     }),
+    getAvailableCurrencies: jest
+      .fn()
+      .mockResolvedValue([{currency: 'usd'}, {currency: 'eur'}]),
+    getSelectedCurrency: jest.fn().mockResolvedValue({currency: 'usd'}),
+    setSelectedCurrency: jest.fn().mockResolvedValue(undefined),
     resolvePrice: jest.fn().mockResolvedValue({
       currency: 'usd',
       unitAmount: {amount: '10.00', minorUnitsAmount: 1000},

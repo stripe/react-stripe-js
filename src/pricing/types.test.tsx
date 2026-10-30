@@ -3,7 +3,13 @@ import type {Stripe} from '@stripe/stripe-js';
 
 import {PricingProvider} from './PricingProvider';
 import {useResolvedPrice} from './useResolvedPrice';
-import type {ResolvedPrice, ResolvedPriceResult} from './types';
+import {useCurrencySelection} from './useCurrencySelection';
+import type {
+  CurrencySelection,
+  CurrencySelectionResult,
+  ResolvedPrice,
+  ResolvedPriceResult,
+} from './types';
 
 const assertProviderTypes = (
   stripe: Stripe,
@@ -43,7 +49,25 @@ const useAssertPriceTypes = () => {
   return [data, invalid];
 };
 
-test('pricing provider and price type assertions compile', () => {
+const useAssertCurrencyTypes = () => {
+  const result: CurrencySelectionResult = useCurrencySelection();
+  const change: Promise<void> = result.setSelectedCurrency('eur');
+  // @ts-expect-error A currency must be a string.
+  result.setSelectedCurrency(123);
+  if (result.loading) {
+    const data: undefined = result.data;
+    return [change, data];
+  }
+  if (result.error) {
+    const error: Error = result.error;
+    return [change, error];
+  }
+  const data: CurrencySelection = result.data;
+  return [change, data];
+};
+
+test('pricing contract type assertions compile', () => {
   expect(assertProviderTypes).toBeDefined();
   expect(useAssertPriceTypes).toBeDefined();
+  expect(useAssertCurrencyTypes).toBeDefined();
 });

@@ -36,6 +36,15 @@ export type PricingDataResult<T> =
 
 export type ResolvedPriceResult = PricingDataResult<ResolvedPrice>;
 
+export interface CurrencySelection {
+  availableCurrencies: Currency[];
+  selectedCurrency: Currency;
+}
+
+export type CurrencySelectionResult = PricingDataResult<CurrencySelection> & {
+  setSelectedCurrency(currency: string): Promise<void>;
+};
+
 export type PricingChangeEvent = Record<string, never>;
 
 // Temporary bridge for the Pricing beta API until @stripe/stripe-js publishes
@@ -44,5 +53,8 @@ export type PricingChangeEvent = Record<string, never>;
 export interface Pricing {
   on(event: 'change', listener: (event: PricingChangeEvent) => void): void;
   off(event: 'change', listener: (event: PricingChangeEvent) => void): void;
+  getAvailableCurrencies(): Promise<Currency[]>;
+  getSelectedCurrency(): Promise<Currency>;
+  setSelectedCurrency(currency: string): Promise<void>;
   resolvePrice(price: string): Promise<ResolvedPrice>;
 }
