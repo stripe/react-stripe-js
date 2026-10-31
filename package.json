@@ -21,18 +21,27 @@
       "import": "./dist/checkout.esm.mjs",
       "default": "./dist/checkout.esm.mjs",
       "types": "./dist/checkout.d.ts"
+    },
+    "./pricing": {
+      "require": "./dist/pricing.js",
+      "import": "./dist/pricing.esm.mjs",
+      "default": "./dist/pricing.esm.mjs",
+      "types": "./dist/pricing.d.ts"
     }
   },
   "typesVersions": {
     "*": {
       "checkout": [
         "dist/checkout.d.ts"
+      ],
+      "pricing": [
+        "dist/pricing.d.ts"
       ]
     }
   },
   "scripts": {
     "test": "yarn run lint && yarn run lint:prettier && yarn run test:unit && yarn test:package-types && yarn run typecheck",
-    "test:package-types": "attw --pack .",
+    "test:package-types": "attw --pack . && node scripts/check-pricing-imports.js",
     "test:unit": "jest",
     "lint": "eslint --max-warnings=0 '{src,examples}/**/*.{ts,tsx,js}'",
     "lint:prettier": "prettier './**/*.js' './**/*.ts' './**/*.tsx' './**/*.css' './**/*.md' --list-different",
@@ -60,7 +69,9 @@
     "dist",
     "src",
     "checkout.js",
-    "checkout.d.ts"
+    "checkout.d.ts",
+    "pricing.js",
+    "pricing.d.ts"
   ],
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",

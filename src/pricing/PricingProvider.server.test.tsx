@@ -6,15 +6,27 @@ import React from 'react';
 import {renderToString} from 'react-dom/server';
 
 import * as mocks from '../../test/mocks';
-import {PricingProvider} from './PricingProvider';
+import {
+  PricingProvider,
+  useResolvedPrice,
+  useCurrencySelection,
+  usePricingToken,
+} from '.';
 import {usePricingContext} from './PricingContext';
-import {useResolvedPrice} from './useResolvedPrice';
 
 const Consumer = () => {
   const context = usePricingContext('test');
   const price = useResolvedPrice('price_123');
+  const currency = useCurrencySelection();
+  const token = usePricingToken();
+  expect(typeof currency.setSelectedCurrency).toBe('function');
+  expect(typeof token.createPricingToken).toBe('function');
   return (
-    <p>{context.type === 'loading' && price.loading ? 'Loading' : 'Ready'}</p>
+    <p>
+      {context.type === 'loading' && price.loading && currency.loading
+        ? 'Loading'
+        : 'Ready'}
+    </p>
   );
 };
 
@@ -23,6 +35,8 @@ describe('Pricing on the server', () => {
     'renders loading without SDK effects with %s',
     (kind) => {
       const stripe = mocks.mockStripe();
+      const pricing = mocks.mockPricing();
+      stripe.initializePricing.mockResolvedValue(pricing);
       const value = kind.endsWith('Stripe') ? stripe : null;
       const stripeProp = kind.startsWith('promised')
         ? Promise.resolve(value)
@@ -39,6 +53,12 @@ describe('Pricing on the server', () => {
       expect(stripe.initializePricing).not.toHaveBeenCalled();
       expect(stripe._registerWrapper).not.toHaveBeenCalled();
       expect(stripe.registerAppInfo).not.toHaveBeenCalled();
+      expect(pricing.on).not.toHaveBeenCalled();
+      expect(pricing.resolvePrice).not.toHaveBeenCalled();
+      expect(pricing.getAvailableCurrencies).not.toHaveBeenCalled();
+      expect(pricing.getSelectedCurrency).not.toHaveBeenCalled();
+      expect(pricing.setSelectedCurrency).not.toHaveBeenCalled();
+      expect(pricing.createPricingToken).not.toHaveBeenCalled();
     }
   );
 });

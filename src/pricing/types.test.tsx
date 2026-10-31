@@ -1,10 +1,12 @@
 import React from 'react';
 import type {Stripe} from '@stripe/stripe-js';
 
-import {PricingProvider} from './PricingProvider';
-import {useResolvedPrice} from './useResolvedPrice';
-import {useCurrencySelection} from './useCurrencySelection';
-import {usePricingToken} from './usePricingToken';
+import {
+  PricingProvider,
+  useResolvedPrice,
+  useCurrencySelection,
+  usePricingToken,
+} from '.';
 import type {
   CurrencySelection,
   CurrencySelectionResult,
@@ -12,7 +14,7 @@ import type {
   PricingTokenResult,
   ResolvedPrice,
   ResolvedPriceResult,
-} from './types';
+} from '.';
 
 const assertProviderTypes = (
   stripe: Stripe,

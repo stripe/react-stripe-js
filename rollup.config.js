@@ -6,11 +6,12 @@ import terser from '@rollup/plugin-terser';
 import ts from 'rollup-plugin-ts';
 import pkg from './package.json';
 
-const PLUGINS = [
+const getPlugins = () => [
   commonjs(),
   ts(),
   nodeResolve(),
   babel({
+    babelHelpers: 'bundled',
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
   }),
   replace({
@@ -28,7 +29,7 @@ export default [
       {file: pkg.main, format: 'cjs'},
       {file: pkg.module, format: 'es'},
     ],
-    plugins: PLUGINS,
+    plugins: getPlugins(),
   },
   // Checkout subpath build
   {
@@ -38,7 +39,17 @@ export default [
       {file: 'dist/checkout.js', format: 'cjs'},
       {file: 'dist/checkout.esm.mjs', format: 'es'},
     ],
-    plugins: PLUGINS,
+    plugins: getPlugins(),
+  },
+  // Pricing subpath build
+  {
+    input: 'src/pricing/index.ts',
+    external: ['react', 'prop-types'],
+    output: [
+      {file: 'dist/pricing.js', format: 'cjs'},
+      {file: 'dist/pricing.esm.mjs', format: 'es'},
+    ],
+    plugins: getPlugins(),
   },
   // UMD build with inline PropTypes
   {
@@ -54,7 +65,7 @@ export default [
         },
       },
     ],
-    plugins: PLUGINS,
+    plugins: getPlugins(),
   },
   // Minified UMD Build without PropTypes
   {
@@ -70,6 +81,6 @@ export default [
         },
       },
     ],
-    plugins: [...PLUGINS, terser()],
+    plugins: [...getPlugins(), terser()],
   },
 ];
