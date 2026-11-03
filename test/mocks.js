@@ -175,6 +175,7 @@ export const mockPricing = () => {
   const changeListeners = new Set();
 
   return {
+    resolvePrice: jest.fn(),
     on: jest.fn((event, listener) => {
       if (event === 'change') {
         changeListeners.add(listener);
