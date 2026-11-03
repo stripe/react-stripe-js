@@ -11,11 +11,16 @@ export type PricingDataResult<T> =
 
 type Request<T> = (pricing: stripeJs.Pricing) => Promise<T>;
 
+// There are a couple of hooks that need to automatically refresh data whenever the
+// pricing object emits a change event (e.g. useResolvedPrice, useCurrencySelection).
+// This hook manages that lifecyle, and ensures loading/error state reflects the
+// state of those data requests.
 export const useRequestOnChange = <T,>(
   hookName: string,
   request: Request<T>
 ): PricingDataResult<T> => {
   const context = usePricingContext(hookName);
+
   const [state, setState] = React.useState<{
     pricing: stripeJs.Pricing;
     changeVersion: number;
@@ -33,29 +38,26 @@ export const useRequestOnChange = <T,>(
       return undefined;
     }
 
-    // Ignore results after cleanup, including during StrictMode effect replay.
     let isActive = true;
+
     Promise.resolve()
       .then(() => request(pricing))
       .then(
         (data) => {
+          // Ignore results if the hook has since been unmounted
           if (isActive) {
-            setState({
-              pricing,
-              changeVersion,
-              request,
-              result: {loading: false, data},
-            });
+            const result: PricingDataResult<T> = {loading: false, data};
+            setState({pricing, changeVersion, request, result});
           }
         },
         (error) => {
           if (isActive) {
-            setState({
-              pricing,
-              changeVersion,
-              request,
-              result: {loading: false, error: normalizeError(error)},
-            });
+            // Ignore results if the hook has since been unmounted
+            const result: PricingDataResult<T> = {
+              loading: false,
+              error: normalizeError(error),
+            };
+            setState({pricing, changeVersion, request, result});
           }
         }
       );
@@ -72,12 +74,15 @@ export const useRequestOnChange = <T,>(
     };
   }
 
+  // If we still don't have a valid state for the current pricing and request, show loading
+  // Also show loading if the request function has changed (e.g. new price id specified in useResolvedPrice)
   if (!state || state.pricing !== pricing || state.request !== request) {
     return {loading: true};
   }
 
-  // Invalidation is visible in the first render, before the request effect
-  // runs. Keep data only for the same request and pricing instance.
+  // On the initial render, we want to show `loading: true` with no data. But
+  // once we have some data, we'll keep exposing it, even if stale, while the new
+  // data loads in.
   if (state.changeVersion !== changeVersion) {
     return state.result.data === undefined
       ? {loading: true}
