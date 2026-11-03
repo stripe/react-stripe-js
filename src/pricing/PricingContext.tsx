@@ -7,10 +7,17 @@ export type PricingState =
   | {type: 'success'; pricing: stripeJs.Pricing; changeVersion: number}
   | {type: 'error'; error: Error};
 
-export const PricingContext = React.createContext<PricingState | null>(null);
+export type PricingContextValue = {
+  state: PricingState;
+  pricingPromise: Promise<stripeJs.Pricing>;
+};
+
+export const PricingContext = React.createContext<PricingContextValue | null>(
+  null
+);
 PricingContext.displayName = 'PricingContext';
 
-export const usePricingContext = (hookName: string): PricingState => {
+export const usePricingContext = (hookName: string): PricingContextValue => {
   const context = React.useContext(PricingContext);
 
   if (!context) {

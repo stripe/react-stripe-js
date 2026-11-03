@@ -92,7 +92,7 @@ describe('PricingProvider', () => {
     const deferredStripe = makeDeferred<stripeJs.Stripe | null>();
     const deferredPricing = makeDeferred();
     mockStripe.initializePricing.mockReturnValue(deferredPricing.promise);
-    const {result} = renderHook(() => usePricingContext('usePricing'), {
+    const {result} = renderHook(() => usePricingContext('usePricing').state, {
       wrapper: ({children}) => (
         <PricingProvider
           stripe={deferredStripe.promise}
@@ -119,7 +119,7 @@ describe('PricingProvider', () => {
     const deferred = makeDeferred<stripeJs.Stripe | null>();
     let stripeProp: any = null;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={stripeProp} options={defaultOptions}>
@@ -141,7 +141,7 @@ describe('PricingProvider', () => {
 
   it('works when stripe is a promise resolving to null', async () => {
     const deferred = makeDeferred<stripeJs.Stripe | null>();
-    const {result} = renderHook(() => usePricingContext('usePricing'), {
+    const {result} = renderHook(() => usePricingContext('usePricing').state, {
       wrapper: ({children}) => (
         <PricingProvider stripe={deferred.promise} options={defaultOptions}>
           {children}
@@ -159,7 +159,7 @@ describe('PricingProvider', () => {
     consoleWarn.mockImplementation(() => {});
     let stripeProp: any = mockStripe;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={stripeProp} options={defaultOptions}>
@@ -187,7 +187,7 @@ describe('PricingProvider', () => {
     consoleWarn.mockImplementation(() => {});
     let optionsProp: stripeJs.InitializePricingOptions = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={mockStripe} options={optionsProp}>
@@ -213,7 +213,7 @@ describe('PricingProvider', () => {
     consoleWarn.mockImplementation(() => {});
     let optionsProp: stripeJs.InitializePricingOptions = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={mockStripe} options={optionsProp}>
@@ -240,7 +240,7 @@ describe('PricingProvider', () => {
     let stripeProp: any = null;
     let optionsProp: stripeJs.InitializePricingOptions = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={stripeProp} options={optionsProp}>
@@ -273,7 +273,7 @@ describe('PricingProvider', () => {
     const deferred = makeDeferred<stripeJs.Stripe | null>();
     let optionsProp: stripeJs.InitializePricingOptions = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={deferred.promise} options={optionsProp}>
@@ -303,7 +303,7 @@ describe('PricingProvider', () => {
     let stripeProp: any = null;
     let optionsProp = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={stripeProp} options={optionsProp}>
@@ -332,7 +332,7 @@ describe('PricingProvider', () => {
     mockStripe.initializePricing.mockReturnValue(deferred.promise);
     let optionsProp = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         reactStrictMode: true,
         wrapper: ({children}) => (
@@ -378,7 +378,7 @@ describe('PricingProvider', () => {
     mockStripe.initializePricing.mockReturnValue(deferred.promise);
     let optionsProp = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={mockStripe} options={optionsProp}>
@@ -398,7 +398,7 @@ describe('PricingProvider', () => {
   });
 
   describe('initialization errors in StrictMode', () => {
-    it('reports a rejected Stripe promise through context', async () => {
+    it('reports a rejected Stripe promise through state and readiness', async () => {
       const deferred = makeDeferred<stripeJs.Stripe | null>();
       const error = new Error('Failed to load Stripe.js');
       const {result} = renderHook(() => usePricingContext('usePricing'), {
@@ -410,14 +410,18 @@ describe('PricingProvider', () => {
         ),
       });
 
-      expect(result.current).toEqual({type: 'loading'});
+      expect(result.current.state).toEqual({type: 'loading'});
+      const rejected = expect(result.current.pricingPromise).rejects.toBe(
+        error
+      );
       await act(() => deferred.reject(error));
+      await rejected;
 
-      expect(result.current).toEqual({type: 'error', error});
+      expect(result.current.state).toEqual({type: 'error', error});
       expect(mockStripe.initializePricing).not.toHaveBeenCalled();
     });
 
-    it('reports an invalid resolved Stripe value through context', async () => {
+    it('reports an invalid resolved Stripe value through state and readiness', async () => {
       const deferred = makeDeferred<any>();
       const {result} = renderHook(() => usePricingContext('usePricing'), {
         reactStrictMode: true,
@@ -428,14 +432,18 @@ describe('PricingProvider', () => {
         ),
       });
 
+      const rejected = expect(result.current.pricingPromise).rejects.toThrow(
+        'Invalid prop `stripe` supplied to `PricingProvider`'
+      );
       await act(() => deferred.resolve({foo: 'bar'}));
+      await rejected;
 
-      expect(result.current).toEqual({
+      expect(result.current.state).toEqual({
         type: 'error',
         error: expect.any(Error),
       });
-      if (result.current.type === 'error') {
-        expect(result.current.error.message).toContain(
+      if (result.current.state.type === 'error') {
+        expect(result.current.state.error.message).toContain(
           'Invalid prop `stripe` supplied to `PricingProvider`'
         );
       }
@@ -443,7 +451,7 @@ describe('PricingProvider', () => {
     });
 
     describe('with a synchronous Stripe prop', () => {
-      it('reports a synchronous initialization exception through context', async () => {
+      it('reports a synchronous initialization exception through state and readiness', async () => {
         const error = new Error('initializePricing threw');
         mockStripe.initializePricing.mockImplementation(() => {
           throw error;
@@ -458,12 +466,13 @@ describe('PricingProvider', () => {
         });
 
         await waitFor(() =>
-          expect(result.current).toEqual({type: 'error', error})
+          expect(result.current.state).toEqual({type: 'error', error})
         );
+        await expect(result.current.pricingPromise).rejects.toBe(error);
         expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1);
       });
 
-      it('reports a rejected initialization promise through context', async () => {
+      it('reports a rejected initialization promise through state and readiness', async () => {
         const deferred = makeDeferred();
         const error = new Error('initializePricing rejected');
         mockStripe.initializePricing.mockReturnValue(deferred.promise);
@@ -479,15 +488,19 @@ describe('PricingProvider', () => {
         await waitFor(() =>
           expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1)
         );
-        expect(result.current).toEqual({type: 'loading'});
+        expect(result.current.state).toEqual({type: 'loading'});
+        const rejected = expect(result.current.pricingPromise).rejects.toBe(
+          error
+        );
         await act(() => deferred.reject(error));
+        await rejected;
 
-        expect(result.current).toEqual({type: 'error', error});
+        expect(result.current.state).toEqual({type: 'error', error});
       });
     });
 
     describe('with a promised Stripe prop', () => {
-      it('reports a synchronous initialization exception through context', async () => {
+      it('reports a synchronous initialization exception through state and readiness', async () => {
         const error = new Error('initializePricing threw');
         mockStripe.initializePricing.mockImplementation(() => {
           throw error;
@@ -505,12 +518,13 @@ describe('PricingProvider', () => {
         });
 
         await waitFor(() =>
-          expect(result.current).toEqual({type: 'error', error})
+          expect(result.current.state).toEqual({type: 'error', error})
         );
+        await expect(result.current.pricingPromise).rejects.toBe(error);
         expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1);
       });
 
-      it('reports a rejected initialization promise through context', async () => {
+      it('reports a rejected initialization promise through state and readiness', async () => {
         const deferred = makeDeferred();
         const error = new Error('initializePricing rejected');
         mockStripe.initializePricing.mockReturnValue(deferred.promise);
@@ -529,16 +543,20 @@ describe('PricingProvider', () => {
         await waitFor(() =>
           expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1)
         );
-        expect(result.current).toEqual({type: 'loading'});
+        expect(result.current.state).toEqual({type: 'loading'});
+        const rejected = expect(result.current.pricingPromise).rejects.toBe(
+          error
+        );
         await act(() => deferred.reject(error));
+        await rejected;
 
-        expect(result.current).toEqual({type: 'error', error});
+        expect(result.current.state).toEqual({type: 'error', error});
       });
     });
   });
 
   it('increments changeVersion for each pricing change', async () => {
-    const {result} = renderHook(() => usePricingContext('usePricing'), {
+    const {result} = renderHook(() => usePricingContext('usePricing').state, {
       wrapper: ({children}) => (
         <PricingProvider stripe={mockStripe} options={defaultOptions}>
           {children}
@@ -562,7 +580,7 @@ describe('PricingProvider', () => {
   it('keeps its change listener when options are replaced with equivalent values', async () => {
     let optionsProp: stripeJs.InitializePricingOptions = defaultOptions;
     const {result, rerender} = renderHook(
-      () => usePricingContext('usePricing'),
+      () => usePricingContext('usePricing').state,
       {
         wrapper: ({children}) => (
           <PricingProvider stripe={mockStripe} options={optionsProp}>
@@ -588,15 +606,22 @@ describe('PricingProvider', () => {
 
   it('does not initialize if the Stripe promise resolves after unmount', async () => {
     const deferred = makeDeferred<stripeJs.Stripe | null>();
-    const {unmount} = renderHook(() => usePricingContext('usePricing'), {
-      wrapper: ({children}) => (
-        <PricingProvider stripe={deferred.promise} options={defaultOptions}>
-          {children}
-        </PricingProvider>
-      ),
-    });
+    const {result, unmount} = renderHook(
+      () => usePricingContext('usePricing'),
+      {
+        wrapper: ({children}) => (
+          <PricingProvider stripe={deferred.promise} options={defaultOptions}>
+            {children}
+          </PricingProvider>
+        ),
+      }
+    );
 
+    const rejected = expect(result.current.pricingPromise).rejects.toThrow(
+      'PricingProvider unmounted before initialization completed.'
+    );
     unmount();
+    await rejected;
     await act(() => deferred.resolve(mockStripe));
 
     expect(mockStripe.initializePricing).not.toHaveBeenCalled();
@@ -605,18 +630,70 @@ describe('PricingProvider', () => {
   it('does not attach a change listener if initialization resolves after unmount', async () => {
     const deferred = makeDeferred();
     mockStripe.initializePricing.mockReturnValue(deferred.promise);
-    const {unmount} = renderHook(() => usePricingContext('usePricing'), {
-      wrapper: ({children}) => (
-        <PricingProvider stripe={mockStripe} options={defaultOptions}>
-          {children}
-        </PricingProvider>
-      ),
-    });
+    const {result, unmount} = renderHook(
+      () => usePricingContext('usePricing'),
+      {
+        wrapper: ({children}) => (
+          <PricingProvider stripe={mockStripe} options={defaultOptions}>
+            {children}
+          </PricingProvider>
+        ),
+      }
+    );
     expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1);
 
+    const rejected = expect(result.current.pricingPromise).rejects.toThrow(
+      'PricingProvider unmounted before initialization completed.'
+    );
     unmount();
+    await rejected;
     await act(() => deferred.resolve(mockPricing));
 
     expect(mockPricing._changeListeners.size).toBe(0);
+  });
+
+  describe('readiness promise', () => {
+    it('stays pending until Stripe and pricing are available and keeps the same promise across updates', async () => {
+      const stripe = makeDeferred<stripeJs.Stripe | null>();
+      const pricing = makeDeferred<stripeJs.Pricing>();
+      mockStripe.initializePricing.mockReturnValue(pricing.promise);
+      let stripeProp: any = null;
+      const {result, rerender, unmount} = renderHook(
+        () => usePricingContext('usePricing'),
+        {
+          reactStrictMode: true,
+          wrapper: ({children}) => (
+            <PricingProvider stripe={stripeProp} options={defaultOptions}>
+              {children}
+            </PricingProvider>
+          ),
+        }
+      );
+      const pricingPromise = result.current.pricingPromise;
+      const settled = jest.fn();
+      pricingPromise.then(settled);
+      await act(async () => {});
+      expect(settled).not.toHaveBeenCalled();
+
+      stripeProp = stripe.promise;
+      rerender();
+      await act(() => stripe.resolve(mockStripe));
+      expect(result.current.state).toEqual({type: 'loading'});
+      expect(result.current.pricingPromise).toBe(pricingPromise);
+      expect(settled).not.toHaveBeenCalled();
+
+      await act(() => pricing.resolve(mockPricing));
+      await expect(pricingPromise).resolves.toBe(mockPricing);
+      expectContextValueSuccess(result.current.state);
+      expect(mockStripe.initializePricing).toHaveBeenCalledTimes(1);
+
+      act(() => mockPricing._emitChange());
+      expect(result.current.pricingPromise).toBe(pricingPromise);
+      expect(result.current.state).toMatchObject({changeVersion: 1});
+
+      unmount();
+      await act(async () => {});
+      await expect(pricingPromise).resolves.toBe(mockPricing);
+    });
   });
 });
