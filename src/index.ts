@@ -32,7 +32,6 @@ export {useElements, Elements, ElementsConsumer} from './components/Elements';
 
 export {EmbeddedCheckout} from './components/EmbeddedCheckout';
 export {EmbeddedCheckoutProvider} from './components/EmbeddedCheckoutProvider';
-export {FinancialAccountDisclosure} from './components/FinancialAccountDisclosure';
 export {IssuingDisclosure} from './components/IssuingDisclosure';
 export {useStripe} from './components/useStripe';
 
