@@ -5,6 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {parseStripeProp} from '../utils/parseStripeProp';
+import {createDeferred} from '../utils/createDeferred';
 import {PricingContext, PricingState} from './PricingContext';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {usePrevious} from '../utils/usePrevious';
@@ -55,18 +56,9 @@ export const PricingProvider: FunctionComponent<
   // Expose a promise so context consumers can imperatively await the pricing
   // object before initialization is complete/rejected.
   const [pricingReadiness] = React.useState(() => {
-    let resolve!: (pricing: stripeJs.Pricing) => void;
-    let reject!: (error: Error) => void;
-
-    const promise = new Promise<stripeJs.Pricing>((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-
-    // Observe failures even if no action has awaited readiness yet. Callers
-    // still receive the rejection when they await the original promise.
-    promise.catch(() => {});
-    return {promise, resolve, reject};
+    const deferred = createDeferred<stripeJs.Pricing>();
+    deferred.promise.catch(() => {});
+    return deferred;
   });
 
   // We want to lock the options once initialization starts, so they can't be
