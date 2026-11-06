@@ -11,6 +11,7 @@ import {useResolvedPrice} from './useResolvedPrice';
 describe('useResolvedPrice', () => {
   let mockPricing: any;
   let pricingState: PricingState;
+  let pricingPromise: Promise<stripeJs.Pricing>;
 
   const price = 'price_123';
   const resolvedPrice: stripeJs.ResolvedPrice = {
@@ -27,7 +28,7 @@ describe('useResolvedPrice', () => {
   };
 
   const ContextWrapper = ({children}: React.PropsWithChildren) => (
-    <PricingContext.Provider value={pricingState}>
+    <PricingContext.Provider value={{state: pricingState, pricingPromise}}>
       {children}
     </PricingContext.Provider>
   );
@@ -36,6 +37,7 @@ describe('useResolvedPrice', () => {
     mockPricing = mocks.mockPricing();
     mockPricing.resolvePrice.mockResolvedValue(resolvedPrice);
     pricingState = {type: 'success', pricing: mockPricing, changeVersion: 0};
+    pricingPromise = Promise.resolve(mockPricing);
   });
 
   afterEach(() => {
@@ -52,6 +54,8 @@ describe('useResolvedPrice', () => {
 
   it('waits for pricing initialization and price resolution before returning data', async () => {
     pricingState = {type: 'loading'};
+    const initialized = makeDeferred<stripeJs.Pricing>();
+    pricingPromise = initialized.promise;
     const deferred = makeDeferred<stripeJs.ResolvedPrice>();
     mockPricing.resolvePrice.mockReturnValue(deferred.promise);
     const {result, rerender} = renderHook(() => useResolvedPrice(price), {
@@ -64,6 +68,7 @@ describe('useResolvedPrice', () => {
     pricingState = {type: 'success', pricing: mockPricing, changeVersion: 0};
     await act(async () => {
       rerender();
+      await initialized.resolve(mockPricing);
     });
     expect(mockPricing.resolvePrice).toHaveBeenCalledWith(price);
     expect(result.current).toEqual({loading: true});
@@ -75,6 +80,8 @@ describe('useResolvedPrice', () => {
   it('reports provider initialization errors', () => {
     const error = new Error('Failed to initialize pricing');
     pricingState = {type: 'error', error};
+    pricingPromise = Promise.reject(new Error(error.message));
+    pricingPromise.catch(() => {});
     const {result} = renderHook(() => useResolvedPrice(price), {
       wrapper: ContextWrapper,
     });

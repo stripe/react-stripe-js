@@ -13,7 +13,7 @@ describe('PricingProvider on the server', () => {
   it('remains loading and does not initialize pricing', () => {
     const mockStripe: any = mocks.mockStripe();
     const TestComponent = () => {
-      const state = usePricingContext('usePricing');
+      const state = usePricingContext('usePricing').state;
       expect(state).toEqual({type: 'loading'});
       return <div>{state.type}</div>;
     };

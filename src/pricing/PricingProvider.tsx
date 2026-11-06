@@ -5,6 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {parseStripeProp} from '../utils/parseStripeProp';
+import {createDeferred} from '../utils/createDeferred';
 import {PricingContext, PricingState} from './PricingContext';
 import {registerWithStripeJs} from '../utils/registerWithStripeJs';
 import {usePrevious} from '../utils/usePrevious';
@@ -52,6 +53,14 @@ export const PricingProvider: FunctionComponent<
   const [state, setState] = React.useState<PricingState>({type: 'loading'});
   const [stripe, setStripe] = React.useState<stripeJs.Stripe | null>(null);
 
+  // Expose a promise so context consumers can imperatively await the pricing
+  // object before initialization is complete/rejected.
+  const [pricingReadiness] = React.useState(() => {
+    const deferred = createDeferred<stripeJs.Pricing>();
+    deferred.promise.catch(() => {});
+    return deferred;
+  });
+
   // We want to lock the options once initialization starts, so they can't be
   // changed. This acts as a signal as to whether initialization has been started.
   const initializedOptionsRef =
@@ -64,8 +73,19 @@ export const PricingProvider: FunctionComponent<
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
+      // Let StrictMode set up effects again before treating cleanup as an
+      // actual provider unmount. Settled promises are unaffected by rejection.
+      Promise.resolve().then(() => {
+        if (!isMountedRef.current) {
+          pricingReadiness.reject(
+            new Error(
+              'PricingProvider unmounted before initialization completed.'
+            )
+          );
+        }
+      });
     };
-  }, []);
+  }, [pricingReadiness]);
 
   // Initialize the Pricing SDK once when the stripe prop becomes valid for the first time
   React.useEffect(() => {
@@ -78,6 +98,7 @@ export const PricingProvider: FunctionComponent<
     const handleError = (reason: unknown) => {
       if (isMountedRef.current) {
         const error = normalizeError(reason);
+        pricingReadiness.reject(error);
         setState({type: 'error', error});
       }
     };
@@ -92,6 +113,7 @@ export const PricingProvider: FunctionComponent<
             // Initialization may outlive this effect when options change or
             // StrictMode replays effects. Only an actual unmount discards it.
             if (isMountedRef.current) {
+              pricingReadiness.resolve(pricing);
               setState({type: 'success', pricing, changeVersion: 0});
             }
           })
@@ -128,7 +150,7 @@ export const PricingProvider: FunctionComponent<
     return () => {
       isCurrent = false;
     };
-  }, [parsed, options]);
+  }, [parsed, options, pricingReadiness]);
 
   // When the pricing instance is available, listen to changes so
   // that consumers of the PricingContext can react to updates
@@ -191,8 +213,15 @@ export const PricingProvider: FunctionComponent<
     registerWithStripeJs(stripe);
   }, [stripe]);
 
+  const context = React.useMemo(
+    () => ({state, pricingPromise: pricingReadiness.promise}),
+    [state, pricingReadiness]
+  );
+
   return (
-    <PricingContext.Provider value={state}>{children}</PricingContext.Provider>
+    <PricingContext.Provider value={context}>
+      {children}
+    </PricingContext.Provider>
   );
 }) as FunctionComponent<PropsWithChildren<PricingProviderProps>>;
 

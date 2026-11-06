@@ -19,8 +19,7 @@ export const useRequestOnChange = <T,>(
   hookName: string,
   request: Request<T>
 ): PricingDataResult<T> => {
-  const context = usePricingContext(hookName);
-
+  const {state: context} = usePricingContext(hookName);
   const [state, setState] = React.useState<{
     pricing: stripeJs.Pricing;
     changeVersion: number;
