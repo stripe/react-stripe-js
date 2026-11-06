@@ -95,7 +95,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@storybook/react": "^10.2.3",
     "@storybook/react-webpack5": "^10.2.3",
-    "@stripe/stripe-js": "^10.0.0",
+    "@stripe/stripe-js": "^10.2.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^16.1.0",
