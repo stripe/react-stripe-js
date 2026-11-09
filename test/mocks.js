@@ -176,6 +176,10 @@ export const mockPricing = () => {
 
   return {
     resolvePrice: jest.fn(),
+    getAvailableCurrencies: jest.fn(),
+    getSelectedCurrency: jest.fn(),
+    setSelectedCurrency: jest.fn(),
+    createPricingToken: jest.fn(),
     on: jest.fn((event, listener) => {
       if (event === 'change') {
         changeListeners.add(listener);
