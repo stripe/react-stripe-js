@@ -2282,10 +2282,10 @@
     react-docgen "^8.0.2"
     react-docgen-typescript "^2.2.2"
 
-"@stripe/stripe-js@^10.2.1":
-  version "10.2.1"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-10.2.1.tgz#1d626806d04d1db50cbd216c2f733c873279f572"
-  integrity sha512-diHeR1/FeWZZzuFXEvkjRMzydgKEpxUTrKEUxSV8NcpeZY3Kl8C4Gerw/JSMK+3oXsBRJtgkG7ckviQJ651moA==
+"@stripe/stripe-js@^10.3.0":
+  version "10.3.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-10.3.0.tgz#36b99e0765b12ab54837c940a6a9a9702b1384ab"
+  integrity sha512-/C+qwO7bkDIYbIHypxppg8qGnWXdqQEOM855lJ8wTkd2VPoRAYLTGDOFTpJ8B7kso3o9cjMy2r1KPw8WQregNA==
 
 "@testing-library/dom@^10.4.0", "@testing-library/dom@^10.4.1":
   version "10.4.1"

@@ -439,6 +439,14 @@ export interface PaymentElementProps extends ElementProps {
   onAvailablePaymentMethodsChange?: (
     event: stripeJs.StripePaymentElementAvailablePaymentMethodsChangeEvent
   ) => any;
+
+  /**
+   * Requires beta access:
+   * Contact [Stripe support](https://support.stripe.com/) for more information.
+   *
+   * Triggered when the state of a field in the Payment Element changes.
+   */
+  onFieldChange?: (event: stripeJs.StripePaymentElementFieldChangeEvent) => any;
 }
 
 export type PaymentElementComponent = FunctionComponent<PaymentElementProps>;
