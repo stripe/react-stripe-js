@@ -4,6 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 RELEASE_TYPE=${1:-}
+NPM_REGISTRY="https://registry.npmjs.org/"
 IS_RELEASE_CANDIDATE=$(node scripts/is_release_candidate.js)
 
 echo_help() {
@@ -21,14 +22,14 @@ verify_prerequisites() {
   echo "Verifying prerequisites..."
   
   # Check npm login status
-  if ! npm whoami &> /dev/null; then
+  if ! npm whoami --registry "$NPM_REGISTRY" &> /dev/null; then
     echo "Error! You are not logged in to npm."
     echo "Please run 'npm login' and try again."
     exit 1
   fi
   
   # Check yarn login status
-  if ! yarn login --silent &> /dev/null; then
+  if ! yarn login --silent --registry "$NPM_REGISTRY" &> /dev/null; then
     echo "Error! You are not logged in to yarn."
     echo "Please run 'yarn login' and try again."
     exit 1
@@ -275,9 +276,9 @@ fi
 
 echo "Publishing release"
 if [ "$IS_RELEASE_CANDIDATE" -eq 1 ]; then
-  yarn --ignore-scripts publish --tag=rc --non-interactive --access=public
+  yarn --ignore-scripts publish --registry "$NPM_REGISTRY" --tag=rc --non-interactive --access=public
 else
-  yarn --ignore-scripts publish --non-interactive --access=public
+  yarn --ignore-scripts publish --registry "$NPM_REGISTRY" --non-interactive --access=public
 fi
 
 echo "Publish successful!"
