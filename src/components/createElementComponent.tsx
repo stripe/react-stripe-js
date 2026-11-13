@@ -36,6 +36,7 @@ interface PrivateElementProps {
   onSavedPaymentMethodRemove?: UnknownCallback;
   onSavedPaymentMethodUpdate?: UnknownCallback;
   onAvailablePaymentMethodsChange?: UnknownCallback;
+  onFieldChange?: UnknownCallback;
   options?: UnknownOptions;
 }
 
@@ -68,6 +69,7 @@ const createElementComponent = (
     onSavedPaymentMethodRemove,
     onSavedPaymentMethodUpdate,
     onAvailablePaymentMethodsChange,
+    onFieldChange,
   }) => {
     const ctx = useElementsOrCheckoutContextWithUseCase(
       `mounts <${displayName}>`
@@ -109,6 +111,7 @@ const createElementComponent = (
       'availablepaymentmethodschange',
       onAvailablePaymentMethodsChange
     );
+    useAttachEvent(element, 'fieldchange', onFieldChange);
     useAttachEvent(element, 'change', onChange);
 
     let readyCallback: UnknownCallback | undefined;
@@ -271,6 +274,7 @@ const createElementComponent = (
     onSavedPaymentMethodRemove: PropTypes.func,
     onSavedPaymentMethodUpdate: PropTypes.func,
     onAvailablePaymentMethodsChange: PropTypes.func,
+    onFieldChange: PropTypes.func,
     options: PropTypes.object as any,
   };
 

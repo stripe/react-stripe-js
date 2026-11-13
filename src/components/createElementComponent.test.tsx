@@ -943,6 +943,26 @@ describe('createElementComponent', () => {
       expect(mockHandler).not.toHaveBeenCalled();
     });
 
+    it('propagates the Element`s fieldchange event to the current onFieldChange prop', () => {
+      const mockHandler = jest.fn();
+      const mockHandler2 = jest.fn();
+      const {rerender} = render(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onFieldChange={mockHandler} />
+        </Elements>
+      );
+      rerender(
+        <Elements stripe={mockStripe}>
+          <PaymentElement onFieldChange={mockHandler2} />
+        </Elements>
+      );
+
+      const fieldChangeEventMock = Symbol('fieldchange');
+      simulateEvent('fieldchange', fieldChangeEventMock);
+      expect(mockHandler2).toHaveBeenCalledWith(fieldChangeEventMock);
+      expect(mockHandler).not.toHaveBeenCalled();
+    });
+
     it('propagates the Element`s availablepaymentmethodschange event to the current onAvailablePaymentMethodsChange prop for PaymentElement', () => {
       const mockHandler = jest.fn();
       const mockHandler2 = jest.fn();
